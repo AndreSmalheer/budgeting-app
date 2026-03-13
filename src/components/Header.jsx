@@ -1,10 +1,15 @@
+import "./Header.css"
 
-function Header(props) {
+function Header({ className}) {
     return(
         <>
-        <div id="header">
-            <h1>HEader</h1>
-        </div>
+            <div className={`Header ${className}`}>
+               <img className="icon" src="/favicon.svg"></img>
+
+               <h1>Naam App</h1>
+
+
+            </div>
         </>
     )
 

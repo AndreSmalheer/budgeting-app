@@ -1,0 +1,27 @@
+.Header{
+    background-color: #00FFAE;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding-left: 16px;
+    padding-top: 9px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+
+    &.Mobile{
+        border-radius: 27px;
+        width: 279px;
+        height: 44px;
+
+        & .icon{
+            width: 25px;
+            height: 25px;
+        }
+
+        & h1{
+            padding-left: 5px;
+            font-size: 11px;
+            cursor: default;
+        }
+    }
+}
