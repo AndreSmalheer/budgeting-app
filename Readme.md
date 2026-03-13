@@ -1,1 +1,1 @@
-Budgeting App
+Budgeting app
