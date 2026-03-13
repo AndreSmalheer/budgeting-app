@@ -1,0 +1,93 @@
+.Starter-inhoud {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 40px 20px;
+    background-color: #4a4a93;
+    min-height: 100vh;
+}
+
+.Starter-inhoud .img-container {
+    width: 70%;
+    max-width: 420px;
+    aspect-ratio: 16 / 9;
+    background-color: #1077bc;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Starter-inhoud .img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.Starter-inhoud .btn-group {
+    display: flex;
+    gap: 20px;
+}
+ /* knop*/
+.Starter-inhoud .btn {
+    background-color: #3a7bd5;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.Starter-inhoud .btn:hover {
+    background-color: #2f63b0;
+}
+
+/* Onderste container met tekst + afbeelding */
+.Starter-inhoud .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 32px;
+    background-color: #3a3aff;
+    border: 2px solid #cc44ff;
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.Starter-inhoud .container-tekst {
+    flex: 1;
+    color: white;
+}
+
+.Starter-inhoud .container-tekst h1 {
+    font-size: 28px;
+    margin: 0 0 10px 0;
+}
+
+.Starter-inhoud .container-tekst p {
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.Starter-inhoud .container-img {
+    width: 200px;
+    aspect-ratio: 4 / 3;
+    background-color: #d0d8e0;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.Starter-inhoud .container-img img {
+    width: 75%;
+    height: 50%;
+    object-fit: cover;
+}
