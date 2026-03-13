@@ -1,18 +1,25 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import Header from './components/Header/Header'
+import { BrowserRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
-function  App() {
-    return(
-        <>
-        <Header />
-        </>
-    )
+import './index.css'
+import LandingPage from './pages/LandingPage/LandingPage';
+import StarterInhoud from './pages/Starter-inhoud/Starter-inhoud';
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/starter-inhoud" element={<StarterInhoud />} />
+    </Routes>
+  );
 }
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </StrictMode>,
-)
+);
