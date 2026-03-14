@@ -63,7 +63,7 @@
         width: clamp(500px, 60%, 642px);
         height: clamp(60px, 6vw, 75px);
         border-radius: clamp(10px, 1.5vw, 14px);
-        margin-top: clamp(28px, 6vw, 43px);
+        margin-top: clamp(16px, 3vh, 20px);
 
         & .icon{
             width: clamp(45px, 6vw, 57px);
