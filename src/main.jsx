@@ -14,6 +14,7 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/home-page" element={<HomePage/>} />
       <Route path="/starter-inhoud" element={<StarterInhoud />} />
+
     </Routes>
   );
 }
