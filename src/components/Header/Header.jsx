@@ -5,7 +5,7 @@ function Header() {
   const [loggedIn, setLoggedIn] = useState(true);
   const [isPopUpActive, setPopUpActive] = useState(false);
   const [activeLi, setActiveLi] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 650);
 
   const togglePopUp = () => {
     setPopUpActive(prev => !prev);
@@ -17,7 +17,7 @@ function Header() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 650);
     };
 
     window.addEventListener("resize", handleResize);

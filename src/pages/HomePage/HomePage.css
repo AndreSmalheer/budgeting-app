@@ -3,12 +3,15 @@
 .Balance-container{
 
     &.Mobile{
-        padding-left: clamp(10px, 1.5vw, 15px);
-        padding-right: clamp(10px, 1.5vw, 15px);
+        /* padding-left: clamp(10px, 1.5vw, 15px); */
+        /* padding-right: clamp(10px, 1.5vw, 15px); */
         padding-top: clamp(20px, 3vw, 15px);
         display: flex;
-        justify-content: center;
-        gap: clamp(20px, 25vw, 200px);
+        justify-content: space-between;
+        /* justify-content: center; */
+        /* gap: clamp(20px, 25vw, 200px); */
+        padding-left: clamp(20px, 5vw, 75px);
+        padding-right: clamp(20px, 5vw, 75px);
 
         & h1{
             margin: 0;
@@ -73,3 +76,79 @@
         }
     }
 }
+
+.budget-container.Mobile{
+    display: flex;
+    flex-direction: column;
+}
+
+.budget-container.Mobile .budget-header {
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    padding-left: clamp(20px, 5vw, 75px);
+    padding-right: clamp(20px, 5vw, 75px);
+}
+
+
+.budget-container.Mobile .budget-items {
+    display: flex;
+    gap: clamp(10px, 4vw, 50px);
+    padding-left: clamp(25px, 6vw, 80px);
+    padding-right: clamp(25px, 6vw, 75px);
+}
+
+.budget-container.Mobile .budget-link{
+    font-weight: 400;
+}
+
+@media (max-width: 410px) {
+
+    .budget-container.Mobile .budget-header {
+        padding: 0;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+}
+
+/* .budget-container.Mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: min(90vw, 600px);
+    justify-self: center;
+}
+
+.budget-container.Mobile .budget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    padding-left: clamp(12px, 2vw, 17px);
+    padding-right: clamp(12px, 2vw, 17px);
+    width: 100%;
+    gap: clamp(10px, 4vw, 50px);
+}
+
+.budget-container.Mobile .budget-items {
+    display: flex;
+    gap: clamp(10px, 2vw, 18px);
+    padding-left: clamp(14px, 2vw, 20px);
+    padding-right: clamp(14px, 2vw, 20px);
+}
+
+@media (max-width: 410px) {
+
+    .budget-container.Mobile {
+        width: 100vw !important;
+    }
+
+    .budget-container.Mobile .budget-header{
+        gap: 0;
+        width: 94vw;
+    }
+} */
