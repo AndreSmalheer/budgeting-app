@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Potjes from "../../components/Potjes/Potjes";
 
 import Header from "../../components/Header/Header";
 import "./HomePage.css"
@@ -20,6 +21,7 @@ function HomePage() {
         <Header />
 
         {isMobile && (
+            <>
             <div className="Balance-container Mobile">
             <div>
                 <h1>Balance</h1>
@@ -39,6 +41,9 @@ function HomePage() {
 
             <div className="Grapgh"></div>
             </div>
+
+            <Potjes />
+            </>
         )}
 
 

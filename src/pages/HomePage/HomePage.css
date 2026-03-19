@@ -3,9 +3,9 @@
 .Balance-container{
 
     &.Mobile{
-        padding-left: clamp(10px, 3vw, 15px);
-        padding-right: clamp(10px, 3vw, 15px);
-        padding-top: clamp(10px, 3vw, 15px);
+        padding-left: clamp(10px, 1.5vw, 15px);
+        padding-right: clamp(10px, 1.5vw, 15px);
+        padding-top: clamp(20px, 3vw, 15px);
         display: flex;
         justify-content: center;
         gap: clamp(20px, 25vw, 200px);
@@ -16,7 +16,7 @@
             font-family: 'Poppins', sans-serif;
             color: white;
             font-weight: 500;
-            font-size: clamp(18px, 4vw, 24px);
+            font-size: clamp(24px, 8vw, 32px);
         }
 
         .Balance-items{
@@ -61,13 +61,14 @@
         .Balance-value{
             margin: 0;
             padding: 0;
-            font-size: clamp(16px, 4vw, 20px);
+            font-size: clamp(20px, 3vw, 24px);
             font-weight: 400;
         }
 
         .Grapgh{
-            width: clamp(120px, 30vw, 151px);
-            height: clamp(100px, 25vw, 133px);
+            margin-top: 2vh;
+            width: clamp(130px, 22vw, 151px);
+            height: clamp(120px, 20vw, 133px);
             background-color: gray;
         }
     }
