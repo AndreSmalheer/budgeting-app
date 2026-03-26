@@ -124,7 +124,7 @@ function RecentTransactions() {
     <div className="SpendingOverview">
       <div className="recent-transactions__header">
         <h2 className="recent-transactions__title">Recent</h2>
-        <span className="recent-transactions__see-all">See all</span>
+        <h2 className="recent-transactions__see-all">See All</h2>
       </div>
       <div className="recent-transactions">
         {TRANSACTIONS.map((t, i) => (
@@ -134,10 +134,15 @@ function RecentTransactions() {
             </div>
             <div className="transaction__info">
               <p className="transaction__name">{t.name}</p>
-              <p className="transaction__meta">{t.category} · {t.date}</p>
+              <p className="transaction__meta">
+                {t.category} · {t.date}
+              </p>
             </div>
-            <span className={`transaction__amount ${t.amount < 0 ? 'negative' : 'positive'}`}>
-              {t.amount < 0 ? '-' : '+'}€{Math.abs(t.amount).toLocaleString('nl-NL')}
+            <span
+              className={`transaction__amount ${t.amount < 0 ? "negative" : "positive"}`}
+            >
+              {t.amount < 0 ? "-" : "+"}€
+              {Math.abs(t.amount).toLocaleString("nl-NL")}
             </span>
           </div>
         ))}
