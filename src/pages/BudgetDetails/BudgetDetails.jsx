@@ -209,7 +209,7 @@ function BudgetDetails() {
         </div>
 
         {transactions.map((t, i) => (
-          <div key={i} className="transaction">
+          <div key={i} className="transaction-potje">
             <div className="transaction__icon">
               <GroceryIcon />
             </div>
