@@ -9,7 +9,7 @@
   background: #2F3349;
   display: flex;
   justify-content: center;
-  padding: 64px 20px 80px;
+  /* padding: 64px 20px 80px; */
 }
 
 .wrap {
@@ -17,6 +17,7 @@
   max-width: 400px;
   display: flex;
   flex-direction: column;
+  margin-top: 45px;
   gap: 36px;
 }
 

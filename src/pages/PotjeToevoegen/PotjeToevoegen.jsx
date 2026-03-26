@@ -21,9 +21,11 @@ export default function PotjeToevoegen() {
   };
 
   return (
+
     <div className="page">
+     <BackBtn style={{ position: "absolute", left: "20px", top: "5px" }} />
+
       <div className="wrap">
-        <BackBtn />
 
         <div className="header section s1">
           <p className="eyebrow">Nieuw spaarpotje</p>
