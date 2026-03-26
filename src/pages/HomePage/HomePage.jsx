@@ -1,27 +1,19 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import Potjes from "../../components/Potjes/Potjes";
 import Header from "../../components/Header/Header";
 import "./HomePage.css";
 import { Link } from "react-router-dom";
 
-const SPENDING_DATA = [
-  { name: "Home", value: 875 },
-  { name: "Food", value: 625 },
-  { name: "Transport", value: 375 },
-  { name: "Entertainment", value: 375 },
-  { name: "Other", value: 250 },
-];
-
 const COLORS = ["#534AB7", "#1D9E75", "#EF9F27", "#D4537E", "#888780"];
 
-function SpendingChart() {
+function SpendingChart({ data }) {
   return (
     <div className="SpendingChart">
       <div className="Graph">
         <PieChart width={145} height={128}>
           <Pie
-            data={SPENDING_DATA}
+            data={data}
             cx="50%"
             cy="50%"
             innerRadius={35}
@@ -30,8 +22,8 @@ function SpendingChart() {
             dataKey="value"
             strokeWidth={0}
           >
-            {SPENDING_DATA.map((_, i) => (
-              <Cell key={i} fill={COLORS[i]} />
+            {data.map((_, i) => (
+              <Cell key={i} fill={COLORS[i % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip
@@ -49,7 +41,7 @@ function SpendingChart() {
   );
 }
 
-function RecentTransactions({transacties, potjes}) {
+function RecentTransactions({ transacties, potjes }) {
   return (
     <div className="SpendingOverview">
       <div className="recent-transactions__header">
@@ -76,7 +68,7 @@ function RecentTransactions({transacties, potjes}) {
                 }`}
               >
                 {t.type === "expense" ? "-" : "+"}€
-                {t.amount.toLocaleString("nl-NL")}
+                {Math.abs(t.amount).toLocaleString("nl-NL")}
               </span>
             </div>
           ))}
@@ -85,7 +77,33 @@ function RecentTransactions({transacties, potjes}) {
   );
 }
 
-function HomePage({ potjes, transacties }) {
+function HomePage({ potjes = [], transacties = [] }) {
+  const { incomeTotal, expenseTotal, netBalance, spendingData } =
+    useMemo(() => {
+      const incomeTotal = potjes.reduce((sum, p) => sum + (p.budget || 0), 0);
+
+      const expenseTotal = transacties
+        .filter((t) => t.type === "expense")
+        .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+      const netBalance = incomeTotal - expenseTotal;
+
+      const spendingData = potjes
+        .map((p) => {
+          const spent = transacties
+            .filter((t) => t.potjeId === p.id && t.type === "expense")
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+          return {
+            name: p.name,
+            value: spent,
+          };
+        })
+        .filter((item) => item.value > 0);
+
+      return { incomeTotal, expenseTotal, netBalance, spendingData };
+    }, [potjes, transacties]);
+
   return (
     <>
       <Header />
@@ -96,15 +114,20 @@ function HomePage({ potjes, transacties }) {
           <div className="Balance-items">
             <div className="Balance-item positive">
               <span className="Balance-icon"></span>
-              <h2 className="Balance-value">200</h2>
+              <h2 className="Balance-value">
+                    € {incomeTotal.toLocaleString("nl-NL")}
+              </h2>
             </div>
             <div className="Balance-item negative">
               <span className="Balance-icon"></span>
-              <h2 className="Balance-value">300</h2>
+              <h2 className="Balance-value">
+                € {expenseTotal.toLocaleString("nl-NL")}
+              </h2>
             </div>
           </div>
         </div>
-        <SpendingChart />
+
+        <SpendingChart data={spendingData} />
       </div>
 
       <div className="budget-container Mobile">
@@ -116,7 +139,7 @@ function HomePage({ potjes, transacties }) {
           {potjes.map((p) => {
             const spent = transacties
               .filter((t) => t.potjeId === p.id && t.type === "expense")
-              .reduce((sum, t) => sum + t.amount, 0);
+              .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
             const progress = p.budget
               ? Math.min((spent / p.budget) * 100, 100)
@@ -160,7 +183,7 @@ function HomePage({ potjes, transacties }) {
         </div>
       </div>
 
-       <RecentTransactions transacties={transacties} potjes={potjes} />
+      <RecentTransactions transacties={transacties} potjes={potjes} />
     </>
   );
 }
