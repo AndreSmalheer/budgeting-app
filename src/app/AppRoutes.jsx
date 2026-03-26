@@ -7,10 +7,10 @@ import BudgetDetails from "../pages/BudgetDetails/BudgetDetails";
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/home-page" element={<HomePage />} />
-      <Route path="/starter-inhoud" element={<StarterInhoud />} />
-      <Route path="/budget-details" element={<BudgetDetails/>} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/home-page" element={<HomePage />} />
+        <Route path="/starter-inhoud" element={<StarterInhoud />} />
+        <Route path="/budget-details/:id" element={<BudgetDetails />} />
     </Routes>
   );
 }
