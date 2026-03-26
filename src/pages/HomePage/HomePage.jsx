@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import Potjes from "../../components/Potjes/Potjes";
 import Header from "../../components/Header/Header";
 import "./HomePage.css";
+import { Link } from "react-router-dom";
 
 const SPENDING_DATA = [
   { name: "Home", value: 875 },
@@ -190,6 +191,13 @@ function HomePage() {
             <div className="budget-items">
               <Potjes className="budget-item" id="1" progress={20} />
               <Potjes className="budget-item" id="2" progress={60} />
+
+              <Link to="/add" className="plus-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </Link>
             </div>
           </div>
 
