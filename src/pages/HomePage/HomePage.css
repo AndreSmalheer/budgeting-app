@@ -1,8 +1,6 @@
-#root{
-    overflow-x: hidden
+#root {
+    overflow-x: hidden;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 .Balance-container.Mobile {
     padding-top: clamp(20px, 3vw, 15px);
@@ -14,7 +12,6 @@
 
 .Balance-container.Mobile h1 {
     margin: 0;
-    font-family: 'Poppins', sans-serif;
     color: white;
     font-weight: 500;
     font-size: clamp(24px, 8vw, 32px);
@@ -69,14 +66,12 @@
 .recent-transactions__title {
     color: white;
     font-size: clamp(24px, 8vw, 32px);
-    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
 }
 
 .recent-transactions__see-all {
     color: white;
-    /* font-size: clamp(14px, 3vw, 18px); */
     cursor: pointer;
     flex-shrink: 0;
     margin-left: auto;
@@ -120,7 +115,7 @@
 }
 
 .transaction__amount.negative { color: #BF0104; }
-    .transaction__amount.positive { color: #00AB06; }
+.transaction__amount.positive { color: #00AB06; }
 
 .Graph {
     margin-top: 2vh;

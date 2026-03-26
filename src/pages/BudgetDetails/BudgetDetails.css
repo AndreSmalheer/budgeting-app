@@ -1,0 +1,239 @@
+.potje-container {
+    width: 100vw;
+    background-color: #2F3349;
+    border-radius: 0 0 28px 28px;
+    padding: 23px 24px 24px;
+    box-sizing: border-box;
+}
+
+.back-btn {
+    margin-bottom: 16px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.potje-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.potje-label {
+    color: #888;
+    font-size: 12px;
+    margin: 0 0 4px;
+}
+
+.potje-title {
+    color: white;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.potje-amounts {
+    text-align: right;
+}
+
+.potje-spent {
+    color: #ff6b6b;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.potje-remaining {
+    color: #4ade80;
+    font-size: 12px;
+    margin: 0;
+}
+
+.potje-progress-track {
+    background: #3a3f5c;
+    border-radius: 8px;
+    height: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.potje-progress-fill {
+    background: #00FFAE;
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.4s ease;
+}
+
+.potje-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.potje-stat {
+    background: #3a3f5c;
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.potje-stat-label {
+    color: #888;
+    font-size: 10px;
+    margin: 0 0 4px;
+}
+
+.potje-stat-value {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.potje-chart {
+    width: 100%;
+}
+
+.transaction-list {
+    padding: 20px 24px;
+}
+
+.transaction-list__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.transaction-list__title {
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.transaction-list__month {
+    color: #888;
+    font-size: 12px;
+}
+
+.transaction {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
+}
+
+.transaction:last-child {
+    border-bottom: none;
+}
+
+.transaction__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #E1F5EE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.transaction__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.transaction__name {
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.transaction__meta {
+    color: #888;
+    font-size: 11px;
+    margin: 2px 0 0;
+}
+
+.transaction__amount {
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.transaction__amount.negative { color: #ff6b6b; }
+.transaction__amount.positive { color: #4ade80; }
+
+@media (max-width: 650px) {
+    .potje-container {
+        padding: 16px 14px 20px;
+        border-radius: 0 0 22px 22px;
+    }
+
+    .potje-title {
+        font-size: 18px;
+    }
+
+    .potje-spent {
+        font-size: 16px;
+    }
+
+    .potje-stats {
+        gap: 6px;
+    }
+
+    .potje-stat {
+        padding: 8px 10px;
+    }
+
+    .transaction-list {
+        padding: 16px 14px;
+    }
+
+    .transaction {
+        gap: 10px;
+        padding: 9px 0;
+    }
+
+    .transaction__icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .transaction__name {
+        font-size: 12px;
+    }
+
+    .transaction__amount {
+        font-size: 12px;
+    }
+}
+
+.afnemen-container {
+    display: flex;
+    gap: 10px;
+    margin: 12px 0 18px;
+}
+
+.afnemen-input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: #3a3f5c;
+    color: white;
+}
+
+.afnemen-button {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #00FFAE;
+    color: #085041;
+    font-weight: 600;
+}
