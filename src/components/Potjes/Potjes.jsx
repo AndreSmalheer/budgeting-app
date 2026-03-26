@@ -1,8 +1,10 @@
 import "./Potjes.css";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Potjes({ progress }) {
+function Potjes({ progress, id }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -13,8 +15,12 @@ function Potjes({ progress }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  function handleCLick() {
+    navigate(`/budget-details/${id}`);
+  }
+
     return (
-        <div className={`Potje ${isMobile ? "Mobile" : "Desktop"}`}>
+        <div className={`Potje ${isMobile ? "Mobile" : "Desktop"}`} id={id} onClick={handleCLick}>
             <div className="Potje-progress-circle" style={{ "--progress": `${progress}%` }}>
                 <div className="Potje-image-wrapper">
                     <img className="Potje-image" src="/spaarvarken.png" />

@@ -188,8 +188,8 @@ function HomePage() {
               {/* <h2 className="budget-link">See all</h2> */}
             </div>
             <div className="budget-items">
-              <Potjes className="budget-item" progress={20} />
-              <Potjes className="budget-item" progress={60} />
+              <Potjes className="budget-item" id="1" progress={20} />
+              <Potjes className="budget-item" id="2" progress={60} />
             </div>
           </div>
 
