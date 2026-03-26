@@ -15,8 +15,8 @@
 }
 
 .Potje-image-wrapper {
-    width: 55px;
-    height: 55px;
+    width: fit-content;
+    height: fit-content;
     flex-shrink: 0;
 }
 
@@ -59,4 +59,22 @@
 .Potje-subtitle {
     font-size: 12px;
     color: #EEEEEE;
+}
+
+
+.Potje-image {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.05);
+}
+
+.Potje-image svg {
+  width: 26px;
+  height: 26px;
+  stroke: white;
+  stroke-width: 2;
 }

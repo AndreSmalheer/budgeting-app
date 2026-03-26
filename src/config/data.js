@@ -42,18 +42,18 @@ export const potjes = [
     id: "p1",
     name: "Boodschappen",
     budget: 300,
-    color: "#FFB020"
+    icon: "shopping-cart",
   },
   {
     id: "p2",
     name: "Transport",
     budget: 100,
-    color: "#4C6FFF"
+    icon: "car",
   },
   {
     id: "p3",
     name: "Abonnementen",
     budget: 50,
-    color: "#22C55E"
+    icon: "credit-card",
   }
 ];

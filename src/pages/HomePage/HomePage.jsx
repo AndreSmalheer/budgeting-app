@@ -130,6 +130,7 @@ function HomePage({ potjes, transacties }) {
                 budget={p.budget}
                 spent={spent}
                 progress={progress}
+                icon={p.icon}
               />
             );
           })}
