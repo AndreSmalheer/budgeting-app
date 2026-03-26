@@ -1,83 +1,144 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-.Balance-container{
-
-    &.Mobile{
-        /* padding-left: clamp(10px, 1.5vw, 15px); */
-        /* padding-right: clamp(10px, 1.5vw, 15px); */
-        padding-top: clamp(20px, 3vw, 15px);
-        display: flex;
-        justify-content: space-between;
-        /* justify-content: center; */
-        /* gap: clamp(20px, 25vw, 200px); */
-        padding-left: clamp(20px, 5vw, 75px);
-        padding-right: clamp(20px, 5vw, 75px);
-
-        & h1{
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            color: white;
-            font-weight: 500;
-            font-size: clamp(24px, 8vw, 32px);
-        }
-
-        .Balance-items{
-            padding-top: clamp(4px, 1vw, 6px);
-            padding-left: clamp(10px, 2vw, 14px);
-            display: grid;
-            gap: clamp(4px, 1vw, 6px);
-        }
-
-        .Balance-item{
-            display: flex;
-            align-items: center;
-            gap: clamp(6px, 1.5vw, 8px);
-
-            &.positive{
-                & h2{
-                    color: #00AB06;
-                }
-            }
-
-            &.negetive{
-                & h2{
-                    color: #BF0104;
-                }
-
-                & .Balance-icon{
-                    transform: rotate(180deg);
-                }
-            }
-        }
-
-        .Balance-icon {
-            width: clamp(12px, 2vw, 14px);
-            height: clamp(14px, 2.5vw, 16px);
-            display: inline-block;
-
-            background-image: url('/arrow.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-        }
-
-        .Balance-value{
-            margin: 0;
-            padding: 0;
-            font-size: clamp(20px, 3vw, 24px);
-            font-weight: 400;
-        }
-
-        .Grapgh{
-            margin-top: 2vh;
-            width: clamp(130px, 22vw, 151px);
-            height: clamp(120px, 20vw, 133px);
-            background-color: gray;
-        }
-    }
+#root{
+    overflow-x: hidden
 }
 
-.budget-container.Mobile{
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.Balance-container.Mobile {
+    padding-top: clamp(20px, 3vw, 15px);
+    display: flex;
+    justify-content: space-between;
+    padding-left: clamp(20px, 5vw, 75px);
+    padding-right: clamp(20px, 5vw, 75px);
+}
+
+.Balance-container.Mobile h1 {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    font-weight: 500;
+    font-size: clamp(24px, 8vw, 32px);
+}
+
+.Balance-items {
+    padding-top: clamp(4px, 1vw, 6px);
+    padding-left: clamp(10px, 2vw, 14px);
+    display: grid;
+    gap: clamp(4px, 1vw, 6px);
+}
+
+.Balance-item {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 1.5vw, 8px);
+}
+
+.Balance-item.positive h2 { color: #00AB06; }
+.Balance-item.negative h2 { color: #BF0104; }
+.Balance-item.negative .Balance-icon { transform: rotate(180deg); }
+
+.Balance-icon {
+    width: clamp(12px, 2vw, 14px);
+    height: clamp(14px, 2.5vw, 16px);
+    display: inline-block;
+    background-image: url('/arrow.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.Balance-value {
+    margin: 0;
+    font-size: clamp(20px, 3vw, 24px);
+    font-weight: 400;
+}
+
+.SpendingOverview {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(20px, 5vw, 75px);
+    padding-top: 16px;
+    width: 100%;
+}
+
+.recent-transactions__header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.recent-transactions__title {
+    color: white;
+    font-size: clamp(24px, 8vw, 32px);
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.recent-transactions__see-all {
+    color: white;
+    font-size: clamp(14px, 3vw, 18px);
+    font-weight: 400;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    margin-right: 40px;
+}
+
+.transaction {
+    max-width: 90%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
+}
+
+.transaction__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.transaction__name {
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.transaction__meta {
+    color: #888;
+    font-size: 11px;
+}
+
+.transaction__amount {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.transaction__amount.negative { color: #ff6b6b; }
+.transaction__amount.positive { color: #4ade80; }
+
+.Graph {
+    margin-top: 2vh;
+    width: clamp(130px, 22vw, 151px);
+    height: clamp(120px, 20vw, 133px);
+    overflow: hidden;
+}
+
+.SpendingChart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -1vh;
+}
+
+.budget-container.Mobile {
     display: flex;
     flex-direction: column;
 }
@@ -89,66 +150,17 @@
     align-items: center;
     justify-content: space-between;
     color: white;
-    padding-left: clamp(20px, 5vw, 75px);
-    padding-right: clamp(20px, 5vw, 75px);
+    padding: 0 clamp(20px, 5vw, 75px);
 }
-
 
 .budget-container.Mobile .budget-items {
     display: flex;
     gap: clamp(10px, 4vw, 50px);
-    padding-left: clamp(25px, 6vw, 80px);
-    padding-right: clamp(25px, 6vw, 75px);
-}
-
-.budget-container.Mobile .budget-link{
-    font-weight: 400;
+    padding: 0 clamp(25px, 6vw, 80px);
 }
 
 @media (max-width: 410px) {
-
     .budget-container.Mobile .budget-header {
-        padding: 0;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding: 0 20px;
     }
-
 }
-
-/* .budget-container.Mobile {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    width: min(90vw, 600px);
-    justify-self: center;
-}
-
-.budget-container.Mobile .budget-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: white;
-    padding-left: clamp(12px, 2vw, 17px);
-    padding-right: clamp(12px, 2vw, 17px);
-    width: 100%;
-    gap: clamp(10px, 4vw, 50px);
-}
-
-.budget-container.Mobile .budget-items {
-    display: flex;
-    gap: clamp(10px, 2vw, 18px);
-    padding-left: clamp(14px, 2vw, 20px);
-    padding-right: clamp(14px, 2vw, 20px);
-}
-
-@media (max-width: 410px) {
-
-    .budget-container.Mobile {
-        width: 100vw !important;
-    }
-
-    .budget-container.Mobile .budget-header{
-        gap: 0;
-        width: 94vw;
-    }
-} */
