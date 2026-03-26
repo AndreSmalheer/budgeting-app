@@ -1,4 +1,5 @@
 import "./starter-inhoud.css"
+import Header from "../../components/Header/Header"
 
 function StarterInhoud() {
     function Ouder() {

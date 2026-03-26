@@ -240,3 +240,15 @@
     color: #085041;
     font-weight: 600;
 }
+
+@media (min-width: 650px) {
+    .potje-container{
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .transaction-list{
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+}

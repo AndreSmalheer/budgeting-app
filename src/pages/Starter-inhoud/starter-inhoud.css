@@ -90,3 +90,11 @@
     height: 50%;
     object-fit: cover;
 }
+
+
+@media (min-width: 650px) {
+    .Starter-inhoud{
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+}

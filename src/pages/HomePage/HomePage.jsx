@@ -153,59 +153,62 @@ function RecentTransactions() {
 }
 
 function HomePage() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 650);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 650);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   return (
     <>
       <Header />
-      {isMobile ? (
-        <>
-          <div className="Balance-container Mobile">
-            <div>
-              <h1>Balance</h1>
-              <div className="Balance-items">
-                <div className="Balance-item positive">
-                  <span className="Balance-icon"></span>
-                  <h2 className="Balance-value">200</h2>
-                </div>
-                <div className="Balance-item negative">
-                  <span className="Balance-icon"></span>
-                  <h2 className="Balance-value">300</h2>
-                </div>
-              </div>
-            </div>
-            <SpendingChart />
-          </div>
 
-          <div className="budget-container Mobile">
-            <div className="budget-header">
-              <h1 className="budget-title">Budget</h1>
-              {/* <h2 className="budget-link">See all</h2> */}
+      <div className="Balance-container Mobile">
+        <div>
+          <h1>Balance</h1>
+          <div className="Balance-items">
+            <div className="Balance-item positive">
+              <span className="Balance-icon"></span>
+              <h2 className="Balance-value">200</h2>
             </div>
-            <div className="budget-items">
-              <Potjes className="budget-item" id="1" progress={20} />
-              <Potjes className="budget-item" id="2" progress={60} />
-
-              <Link to="/potje-toevoegen" className="plus-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 5V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </Link>
+            <div className="Balance-item negative">
+              <span className="Balance-icon"></span>
+              <h2 className="Balance-value">300</h2>
             </div>
           </div>
+        </div>
+        <SpendingChart />
+      </div>
 
-        <RecentTransactions />
-        </>
-      ) : (
-        <h1>Desktop placeholder</h1>
-      )}
+      <div className="budget-container Mobile">
+        <div className="budget-header">
+          <h1 className="budget-title">Budget</h1>
+        </div>
+
+        <div className="budget-items">
+          <Potjes className="budget-item" id="1" progress={20} />
+          <Potjes className="budget-item" id="2" progress={60} />
+
+          <Link to="/potje-toevoegen" className="plus-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 5V19"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <path
+                d="M5 12H19"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </Link>
+        </div>
+      </div>
+
+      <RecentTransactions />
     </>
   );
 }
