@@ -21,47 +21,42 @@ function HomePage() {
         <Header />
 
         {isMobile && (
-            <>
+          <>
             <div className="Balance-container Mobile">
-            <div>
+              <div>
                 <h1>Balance</h1>
 
                 <div className="Balance-items">
-                <div className="Balance-item positive">
+                  <div className="Balance-item positive">
                     <span className="Balance-icon"></span>
                     <h2 className="Balance-value">200</h2>
-                </div>
+                  </div>
 
-                <div className="Balance-item negetive">
+                  <div className="Balance-item negetive">
                     <span className="Balance-icon"></span>
                     <h2 className="Balance-value">300</h2>
+                  </div>
                 </div>
-                </div>
+              </div>
+
+              <div className="Grapgh"></div>
             </div>
 
-            <div className="Grapgh"></div>
+            <div className="budget-container Mobile">
+              <div className="budget-header">
+                <h1 className="budget-title">Budget</h1>
+                <h2 className="budget-link">See all</h2>
+              </div>
+
+              <div className="budget-items">
+                <Potjes className="budget-item" progress={20} />
+                <Potjes className="budget-item" progress={60} />
+              </div>
             </div>
-
-            <div class="budget-container Mobile">
-                <div class="budget-header">
-                    <h1 class="budget-title">Budget</h1>
-                    <h2 class="budget-link">See all</h2>
-                </div>
-
-                <div class="budget-items">
-                    <Potjes class="budget-item" />
-                    <Potjes class="budget-item" />
-                </div>
-            </div>
-
-            </>
+          </>
         )}
 
-
-        {!isMobile &&(
-            <h1>Desktop placeholder</h1>
-        )}
-
+        {!isMobile && <h1>Desktop placeholder</h1>}
       </>
     );
 }

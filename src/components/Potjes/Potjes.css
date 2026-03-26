@@ -14,13 +14,16 @@
 }
 
 .Potje-progress-circle{
+    --progress: 0%;
     background-color: #454D76;
     border-radius: 50%;
     padding: 5px;
-    /* background-image: conic-gradient(
-        #079166 0% 20%,
-        transparent 20% 100%
-    ); */
+    background:
+        conic-gradient(
+            #079166 var(--progress),
+            transparent var(--progress)
+    ),
+    #454D76;
 }
 
 .Potje-image-wrapper img{

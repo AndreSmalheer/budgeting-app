@@ -1,7 +1,7 @@
 import "./Potjes.css";
 import { useState, useEffect } from "react";
 
-function Potjes() {
+function Potjes({ progress }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
@@ -15,7 +15,7 @@ function Potjes() {
 
     return (
         <div className={`Potje ${isMobile ? "Mobile" : "Desktop"}`}>
-            <div className="Potje-progress-circle">
+            <div className="Potje-progress-circle" style={{ "--progress": `${progress}%` }}>
                 <div className="Potje-image-wrapper">
                     <img className="Potje-image" src="/spaarvarken.png" />
                 </div>
