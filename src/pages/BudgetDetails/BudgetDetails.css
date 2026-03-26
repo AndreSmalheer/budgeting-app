@@ -1,9 +1,10 @@
 .potje-container {
-    width: 100vw;
+    width: 90vw;
     background-color: #2F3349;
     border-radius: 0 0 28px 28px;
     padding: 23px 24px 24px;
     box-sizing: border-box;
+    margin: clamp(20px, 5vw, 75px);
 }
 
 .back-btn {
@@ -96,6 +97,7 @@
 
 .transaction-list {
     padding: 20px 24px;
+    margin: clamp(20px, 5vw, 75px);
 }
 
 .transaction-list__header {
