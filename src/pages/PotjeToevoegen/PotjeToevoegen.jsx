@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useDeferredValue, memo, useCallback } from "react";
 import * as Icons from "lucide-react";
 import "./PotjeToevoegen.css";
 import BackBtn from "../../components/BackBtn/BackBtn";
@@ -9,6 +9,19 @@ const iconEntries = Object.entries(Icons).filter(([name]) => {
     name !== "DynamicIcon" &&
     name !== "createLucideIcon" &&
     /^[A-Z]/.test(name)
+  );
+});
+
+const IconOption = memo(function IconOption({ name, Icon, active, onSelect }) {
+  return (
+    <button
+      type="button"
+      className={`iconOption ${active ? "active" : ""}`}
+      onClick={() => onSelect(name)}
+    >
+      <Icon size={22} />
+      <span>{name}</span>
+    </button>
   );
 });
 
@@ -23,9 +36,23 @@ export default function PotjeToevoegen({ setPotjes }) {
   const doelNum = parseFloat(doel.replace(",", ".")) || 0;
   const canSubmit = naam.trim().length > 0 && doelNum > 0;
 
-  const filteredIcons = iconEntries.filter(([name]) =>
-    name.toLowerCase().includes(search.toLowerCase())
-  );
+  const deferredSearch = useDeferredValue(search);
+
+  const filteredIcons = useMemo(() => {
+    const query = deferredSearch.trim().toLowerCase();
+
+    if (!query) {
+      return iconEntries;
+    }
+
+    return iconEntries.filter(([name]) =>
+      name.toLowerCase().includes(query)
+    );
+  }, [deferredSearch]);
+
+  const handleSelectIcon = useCallback((name) => {
+    setSelectedIcon(name);
+  }, []);
 
   const handleSubmit = () => {
     if (!canSubmit) return;
@@ -41,6 +68,7 @@ export default function PotjeToevoegen({ setPotjes }) {
 
     setNaam("");
     setDoel("");
+    setSearch("");
     setSelectedIcon("ShoppingCart");
 
     setSubmitted(true);
@@ -58,7 +86,6 @@ export default function PotjeToevoegen({ setPotjes }) {
         </div>
 
         <div className="fields section s2">
-          {/* NAME */}
           <div className="fieldWrap">
             <label className="label">Naam</label>
             <input
@@ -71,7 +98,6 @@ export default function PotjeToevoegen({ setPotjes }) {
             />
           </div>
 
-          {/* BUDGET */}
           <div className="fieldWrap">
             <label className="label">Budget</label>
             <div className="prefixWrap">
@@ -88,36 +114,33 @@ export default function PotjeToevoegen({ setPotjes }) {
             </div>
           </div>
 
-          {/* ICON PICKER */}
           <div className="fieldWrap">
             <label className="label">Icoon</label>
 
-            {/* SEARCH */}
             <input
               className="input"
               placeholder="Zoek icoon..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              autoComplete="off"
+              spellCheck="false"
               style={{ marginBottom: "10px" }}
             />
 
             <div className="iconPicker">
               {filteredIcons.map(([name, Icon]) => (
-                <button
+                <IconOption
                   key={name}
-                  type="button"
-                  className={`iconOption ${selectedIcon === name ? "active" : ""}`}
-                  onClick={() => setSelectedIcon(name)}
-                >
-                  <Icon size={22} />
-                  <span>{name}</span>
-                </button>
+                  name={name}
+                  Icon={Icon}
+                  active={selectedIcon === name}
+                  onSelect={handleSelectIcon}
+                />
               ))}
             </div>
           </div>
         </div>
 
-        {/* SUBMIT */}
         <div className="section s4">
           <button
             className="btn"
