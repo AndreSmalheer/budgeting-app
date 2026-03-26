@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./PotjeToevoegen.css";
 import BackBtn from "../../components/BackBtn/BackBtn";
 
-export default function PotjeToevoegen() {
+export default function PotjeToevoegen({ setPotjes }) {
   const [naam, setNaam] = useState("");
   const [doel, setDoel] = useState("");
   const [huidig, setHuidig] = useState("");
@@ -17,19 +17,27 @@ export default function PotjeToevoegen() {
   const handleSubmit = () => {
     if (!canSubmit) return;
     setSubmitted(true);
+
+    const newPotje = {
+      id: Date.now().toString(),
+      name: naam.trim(),
+      budget: Number(doel.replace(",", ".")),
+      color: "#FFB020",
+    };
+
+    setPotjes((prev) => [newPotje, ...prev]);
+
     setTimeout(() => setSubmitted(false), 2800);
   };
 
   return (
-
     <div className="page">
-     <BackBtn style={{ position: "absolute", left: "20px", top: "5px" }} />
+      <BackBtn style={{ position: "absolute", left: "20px", top: "5px" }} />
 
       <div className="wrap">
-
         <div className="header section s1">
-          <p className="eyebrow">Nieuw spaarpotje</p>
-          <h1 className="title">Wat spaar je voor?</h1>
+          <p className="eyebrow">Niew Budget</p>
+          <h1 className="title">Waar wil je je budget voor gebruiken?</h1>
         </div>
 
         <div className="fields section s2">
@@ -37,7 +45,7 @@ export default function PotjeToevoegen() {
             <label className="label">Naam</label>
             <input
               className={`input ${focused === "naam" ? "focus" : ""}`}
-              placeholder="bijv. Vakantie Italië"
+              placeholder="bijv. Boodschappen"
               value={naam}
               onChange={(e) => setNaam(e.target.value)}
               onFocus={() => setFocused("naam")}
@@ -46,7 +54,7 @@ export default function PotjeToevoegen() {
           </div>
 
           <div className="fieldWrap">
-            <label className="label">Doelbedrag</label>
+            <label className="label">Budget</label>
             <div className="prefixWrap">
               <span className="prefix">€</span>
               <input
@@ -60,26 +68,7 @@ export default function PotjeToevoegen() {
               />
             </div>
           </div>
-
-          <div className="fieldWrap">
-            <label className="label row">
-              <span>Al gespaard</span>
-              <span className="optional">optioneel</span>
-            </label>
-            <div className="prefixWrap">
-              <span className="prefix">€</span>
-              <input
-                className={`input withPrefix ${focused === "huidig" ? "focus" : ""}`}
-                placeholder="0"
-                inputMode="decimal"
-                value={huidig}
-                onChange={(e) => setHuidig(e.target.value)}
-                onFocus={() => setFocused("huidig")}
-                onBlur={() => setFocused(null)}
-              />
-            </div>
-          </div>
-        </div>
+       </div>
 
         <div
           className="progress section s3"

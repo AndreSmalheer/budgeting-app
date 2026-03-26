@@ -11,23 +11,24 @@ import {
 import Header from "../../components/Header/Header";
 import "./BudgetDetails.css";
 import BackBtn from "../../components/BackBtn/BackBtn";
-import { potjes, transacties } from "../../config/data";
 
 const GroceryIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="#085041" strokeWidth="2"/>
+    <path
+      d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
+      stroke="#085041"
+      strokeWidth="2"
+    />
   </svg>
 );
 
-function BudgetDetails() {
+function BudgetDetails({ potjes, transacties, setTransacties }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const potje = potjes.find((p) => p.id === id);
 
-  const potjeTransacties = transacties
-    .filter((t) => t.potjeId === id)
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+  const potjeTransacties = transacties.filter((t) => t.potjeId === id);
 
   const budget = potje?.budget || 0;
 
@@ -56,9 +57,8 @@ function BudgetDetails() {
       potjeId: id,
     };
 
-    setExtraTransactions([newTransaction, ...extraTransactions]);
-    setAfnemenAmount("");
-  };
+    setTransacties((prev) => [newTransaction, ...prev]);
+    };
 
   const WEEKLY_DATA = [
     { week: "W1", spent: spent / 4, budget: budget / 4 },
@@ -73,10 +73,11 @@ function BudgetDetails() {
 
   return (
     <>
-      <BackBtn style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }} />
+      <BackBtn
+        style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }}
+      />
 
       <div className="potje-container">
-
         <div className="potje-header">
           <div>
             <p className="potje-label">Budget pot</p>
@@ -86,9 +87,7 @@ function BudgetDetails() {
 
           <div className="potje-amounts">
             <p className="potje-label">Spent</p>
-            <p className="potje-spent">
-              € {spent.toLocaleString("nl-NL")}
-            </p>
+            <p className="potje-spent">€ {spent.toLocaleString("nl-NL")}</p>
             <p className="potje-remaining">
               € {remaining.toLocaleString("nl-NL")} left
             </p>
@@ -115,9 +114,7 @@ function BudgetDetails() {
 
           <div className="potje-stat">
             <p className="potje-stat-label">Avg/week</p>
-            <p className="potje-stat-value">
-              € {Math.round(spent / 4)}
-            </p>
+            <p className="potje-stat-value">€ {Math.round(spent / 4)}</p>
           </div>
         </div>
 
@@ -130,10 +127,7 @@ function BudgetDetails() {
             className="afnemen-input"
           />
 
-          <button
-            onClick={handleAfnemen}
-            className="afnemen-button"
-          >
+          <button onClick={handleAfnemen} className="afnemen-button">
             Afnemen
           </button>
         </div>
@@ -172,8 +166,7 @@ function BudgetDetails() {
                 t.type === "expense" ? "negative" : "positive"
               }`}
             >
-              {t.type === "expense" ? "-" : "+"}€
-              {t.amount}
+              {t.type === "expense" ? "-" : "+"}€{t.amount}
             </span>
           </div>
         ))}

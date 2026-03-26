@@ -4,7 +4,6 @@ import Potjes from "../../components/Potjes/Potjes";
 import Header from "../../components/Header/Header";
 import "./HomePage.css";
 import { Link } from "react-router-dom";
-import { potjes, transacties } from "../../config/data.js";
 
 const SPENDING_DATA = [
   { name: "Home", value: 875 },
@@ -15,155 +14,6 @@ const SPENDING_DATA = [
 ];
 
 const COLORS = ["#534AB7", "#1D9E75", "#EF9F27", "#D4537E", "#888780"];
-
-const TRANSACTIONS = [
-  {
-    name: "Rent",
-    category: "Home",
-    date: "Mar 24",
-    amount: -950,
-    iconBg: "#EEEDFE",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-          stroke="#3C3489"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9 22V12h6v10"
-          stroke="#3C3489"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: "Groceries",
-    category: "Food",
-    date: "Mar 23",
-    amount: -84,
-    iconBg: "#E1F5EE",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
-          stroke="#085041"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <line
-          x1="3"
-          y1="6"
-          x2="21"
-          y2="6"
-          stroke="#085041"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M16 10a4 4 0 01-8 0"
-          stroke="#085041"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: "NS Train",
-    category: "Transport",
-    date: "Mar 22",
-    amount: -14,
-    iconBg: "#FAEEDA",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <rect
-          x="1"
-          y="3"
-          width="15"
-          height="13"
-          rx="2"
-          stroke="#633806"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M16 8h4l3 3v5h-7V8z"
-          stroke="#633806"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx="5.5" cy="18.5" r="2.5" stroke="#633806" strokeWidth="2" />
-        <circle cx="18.5" cy="18.5" r="2.5" stroke="#633806" strokeWidth="2" />
-      </svg>
-    ),
-  },
-  {
-    name: "Netflix",
-    category: "Entertainment",
-    date: "Mar 21",
-    amount: -18,
-    iconBg: "#FBEAF0",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <polygon
-          points="23 7 16 12 23 17 23 7"
-          stroke="#72243E"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <rect
-          x="1"
-          y="5"
-          width="15"
-          height="14"
-          rx="2"
-          stroke="#72243E"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: "Salary",
-    category: "Income",
-    date: "Mar 20",
-    amount: 2400,
-    iconBg: "#E1F5EE",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <line
-          x1="12"
-          y1="1"
-          x2="12"
-          y2="23"
-          stroke="#085041"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"
-          stroke="#085041"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-];
 
 function SpendingChart() {
   return (
@@ -199,7 +49,7 @@ function SpendingChart() {
   );
 }
 
-function RecentTransactions() {
+function RecentTransactions({transacties, potjes}) {
   return (
     <div className="SpendingOverview">
       <div className="recent-transactions__header">
@@ -207,33 +57,35 @@ function RecentTransactions() {
       </div>
 
       <div className="recent-transactions">
-        {transacties.map((t) => (
-          <div key={t.id} className="transaction">
+        {[...transacties]
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5)
+          .map((t) => (
+            <div key={t.id} className="transaction">
+              <div className="transaction__info">
+                <p className="transaction__name">{t.description}</p>
+                <p className="transaction__meta">
+                  {potjes.find((p) => p.id === t.potjeId)?.name || "Geen potje"}{" "}
+                  · {t.date}
+                </p>
+              </div>
 
-            <div className="transaction__info">
-              <p className="transaction__name">{t.description}</p>
-              <p className="transaction__meta">
-                {t.category} · {t.date}
-              </p>
+              <span
+                className={`transaction__amount ${
+                  t.type === "expense" ? "negative" : "positive"
+                }`}
+              >
+                {t.type === "expense" ? "-" : "+"}€
+                {t.amount.toLocaleString("nl-NL")}
+              </span>
             </div>
-
-            <span
-              className={`transaction__amount ${
-                t.type === "expense" ? "negative" : "positive"
-              }`}
-            >
-              {t.type === "expense" ? "-" : "+"}€
-              {t.amount.toLocaleString("nl-NL")}
-            </span>
-
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );
 }
 
-function HomePage() {
+function HomePage({ potjes, transacties }) {
   return (
     <>
       <Header />
@@ -266,7 +118,9 @@ function HomePage() {
               .filter((t) => t.potjeId === p.id && t.type === "expense")
               .reduce((sum, t) => sum + t.amount, 0);
 
-            const progress = (spent / p.budget) * 100;
+            const progress = p.budget
+              ? Math.min((spent / p.budget) * 100, 100)
+              : 0;
 
             return (
               <Potjes
@@ -305,7 +159,7 @@ function HomePage() {
         </div>
       </div>
 
-      <RecentTransactions />
+       <RecentTransactions transacties={transacties} potjes={potjes} />
     </>
   );
 }
