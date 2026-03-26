@@ -124,7 +124,7 @@ function RecentTransactions() {
     <div className="SpendingOverview">
       <div className="recent-transactions__header">
         <h2 className="recent-transactions__title">Recent</h2>
-        <h2 className="recent-transactions__see-all">See All</h2>
+        {/* <h2 className="recent-transactions__see-all">See All</h2> */}
       </div>
       <div className="recent-transactions">
         {TRANSACTIONS.map((t, i) => (
@@ -185,7 +185,7 @@ function HomePage() {
           <div className="budget-container Mobile">
             <div className="budget-header">
               <h1 className="budget-title">Budget</h1>
-              <h2 className="budget-link">See all</h2>
+              {/* <h2 className="budget-link">See all</h2> */}
             </div>
             <div className="budget-items">
               <Potjes className="budget-item" progress={20} />
