@@ -79,7 +79,6 @@
 }
 
 .transaction {
-    max-width: 90%;
     display: flex;
     align-items: center;
     gap: 12px;
