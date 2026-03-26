@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import Header from "../../components/Header/Header";
 import "./BudgetDetails.css";
+import BackBtn from "../../components/BackBtn/BackBtn";
 
 const BUDGET = 500;
 
@@ -91,10 +92,9 @@ function BudgetDetails() {
 
   return (
     <>
+      <BackBtn style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }} />
+
       <div className="potje-container">
-        <div className="back-btn" onClick={() => navigate(-1)}>
-          <img src="/back-btn.svg" alt="Back" />
-        </div>
 
         <div className="potje-header">
           <div>

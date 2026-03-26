@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./PotjeToevoegen.css";
+import BackBtn from "../../components/BackBtn/BackBtn";
 
 export default function PotjeToevoegen() {
   const [naam, setNaam] = useState("");
@@ -22,6 +23,8 @@ export default function PotjeToevoegen() {
   return (
     <div className="page">
       <div className="wrap">
+        <BackBtn />
+
         <div className="header section s1">
           <p className="eyebrow">Nieuw spaarpotje</p>
           <h1 className="title">Wat spaar je voor?</h1>
@@ -74,24 +77,6 @@ export default function PotjeToevoegen() {
               />
             </div>
           </div>
-
-          <button className="backBtn" onClick={() => window.history.back()}>
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M15 18L9 12L15 6"
-                stroke="white"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
         </div>
 
         <div
