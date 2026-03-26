@@ -11,52 +11,11 @@ import {
 import Header from "../../components/Header/Header";
 import "./BudgetDetails.css";
 import BackBtn from "../../components/BackBtn/BackBtn";
-
-const BUDGET = 500;
-
-const INITIAL_TRANSACTIONS = [
-  { name: "Albert Heijn", date: "Mar 24", amount: -67 },
-  { name: "Jumbo", date: "Mar 20", amount: -54 },
-  { name: "Lidl", date: "Mar 17", amount: -43 },
-  { name: "Albert Heijn", date: "Mar 13", amount: -38 },
-  { name: "Marqt", date: "Mar 10", amount: -29 },
-  { name: "Jumbo", date: "Mar 6", amount: -51 },
-  { name: "Albert Heijn", date: "Mar 3", amount: -22 },
-  { name: "Lidl", date: "Mar 1", amount: -8 },
-];
-
-const WEEKLY_DATA = [
-  { week: "W1", spent: 81, budget: 125 },
-  { week: "W2", spent: 110, budget: 125 },
-  { week: "W3", spent: 77, budget: 125 },
-  { week: "W4", spent: 44, budget: 125 },
-];
+import { potjes, transacties } from "../../config/data";
 
 const GroceryIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
-      stroke="#085041"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <line
-      x1="3"
-      y1="6"
-      x2="21"
-      y2="6"
-      stroke="#085041"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <path
-      d="M16 10a4 4 0 01-8 0"
-      stroke="#085041"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="#085041" strokeWidth="2"/>
   </svg>
 );
 
@@ -64,31 +23,53 @@ function BudgetDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
+  const potje = potjes.find((p) => p.id === id);
+
+  const potjeTransacties = transacties
+    .filter((t) => t.potjeId === id)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const budget = potje?.budget || 0;
+
+  const [extraTransactions, setExtraTransactions] = useState([]);
   const [afnemenAmount, setAfnemenAmount] = useState("");
 
-  const spent = transactions.reduce(
-    (s, t) => s + Math.abs(t.amount),
-    0
-  );
+  const allTransactions = [...extraTransactions, ...potjeTransacties];
 
-  const remaining = BUDGET - spent;
-  const progress = Math.min((spent / BUDGET) * 100, 100);
+  const spent = allTransactions
+    .filter((t) => t.type === "expense" || t.amount < 0)
+    .reduce((s, t) => s + Math.abs(t.amount), 0);
+
+  const remaining = budget - spent;
+  const progress = budget ? Math.min((spent / budget) * 100, 100) : 0;
 
   const handleAfnemen = () => {
     const value = Number(afnemenAmount);
-
     if (!value || value <= 0) return;
 
     const newTransaction = {
-      name: "Afnemen",
-      date: "Now",
-      amount: -value,
+      id: Date.now().toString(),
+      description: "Afnemen",
+      date: new Date().toISOString().split("T")[0],
+      amount: value,
+      type: "expense",
+      potjeId: id,
     };
 
-    setTransactions([newTransaction, ...transactions]);
+    setExtraTransactions([newTransaction, ...extraTransactions]);
     setAfnemenAmount("");
   };
+
+  const WEEKLY_DATA = [
+    { week: "W1", spent: spent / 4, budget: budget / 4 },
+    { week: "W2", spent: spent / 4, budget: budget / 4 },
+    { week: "W3", spent: spent / 4, budget: budget / 4 },
+    { week: "W4", spent: spent / 4, budget: budget / 4 },
+  ];
+
+  if (!potje) {
+    return <p>Potje niet gevonden</p>;
+  }
 
   return (
     <>
@@ -99,8 +80,8 @@ function BudgetDetails() {
         <div className="potje-header">
           <div>
             <p className="potje-label">Budget pot</p>
-            <h2 className="potje-title">Groceries</h2>
-            <p className="potje-label">March 2025</p>
+            <h2 className="potje-title">{potje.name}</h2>
+            <p className="potje-label">This month</p>
           </div>
 
           <div className="potje-amounts">
@@ -124,12 +105,12 @@ function BudgetDetails() {
         <div className="potje-stats">
           <div className="potje-stat">
             <p className="potje-stat-label">Budget</p>
-            <p className="potje-stat-value">€ {BUDGET}</p>
+            <p className="potje-stat-value">€ {budget}</p>
           </div>
 
           <div className="potje-stat">
             <p className="potje-stat-label">Transactions</p>
-            <p className="potje-stat-value">{transactions.length}</p>
+            <p className="potje-stat-value">{allTransactions.length}</p>
           </div>
 
           <div className="potje-stat">
@@ -159,40 +140,12 @@ function BudgetDetails() {
 
         <div className="potje-chart">
           <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={WEEKLY_DATA} barCategoryGap="30%">
-              <XAxis
-                dataKey="week"
-                tick={{ fill: "#888", fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: "#888", fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => `€${v}`}
-              />
-              <Tooltip
-                formatter={(v) => `€${v}`}
-                contentStyle={{
-                  background: "#2F3349",
-                  border: "none",
-                  borderRadius: 8,
-                  fontSize: 12,
-                  color: "white",
-                }}
-                cursor={{ fill: "rgba(255,255,255,0.04)" }}
-              />
-              <Bar
-                dataKey="budget"
-                fill="#3a3f5c"
-                radius={[6, 6, 6, 6]}
-              />
-              <Bar
-                dataKey="spent"
-                fill="#00FFAE"
-                radius={[6, 6, 6, 6]}
-              />
+            <BarChart data={WEEKLY_DATA}>
+              <XAxis dataKey="week" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="budget" fill="#3a3f5c" />
+              <Bar dataKey="spent" fill="#00FFAE" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -200,32 +153,27 @@ function BudgetDetails() {
 
       <div className="transaction-list">
         <div className="transaction-list__header">
-          <h3 className="transaction-list__title">
-            Transactions
-          </h3>
-          <span className="transaction-list__month">
-            March 2025
-          </span>
+          <h3 className="transaction-list__title">Transactions</h3>
         </div>
 
-        {transactions.map((t, i) => (
-          <div key={i} className="transaction-potje">
+        {allTransactions.map((t) => (
+          <div key={t.id} className="transaction-potje">
             <div className="transaction__icon">
               <GroceryIcon />
             </div>
 
             <div className="transaction__info">
-              <p className="transaction__name">{t.name}</p>
+              <p className="transaction__name">{t.description}</p>
               <p className="transaction__meta">{t.date}</p>
             </div>
 
             <span
               className={`transaction__amount ${
-                t.amount < 0 ? "negative" : "positive"
+                t.type === "expense" ? "negative" : "positive"
               }`}
             >
-              {t.amount < 0 ? "-" : "+"}€
-              {Math.abs(t.amount)}
+              {t.type === "expense" ? "-" : "+"}€
+              {t.amount}
             </span>
           </div>
         ))}
