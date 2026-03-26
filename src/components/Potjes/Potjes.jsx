@@ -2,9 +2,10 @@ import "./Potjes.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Potjes({ progress, id }) {
+function Potjes({ id, progress, name, budget, spent }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
+  const remaining = budget - spent;
 
   useEffect(() => {
     const handleResize = () => {
@@ -27,8 +28,8 @@ function Potjes({ progress, id }) {
                 </div>
             </div>
 
-            <h1 className="Potje-title">Title</h1>
-            <h2 className="Potje-subtitle">200 Over</h2>
+            <h1 className="Potje-title">{name}</h1>
+            <h2 className="Potje-subtitle">{remaining} Over</h2>
         </div>
     )
 }
