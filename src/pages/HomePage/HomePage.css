@@ -76,6 +76,8 @@
     flex-shrink: 0;
     margin-left: auto;
     font-size: clamp(20px, 5vw, 26px);
+    text-decoration: none;
+    font-weight: 600;
 }
 
 .transaction {
@@ -160,6 +162,8 @@
     flex-shrink: 0;
     margin-left: auto;
     font-size: clamp(20px, 5vw, 26px);
+    text-decoration: none;
+    font-weight: 600;
 }
 
 
