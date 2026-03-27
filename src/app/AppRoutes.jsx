@@ -60,18 +60,27 @@ function AppRoutes() {
 
       {DEV_BYPASS && (
         <>
-          <Route path="/home-page" element={<HomePage/>} />
+          <Route path="/home-page" element={<HomePage />} />
         </>
       )}
 
       <Route
-        path="/see-all"
+        path="/see-all/transacties"
         element={
-            <PublicRoute loggedIn={loggedIn}>
-                <SeeAllPage/>
-            </PublicRoute>
+          <ProtectedRoute loggedIn={loggedIn}>
+            <SeeAllPage type="transacties" potjes={potjes} transacties={transacties} />
+          </ProtectedRoute>
         }
-        />
+      />
+
+      <Route
+        path="/see-all/potjes"
+        element={
+          <ProtectedRoute loggedIn={loggedIn}>
+            <SeeAllPage type="potjes" potjes={potjes} transacties={transacties} />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/login"

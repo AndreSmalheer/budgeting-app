@@ -1,3 +1,7 @@
+.section-title{
+    color: white;
+}
+
 .see-all-page{
     padding: 16px 16px 0;
 }
@@ -29,6 +33,10 @@
     border-radius: 14px;
     margin-top: 20px;
     backdrop-filter: blur(6px);
+}
+
+.potjes-list{
+    padding-left: clamp(6px, 2vw, 12px);
 }
 
 @media (min-width: 650px) {
