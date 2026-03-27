@@ -1,6 +1,8 @@
 import BackBtn from "../../components/BackBtn/BackBtn";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./SeeAllPage.css";
+import * as Icons from "lucide-react";
 
 const TrashIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -27,6 +29,7 @@ const TrashIcon = () => (
 
 function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
   const [deleteId, setDeleteId] = useState(null);
+  const navigate = useNavigate();
 
   const sortedTransacties = [...transacties].sort(
     (a, b) => new Date(b.date) - new Date(a.date),
@@ -74,10 +77,25 @@ function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
                 const potjeName =
                   potjes.find((p) => p.id === t.potjeId)?.name || "Geen potje";
 
+                const potje = potjes.find((p) => p.id === t.potjeId);
+                const iconName = potje?.icon || "";
+
                 const isExpense = t.type === "expense";
+
+                const Icon =
+                  Icons[
+                    iconName
+                      .split("-")
+                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join("")
+                  ] || Icons.Circle;
 
                 return (
                   <div key={t.id} className="transaction">
+                    <div className="transaction__icon">
+                      <Icon />
+                    </div>
+
                     <div className="transaction__info">
                       <p className="transaction__name">{t.description}</p>
                       <p className="transaction__meta">
@@ -109,23 +127,44 @@ function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
                 <p className="empty-state">Nog geen potjes</p>
               )}
 
-              {sortedPotjes.map((p) => (
-                <div key={p.id} className="transaction">
-                  <div className="transaction__info">
-                    <p className="transaction__name">{p.name}</p>
-                    <p className="transaction__meta">
-                      Budget · €{p.budget.toLocaleString("nl-NL")}
-                    </p>
-                  </div>
+              {sortedPotjes.map((p) => {
+                const Icon =
+                  Icons[
+                    p.icon
+                      .split("-")
+                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join("")
+                  ] || Icons.Circle;
 
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteClick(p.id)}
+                return (
+                  <div
+                    key={p.id}
+                    className="transaction"
+                    onClick={() => navigate(`/budget-details/${p.id}`)}
                   >
-                    <TrashIcon />
-                  </button>
-                </div>
-              ))}
+                    <div className="transaction__icon">
+                      <Icon />
+                    </div>
+
+                    <div className="transaction__info">
+                      <p className="transaction__name">{p.name}</p>
+                      <p className="transaction__meta">
+                        Budget · €{p.budget.toLocaleString("nl-NL")}
+                      </p>
+                    </div>
+
+                    <button
+                      className="delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(p.id);
+                      }}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </>
         )}
