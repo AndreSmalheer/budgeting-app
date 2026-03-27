@@ -78,15 +78,13 @@ function RecentTransactions({ transacties, potjes }) {
 }
 
 function HomePage({ potjes = [], transacties = [] }) {
-  const { incomeTotal, expenseTotal, netBalance, spendingData } =
+  const { incomeTotal, expenseTotal, spendingData } =
     useMemo(() => {
       const incomeTotal = potjes.reduce((sum, p) => sum + (p.budget || 0), 0);
 
       const expenseTotal = transacties
         .filter((t) => t.type === "expense")
         .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-      const netBalance = incomeTotal - expenseTotal;
 
       const spendingData = potjes
         .map((p) => {
@@ -101,7 +99,7 @@ function HomePage({ potjes = [], transacties = [] }) {
         })
         .filter((item) => item.value > 0);
 
-      return { incomeTotal, expenseTotal, netBalance, spendingData };
+      return { incomeTotal, expenseTotal, spendingData };
     }, [potjes, transacties]);
 
   return (

@@ -106,14 +106,17 @@ const iconEntries = uniqueNames
   .slice(0, 100)
   .map((name) => [name, Icons[name]]);
 
-const IconOption = memo(function IconOption({ name, Icon, active, onSelect }) {
+const IconOption = memo(function IconOption(props) {
+  const { name, active, onSelect } = props;
+  const IconComponent = props.Icon;
+
   return (
     <button
       type="button"
       className={`iconOption ${active ? "active" : ""}`}
       onClick={() => onSelect(name)}
     >
-      <Icon size={22} />
+      <IconComponent size={22} />
       <span>{name}</span>
     </button>
   );
@@ -222,11 +225,11 @@ export default function PotjeToevoegen({ setPotjes }) {
             />
 
             <div className="iconPicker">
-              {filteredIcons.map(([name, Icon]) => (
+              {filteredIcons.map(([name, IconComponent]) => (
                 <IconOption
                   key={name}
                   name={name}
-                  Icon={Icon}
+                  Icon={IconComponent}
                   active={selectedIcon === name}
                   onSelect={handleSelectIcon}
                 />

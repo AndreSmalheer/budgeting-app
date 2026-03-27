@@ -1,0 +1,46 @@
+.AccountPage {
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 40px;
+}
+
+.AccountCard {
+    width: min(100%, 460px);
+    padding: 24px 20px;
+    border-radius: 28px;
+    background-color: #ffffff;
+    box-shadow: 0 18px 36px rgba(13, 29, 43, 0.12);
+    box-sizing: border-box;
+}
+
+.AccountCard h1,
+.AccountEyebrow,
+.AccountInfo p,
+.AccountEmpty {
+    font-family: 'Poppins', sans-serif;
+}
+
+.AccountCard h1 {
+    margin: 0 0 16px;
+    color: #16313f;
+}
+
+.AccountEyebrow {
+    margin: 0 0 8px;
+    color: #207567;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.AccountInfo {
+    display: grid;
+    gap: 10px;
+    color: #16313f;
+}
+
+.AccountInfo p,
+.AccountEmpty {
+    margin: 0;
+}
