@@ -16,12 +16,14 @@ import { getStoredSession } from "../utils/authStorage";
 import { Navigate } from "react-router-dom";
 
 function AppRoutes() {
+  const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS === "true";
+
   const [potjes, setPotjes] = useState(initialPotjes);
   const [transacties, setTransacties] = useState(initialTransacties);
   const [loggedIn, setLoggedIn] = useState(() => Boolean(getStoredSession()));
 
   function ProtectedRoute({ loggedIn, children }) {
-    return loggedIn ? children : <Navigate to="/login" />;
+    return loggedIn || DEV_BYPASS ? children : <Navigate to="/login" />;
   }
 
   function PublicRoute({ loggedIn, children }) {
@@ -55,7 +57,6 @@ function AppRoutes() {
         }
       />
 
-      {/* Public routes */}
       <Route
         path="/login"
         element={
@@ -74,7 +75,6 @@ function AppRoutes() {
         }
       />
 
-      {/* Protected routes */}
       <Route
         path="/account"
         element={
