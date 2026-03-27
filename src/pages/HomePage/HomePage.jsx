@@ -46,12 +46,13 @@ function RecentTransactions({ transacties, potjes }) {
     <div className="SpendingOverview">
       <div className="recent-transactions__header">
         <h2 className="recent-transactions__title">Recent</h2>
+        <h2 className="recent-transactions__see-all">See All</h2>
       </div>
 
       <div className="recent-transactions">
         {[...transacties]
           .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 5)
+          .slice(0, 4)
           .map((t) => (
             <div key={t.id} className="transaction">
               <div className="transaction__info">
@@ -102,6 +103,10 @@ function HomePage({ potjes = [], transacties = [] }) {
       return { incomeTotal, expenseTotal, spendingData };
     }, [potjes, transacties]);
 
+    const recentPotjes = [...potjes]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 3);
+
   return (
     <>
       <Header />
@@ -131,10 +136,11 @@ function HomePage({ potjes = [], transacties = [] }) {
       <div className="budget-container Mobile">
         <div className="budget-header">
           <h1 className="budget-title">Budget</h1>
+          <h2 className="budget-see-all">See All</h2>
         </div>
 
         <div className="budget-items">
-          {potjes.map((p) => {
+          {recentPotjes.map((p) => {
             const spent = transacties
               .filter((t) => t.potjeId === p.id && t.type === "expense")
               .reduce((sum, t) => sum + Math.abs(t.amount), 0);

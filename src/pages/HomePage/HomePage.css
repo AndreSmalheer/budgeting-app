@@ -71,11 +71,11 @@
 }
 
 .recent-transactions__see-all {
-    color: white;
+    color: #e5e7eb;
     cursor: pointer;
     flex-shrink: 0;
     margin-left: auto;
-    margin-right: 40px;
+    font-size: clamp(20px, 5vw, 26px);
 }
 
 .transaction {
@@ -143,13 +143,25 @@
     justify-content: space-between;
     color: white;
     padding: 0 clamp(20px, 5vw, 75px);
+    margin-top: clamp(20px, 5vw, 40px);
 }
 
 .budget-container.Mobile .budget-items {
     display: flex;
     gap: clamp(10px, 4vw, 50px);
     padding: 0 clamp(25px, 6vw, 80px);
+    margin-top: clamp(24px, 6vw, 48px);
+    margin-bottom: clamp(24px, 6vw, 48px);
 }
+
+.budget-see-all{
+    color: #e5e7eb;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: clamp(20px, 5vw, 26px);
+}
+
 
 @media (max-width: 410px) {
     .budget-container.Mobile .budget-header {
@@ -185,6 +197,10 @@
 
 .plus-icon:active {
   transform: scale(0.95);
+}
+
+.recent-transactions{
+    margin-left: clamp(6px, 2vw, 12px);
 }
 
 
