@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   BarChart,
   Bar,
@@ -8,9 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import Header from "../../components/Header/Header";
-import "./BudgetDetails.css";
 import BackBtn from "../../components/BackBtn/BackBtn";
+import "./BudgetDetails.css";
 
 const GroceryIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -22,31 +21,28 @@ const GroceryIcon = () => (
   </svg>
 );
 
-function BudgetDetails({ potjes, transacties, setTransacties }) {
+function BudgetDetails({ potjes = [], transacties = [], setTransacties }) {
   const { id } = useParams();
-  const navigate = useNavigate();
 
-  const potje = potjes.find((p) => p.id === id);
-
-  const potjeTransacties = transacties.filter((t) => t.potjeId === id);
-
+  const potje = potjes.find((item) => item.id === id);
+  const potjeTransacties = transacties.filter((item) => item.potjeId === id);
   const budget = potje?.budget || 0;
 
-  const [extraTransactions, setExtraTransactions] = useState([]);
   const [afnemenAmount, setAfnemenAmount] = useState("");
 
-  const allTransactions = [...extraTransactions, ...potjeTransacties];
-
-  const spent = allTransactions
-    .filter((t) => t.type === "expense" || t.amount < 0)
-    .reduce((s, t) => s + Math.abs(t.amount), 0);
+  const spent = potjeTransacties
+    .filter((item) => item.type === "expense" || item.amount < 0)
+    .reduce((sum, item) => sum + Math.abs(item.amount), 0);
 
   const remaining = budget - spent;
   const progress = budget ? Math.min((spent / budget) * 100, 100) : 0;
 
-  const handleAfnemen = () => {
+  function handleAfnemen() {
     const value = Number(afnemenAmount);
-    if (!value || value <= 0) return;
+
+    if (!value || value <= 0 || !setTransacties) {
+      return;
+    }
 
     const newTransaction = {
       id: Date.now().toString(),
@@ -57,10 +53,11 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
       potjeId: id,
     };
 
-    setTransacties((prev) => [newTransaction, ...prev]);
-    };
+    setTransacties((previousTransactions) => [newTransaction, ...previousTransactions]);
+    setAfnemenAmount("");
+  }
 
-  const WEEKLY_DATA = [
+  const weeklyData = [
     { week: "W1", spent: spent / 4, budget: budget / 4 },
     { week: "W2", spent: spent / 4, budget: budget / 4 },
     { week: "W3", spent: spent / 4, budget: budget / 4 },
@@ -73,9 +70,7 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
 
   return (
     <>
-      <BackBtn
-        style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }}
-      />
+      <BackBtn style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }} />
 
       <div className="potje-container">
         <div className="potje-header">
@@ -88,17 +83,12 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
           <div className="potje-amounts">
             <p className="potje-label">Spent</p>
             <p className="potje-spent">€ {spent.toLocaleString("nl-NL")}</p>
-            <p className="potje-remaining">
-              € {remaining.toLocaleString("nl-NL")} left
-            </p>
+            <p className="potje-remaining">€ {remaining.toLocaleString("nl-NL")} left</p>
           </div>
         </div>
 
         <div className="potje-progress-track">
-          <div
-            className="potje-progress-fill"
-            style={{ width: `${progress}%` }}
-          />
+          <div className="potje-progress-fill" style={{ width: `${progress}%` }} />
         </div>
 
         <div className="potje-stats">
@@ -109,7 +99,7 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
 
           <div className="potje-stat">
             <p className="potje-stat-label">Transactions</p>
-            <p className="potje-stat-value">{allTransactions.length}</p>
+            <p className="potje-stat-value">{potjeTransacties.length}</p>
           </div>
 
           <div className="potje-stat">
@@ -122,7 +112,7 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
           <input
             type="number"
             value={afnemenAmount}
-            onChange={(e) => setAfnemenAmount(e.target.value)}
+            onChange={(event) => setAfnemenAmount(event.target.value)}
             placeholder="Afnemen bedrag"
             className="afnemen-input"
           />
@@ -134,7 +124,7 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
 
         <div className="potje-chart">
           <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={WEEKLY_DATA}>
+            <BarChart data={weeklyData}>
               <XAxis dataKey="week" />
               <YAxis />
               <Tooltip />
@@ -150,23 +140,23 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
           <h3 className="transaction-list__title">Transactions</h3>
         </div>
 
-        {allTransactions.map((t) => (
-          <div key={t.id} className="transaction-potje">
+        {potjeTransacties.map((transaction) => (
+          <div key={transaction.id} className="transaction-potje">
             <div className="transaction__icon">
               <GroceryIcon />
             </div>
 
             <div className="transaction__info">
-              <p className="transaction__name">{t.description}</p>
-              <p className="transaction__meta">{t.date}</p>
+              <p className="transaction__name">{transaction.description}</p>
+              <p className="transaction__meta">{transaction.date}</p>
             </div>
 
             <span
               className={`transaction__amount ${
-                t.type === "expense" ? "negative" : "positive"
+                transaction.type === "expense" ? "negative" : "positive"
               }`}
             >
-              {t.type === "expense" ? "-" : "+"}€{t.amount}
+              {transaction.type === "expense" ? "-" : "+"}€{transaction.amount}
             </span>
           </div>
         ))}

@@ -1,6 +1,6 @@
 const appConfig = {
   appName: "BudgetMaatje",
-  apiBaseUrl: "http://localhost/budgeting-app/backend/public/api",
+  apiBaseUrl: "http://localhost:8888/backend/public/index.php/api",
   approvalLimit: 40,
 };
 

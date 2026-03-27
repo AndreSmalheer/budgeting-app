@@ -19,6 +19,10 @@ if ($basePath !== '' && $basePath !== '/' && str_starts_with($path, $basePath)) 
     $path = substr($path, strlen($basePath));
 }
 
+if (str_starts_with($path, '/index.php')) {
+    $path = substr($path, strlen('/index.php'));
+}
+
 $path = rtrim($path, '/');
 
 if ($path === '') {
@@ -37,4 +41,13 @@ if (!isset($routes[$routeKey])) {
 }
 
 $handler = $routes[$routeKey];
-$handler();
+
+try {
+    $handler();
+} catch (Throwable $exception) {
+    jsonResponse([
+        'success' => false,
+        'message' => 'Er ging iets mis in de backend.',
+        'error' => $exception->getMessage(),
+    ], 500);
+}

@@ -22,4 +22,22 @@ export async function getApiHealth() {
   return apiRequest("/health");
 }
 
+export async function getDatabaseStatus() {
+  return apiRequest("/db-status");
+}
+
+export async function registerAccount(formData) {
+  return apiRequest("/register", {
+    method: "POST",
+    body: JSON.stringify(formData),
+  });
+}
+
+export async function loginAccount(formData) {
+  return apiRequest("/login", {
+    method: "POST",
+    body: JSON.stringify(formData),
+  });
+}
+
 export default apiRequest;

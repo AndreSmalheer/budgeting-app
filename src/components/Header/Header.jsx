@@ -1,64 +1,69 @@
 import "./Header.css";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import appConfig from "../../config/appConfig";
+import { clearStoredSession, getStoredSession } from "../../utils/authStorage";
 
 function Header() {
-  const [loggedIn, setLoggedIn] = useState(true);
-  const [isPopUpActive, setPopUpActive] = useState(false);
-  const [activeLi, setActiveLi] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 650);
-
-  const togglePopUp = () => {
-    setPopUpActive(prev => !prev);
-  };
-
-  const handleLiClick = (index) => {
-    setActiveLi(index);
-  };
+  const navigate = useNavigate();
+  const [session, setSession] = useState(() => getStoredSession());
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 650);
+    const syncSession = () => {
+      setSession(getStoredSession());
     };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("storage", syncSession);
+    window.addEventListener("auth-changed", syncSession);
+
+    return () => {
+      window.removeEventListener("storage", syncSession);
+      window.removeEventListener("auth-changed", syncSession);
+    };
   }, []);
 
+  function handleLogout() {
+    clearStoredSession();
+    navigate("/");
+  }
+
   return (
-    <div className="Header-container">
-      <div className={`Header ${isMobile ? "Mobile" : "Desktop"}`}>
-        <img className="icon" src="/favicon.svg" />
-        <h1>Naam App</h1>
+    <header className="Header-shell">
+      <div className="Header">
+        <Link className="Header-brand" to="/">
+          <img className="Header-logo" src="/favicon.svg" alt="BudgetMaatje logo" />
 
-        {loggedIn ? (
-          <div className="loggin-container" onClick={togglePopUp}>
-            <img className="profile-icon" src="/profile-icon-placeholder.png" />
+          <div className="Header-brand-copy">
+            <span className="Header-brand-title">{appConfig.appName}</span>
+            <span className="Header-brand-subtitle">Budgetteren met digitale potjes</span>
           </div>
-        ) : (
-          <div className="loggin-container">
-            <h1>Logging</h1>
-            <img className="logging-icon" src="/loggin.png" />
-          </div>
-        )}
+        </Link>
 
-        <div className={`logged-in-pop-up ${isPopUpActive ? "active" : ""}`}>
-          <ul>
-            <li
-              className={activeLi === 0 ? "active" : ""}
-              onClick={() => handleLiClick(0)}
-            >
-              Action
-            </li>
-            <li
-              className={activeLi === 1 ? "active" : ""}
-              onClick={() => handleLiClick(1)}
-            >
-              Logout
-            </li>
-          </ul>
-        </div>
+        <nav className="Header-actions">
+          {session ? (
+            <>
+              <Link className="Header-link Header-link-primary" to="/account">
+                Ga naar account
+              </Link>
+
+              <button className="Header-link Header-link-secondary" type="button" onClick={handleLogout}>
+                Uitloggen
+              </button>
+            </>
+          ) : (
+            <>
+              <Link className="Header-link Header-link-secondary" to="/login">
+                Login
+              </Link>
+
+              <Link className="Header-link Header-link-primary" to="/register">
+                Register
+              </Link>
+            </>
+          )}
+        </nav>
       </div>
-    </div>
+    </header>
   );
 }
 

@@ -17,11 +17,7 @@ function getDatabaseConnection()
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
     } catch (PDOException $exception) {
-        jsonResponse([
-            'success' => false,
-            'message' => 'Databaseverbinding mislukt.',
-            'error' => $exception->getMessage(),
-        ], 500);
+        throw new RuntimeException('Databaseverbinding mislukt: ' . $exception->getMessage(), 500, $exception);
     }
 
     return $pdo;

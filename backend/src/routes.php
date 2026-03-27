@@ -2,6 +2,7 @@
 
 return [
     'GET /api/health' => 'healthCheck',
+    'GET /api/db-status' => 'databaseStatusCheck',
     'POST /api/register' => 'registerUser',
     'POST /api/login' => 'loginUser',
     'POST /api/link-parent-child' => 'linkParentAndChild',
