@@ -60,7 +60,7 @@ function AppRoutes() {
 
       {DEV_BYPASS && (
         <>
-          <Route path="/home-page" element={<HomePage />} />
+          <Route path="/home-page" element={<HomePage transacties={transacties} potjes={potjes} />} />
         </>
       )}
 
