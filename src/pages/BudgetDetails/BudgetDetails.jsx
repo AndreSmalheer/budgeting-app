@@ -1,13 +1,5 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import BackBtn from "../../components/BackBtn/BackBtn";
 import "./BudgetDetails.css";
 
@@ -21,48 +13,41 @@ const GroceryIcon = () => (
   </svg>
 );
 
-function BudgetDetails({ potjes = [], transacties = [], setTransacties }) {
+function BudgetDetails({ potjes, transacties, setTransacties }) {
   const { id } = useParams();
-
-  const potje = potjes.find((item) => item.id === id);
-  const potjeTransacties = transacties.filter((item) => item.potjeId === id);
-  const budget = potje?.budget || 0;
-
+  const [afnemenName, setAfnemenName] = useState("");
   const [afnemenAmount, setAfnemenAmount] = useState("");
 
-  const spent = potjeTransacties
-    .filter((item) => item.type === "expense" || item.amount < 0)
-    .reduce((sum, item) => sum + Math.abs(item.amount), 0);
+  const potje = potjes.find((p) => p.id === id);
+  const potjeTransacties = transacties.filter((t) => t.potjeId === id);
+  const budget = potje?.budget || 0;
+
+  const allTransactions = [...potjeTransacties];
+
+  const spent = allTransactions
+    .filter((t) => t.type === "expense" || t.amount < 0)
+    .reduce((s, t) => s + Math.abs(t.amount), 0);
 
   const remaining = budget - spent;
   const progress = budget ? Math.min((spent / budget) * 100, 100) : 0;
 
-  function handleAfnemen() {
+  const handleAfnemen = () => {
     const value = Number(afnemenAmount);
-
-    if (!value || value <= 0 || !setTransacties) {
-      return;
-    }
+    if (!value || value <= 0) return;
 
     const newTransaction = {
       id: Date.now().toString(),
-      description: "Afnemen",
+      description: afnemenName || "Afnemen",
       date: new Date().toISOString().split("T")[0],
       amount: value,
       type: "expense",
       potjeId: id,
     };
 
-    setTransacties((previousTransactions) => [newTransaction, ...previousTransactions]);
+    setTransacties((prev) => [newTransaction, ...prev]);
     setAfnemenAmount("");
-  }
-
-  const weeklyData = [
-    { week: "W1", spent: spent / 4, budget: budget / 4 },
-    { week: "W2", spent: spent / 4, budget: budget / 4 },
-    { week: "W3", spent: spent / 4, budget: budget / 4 },
-    { week: "W4", spent: spent / 4, budget: budget / 4 },
-  ];
+    setAfnemenName("");
+  };
 
   if (!potje) {
     return <p>Potje niet gevonden</p>;
@@ -77,42 +62,55 @@ function BudgetDetails({ potjes = [], transacties = [], setTransacties }) {
           <div>
             <p className="potje-label">Budget pot</p>
             <h2 className="potje-title">{potje.name}</h2>
-            <p className="potje-label">This month</p>
+            <p className="potje-label">Deze maand</p>
           </div>
 
           <div className="potje-amounts">
-            <p className="potje-label">Spent</p>
+            <p className="potje-label">Uitgegeven</p>
             <p className="potje-spent">€ {spent.toLocaleString("nl-NL")}</p>
-            <p className="potje-remaining">€ {remaining.toLocaleString("nl-NL")} left</p>
+            <p className="potje-remaining">
+              € {remaining.toLocaleString("nl-NL")} over
+            </p>
           </div>
         </div>
 
         <div className="potje-progress-track">
-          <div className="potje-progress-fill" style={{ width: `${progress}%` }} />
+          <div
+            className="potje-progress-fill"
+            style={{ width: `${progress}%` }}
+          />
         </div>
 
         <div className="potje-stats">
           <div className="potje-stat">
             <p className="potje-stat-label">Budget</p>
-            <p className="potje-stat-value">€ {budget}</p>
+            <p className="potje-stat-value">€ {budget.toLocaleString("nl-NL")}</p>
           </div>
 
           <div className="potje-stat">
-            <p className="potje-stat-label">Transactions</p>
-            <p className="potje-stat-value">{potjeTransacties.length}</p>
+            <p className="potje-stat-label">Transacties</p>
+            <p className="potje-stat-value">{allTransactions.length}</p>
           </div>
 
           <div className="potje-stat">
-            <p className="potje-stat-label">Avg/week</p>
+            <p className="potje-stat-label">Gem./week</p>
             <p className="potje-stat-value">€ {Math.round(spent / 4)}</p>
           </div>
         </div>
 
         <div className="afnemen-container">
           <input
+            type="text"
+            value={afnemenName}
+            onChange={(e) => setAfnemenName(e.target.value)}
+            placeholder="Naam (bv. boodschappen)"
+            className="afnemen-input"
+          />
+
+          <input
             type="number"
             value={afnemenAmount}
-            onChange={(event) => setAfnemenAmount(event.target.value)}
+            onChange={(e) => setAfnemenAmount(e.target.value)}
             placeholder="Afnemen bedrag"
             className="afnemen-input"
           />
@@ -121,42 +119,30 @@ function BudgetDetails({ potjes = [], transacties = [], setTransacties }) {
             Afnemen
           </button>
         </div>
-
-        <div className="potje-chart">
-          <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={weeklyData}>
-              <XAxis dataKey="week" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="budget" fill="#3a3f5c" />
-              <Bar dataKey="spent" fill="#00FFAE" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
       </div>
 
       <div className="transaction-list">
         <div className="transaction-list__header">
-          <h3 className="transaction-list__title">Transactions</h3>
+          <h3 className="transaction-list__title">Transacties</h3>
         </div>
 
-        {potjeTransacties.map((transaction) => (
-          <div key={transaction.id} className="transaction-potje">
+        {allTransactions.map((t) => (
+          <div key={t.id} className="transaction-potje">
             <div className="transaction__icon">
               <GroceryIcon />
             </div>
 
             <div className="transaction__info">
-              <p className="transaction__name">{transaction.description}</p>
-              <p className="transaction__meta">{transaction.date}</p>
+              <p className="transaction__name">{t.description}</p>
+              <p className="transaction__meta">{t.date}</p>
             </div>
 
             <span
               className={`transaction__amount ${
-                transaction.type === "expense" ? "negative" : "positive"
+                t.type === "expense" ? "negative" : "positive"
               }`}
             >
-              {transaction.type === "expense" ? "-" : "+"}€{transaction.amount}
+              {t.type === "expense" ? "-" : "+"}€{t.amount}
             </span>
           </div>
         ))}
