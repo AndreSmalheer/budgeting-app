@@ -78,7 +78,10 @@ function RecentTransactions({ transacties, potjes }) {
                   }`}
                 >
                   {t.type === "expense" ? "-" : "+"}€
-                  {Math.abs(t.amount).toLocaleString("nl-NL")}
+                  {new Intl.NumberFormat("nl-NL", {
+                    style: "currency",
+                    currency: "EUR",
+                  }).format(Math.abs(t.amount))}
                 </span>
               </div>
             ))
