@@ -7,6 +7,10 @@ function Potjes({ id, progress, name, budget, spent, icon }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
   const remaining = budget - spent;
+  const formattedRemaining = new Intl.NumberFormat("nl-NL", {
+  style: "currency",
+  currency: "EUR",
+  }).format(remaining);
 
   const Icon =
     Icons[
@@ -47,7 +51,7 @@ function Potjes({ id, progress, name, budget, spent, icon }) {
       </div>
 
       <h1 className="Potje-title">{name}</h1>
-      <h2 className="Potje-subtitle">{remaining} Over</h2>
+      <h2 className="Potje-subtitle">{formattedRemaining} Over</h2>
     </div>
   );
 }
