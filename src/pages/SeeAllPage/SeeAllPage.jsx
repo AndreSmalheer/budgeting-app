@@ -10,8 +10,6 @@ function SeeAllPage({ type, potjes, transacties }) {
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
-  console.log(type)
-
   return (
     <div className="see-all-page">
       <BackBtn />

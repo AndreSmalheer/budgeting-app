@@ -46,35 +46,43 @@ function RecentTransactions({ transacties, potjes }) {
     <div className="SpendingOverview">
       <div className="recent-transactions__header">
         <h2 className="recent-transactions__title">Recent</h2>
-        <Link to="/see-all/transacties" className="recent-transactions__see-all">
-            Alles
+        <Link
+          to="/see-all/transacties"
+          className="recent-transactions__see-all"
+        >
+          Alles
         </Link>
       </div>
 
       <div className="recent-transactions">
-        {[...transacties]
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 4)
-          .map((t) => (
-            <div key={t.id} className="transaction">
-              <div className="transaction__info">
-                <p className="transaction__name">{t.description}</p>
-                <p className="transaction__meta">
-                  {potjes.find((p) => p.id === t.potjeId)?.name || "Geen potje"}{" "}
-                  · {t.date}
-                </p>
-              </div>
+        {transacties.length === 0 ? (
+          <h1 className="no-transactions">Geen transacties</h1>
+        ) : (
+          [...transacties]
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 4)
+            .map((t) => (
+              <div key={t.id} className="transaction">
+                <div className="transaction__info">
+                  <p className="transaction__name">{t.description}</p>
+                  <p className="transaction__meta">
+                    {potjes.find((p) => p.id === t.potjeId)?.name ||
+                      "Geen potje"}{" "}
+                    · {t.date}
+                  </p>
+                </div>
 
-              <span
-                className={`transaction__amount ${
-                  t.type === "expense" ? "negative" : "positive"
-                }`}
-              >
-                {t.type === "expense" ? "-" : "+"}€
-                {Math.abs(t.amount).toLocaleString("nl-NL")}
-              </span>
-            </div>
-          ))}
+                <span
+                  className={`transaction__amount ${
+                    t.type === "expense" ? "negative" : "positive"
+                  }`}
+                >
+                  {t.type === "expense" ? "-" : "+"}€
+                  {Math.abs(t.amount).toLocaleString("nl-NL")}
+                </span>
+              </div>
+            ))
+        )}
       </div>
     </div>
   );
