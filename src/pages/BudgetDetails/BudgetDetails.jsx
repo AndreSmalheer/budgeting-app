@@ -75,7 +75,7 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
 
   const potje = potjes.find((p) => p.id === id);
   const potjeTransacties = transacties.filter((t) => t.potjeId === id);
-  const icon = potje.icon
+  const icon = potje.icon;
   const Icon =
     Icons[
       icon
@@ -84,14 +84,8 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
         .join("")
     ] || Icons.Circle;
 
-
-
   const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
   const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState("");
-
-  const isValidAmount =
-    budgetAfhalenNaam.trim() !== "" &&
-    Number(budgetAfhalenAmount) > 0;
 
   const handleBudgetAfhalen = () => {
     const value = Number(budgetAfhalenAmount);
@@ -114,8 +108,8 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
       prev.map((p) =>
         p.id === id
           ? { ...p, budget: Math.max(0, Number(p.budget) - value) }
-          : p
-      )
+          : p,
+      ),
     );
 
     setBudgetAfhalenAmount("");
@@ -135,11 +129,18 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
     { name: "Over", value: remaining < 0 ? 0 : remaining },
   ];
 
+  const isValidAmount =
+    budgetAfhalenNaam.trim() !== "" &&
+    Number(budgetAfhalenAmount) > 0 &&
+    Number(budgetAfhalenAmount) <= remaining;
+
   if (!potje) return <p>Potje niet gevonden</p>;
 
   return (
     <>
-      <BackBtn style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }} />
+      <BackBtn
+        style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }}
+      />
 
       <div className="potje-container">
         <SpendingChart data={spendingData} />
@@ -168,7 +169,7 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
           onClick={handleBudgetAfhalen}
           disabled={!isValidAmount}
         >
-            Afnemen
+          Afnemen
         </button>
       </div>
 
@@ -180,7 +181,7 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
         {potjeTransacties.map((t) => (
           <div key={t.id} className="transaction-potje">
             <div className="transaction__icon">
-                <Icon />
+              <Icon />
             </div>
 
             <div className="transaction__info">
