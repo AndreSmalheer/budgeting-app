@@ -1,66 +1,18 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import BackBtn from "../../components/BackBtn/BackBtn";
-import { LucideIcon } from "../../utils/icons";
+import BudgetDetailsChart from "../../components/budget/BudgetDetailsChart";
+import BudgetTransactionsSection from "../../components/budget/BudgetTransactionsSection";
+import BudgetWithdrawForm from "../../components/budget/BudgetWithdrawForm";
 import "./BudgetDetails.css";
-
-const COLORS = ["#00FFAE", "#ff6b6b"];
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-  }).format(value);
-}
-
-function SpendingChart({ data }) {
-  return (
-    <div className="SpendingChart">
-      <div className="SpendingChart__graph">
-        <PieChart width={180} height={180}>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={48}
-            outerRadius={70}
-            paddingAngle={4}
-            dataKey="value"
-            stroke="none"
-          >
-            {data.map((_, i) => (
-              <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
-            ))}
-          </Pie>
-
-          <Tooltip
-            formatter={(value, name) => [formatCurrency(value), name]}
-          />
-        </PieChart>
-      </div>
-
-      <div className="chart-legend">
-        {data.map((item, i) => (
-          <div key={`${item.name}-${i}`} className="chart-legend__item">
-            <span
-              className="chart-legend__dot"
-              style={{ backgroundColor: COLORS[i % COLORS.length] }}
-            />
-            <span className="chart-legend__label">{item.name}</span>
-            <span className="chart-legend__value">{formatCurrency(item.value)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
   const { id } = useParams();
 
   const potje = potjes.find((item) => item.id === id);
-  const potjeTransacties = transacties.filter((transaction) => transaction.potjeId === id);
+  const potjeTransacties = transacties.filter(
+    (transaction) => transaction.potjeId === id,
+  );
 
   const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
   const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState("");
@@ -97,11 +49,9 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
   if (!potje) return <p>Potje niet gevonden.</p>;
 
   const budget = potje.budget || 0;
-
   const spent = potjeTransacties
     .filter((transaction) => transaction.type === "expense" || transaction.amount < 0)
     .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
-
   const remaining = budget - spent;
 
   const spendingData = [
@@ -121,67 +71,22 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
       />
 
       <div className="potje-container">
-        <SpendingChart data={spendingData} />
+        <BudgetDetailsChart data={spendingData} />
       </div>
 
-      <div className="afnemen-container">
-        <input
-          className="afnemen-input"
-          type="text"
-          placeholder="Naam van de transactie"
-          value={budgetAfhalenNaam}
-          onChange={(event) => setBudgetAfhalenNaam(event.target.value)}
-        />
+      <BudgetWithdrawForm
+        amount={budgetAfhalenAmount}
+        name={budgetAfhalenNaam}
+        isValid={isValidAmount}
+        onAmountChange={(event) => setBudgetAfhalenAmount(event.target.value)}
+        onNameChange={(event) => setBudgetAfhalenNaam(event.target.value)}
+        onSubmit={handleBudgetAfhalen}
+      />
 
-        <input
-          className="afnemen-input"
-          type="number"
-          inputMode="decimal"
-          placeholder="Bedrag"
-          value={budgetAfhalenAmount}
-          onChange={(event) => setBudgetAfhalenAmount(event.target.value)}
-        />
-
-        <button
-          className={`afnemen-button ${!isValidAmount ? "disabled" : ""}`}
-          onClick={handleBudgetAfhalen}
-          disabled={!isValidAmount}
-        >
-          Bedrag afhalen
-        </button>
-      </div>
-
-      <div className="transaction-list budget-details-page">
-        <div className="transaction-list__header">
-          <h3 className="transaction-list__title">Transacties</h3>
-        </div>
-
-        {potjeTransacties.length === 0 ? (
-          <p className="empty-state">Er zijn nog geen transacties voor dit potje.</p>
-        ) : (
-          potjeTransacties.map((transaction) => (
-            <div key={transaction.id} className="transaction-potje">
-              <div className="transaction__icon">
-                <LucideIcon name={potje?.icon} size={18} strokeWidth={2} />
-              </div>
-
-              <div className="transaction__info">
-                <p className="transaction__name">{transaction.description}</p>
-                <p className="transaction__meta">{transaction.date}</p>
-              </div>
-
-              <span
-                className={`transaction__amount ${
-                  transaction.type === "expense" ? "negative" : "positive"
-                }`}
-              >
-                {transaction.type === "expense" ? "-" : "+"}
-                {formatCurrency(Math.abs(transaction.amount))}
-              </span>
-            </div>
-          ))
-        )}
-      </div>
+      <BudgetTransactionsSection
+        transactions={potjeTransacties}
+        iconName={potje.icon}
+      />
     </>
   );
 }

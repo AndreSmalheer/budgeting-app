@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Header from "../../components/Header/Header";
+import AuthCard from "../../components/auth/AuthCard";
+import AuthPageLayout from "../../components/auth/AuthPageLayout";
 import { registerAccount } from "../../services/api/client";
 import { saveStoredSession } from "../../utils/authStorage";
 import "../LoginPage/AuthPage.css";
@@ -20,10 +21,10 @@ function RegisterPage() {
   const redirectTarget = location.state?.from?.pathname || "/";
 
   function handleChange(event) {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [event.target.name]: event.target.value,
-    });
+    }));
 
     if (feedback.message) {
       setFeedback({ type: "", message: "" });
@@ -64,75 +65,67 @@ function RegisterPage() {
   }
 
   return (
-    <>
-      <Header />
+    <AuthPageLayout>
+      <AuthCard
+        eyebrow="Nieuw account maken"
+        title="Registreren"
+        description="Maak een account aan en start direct met budgetteren."
+        feedback={feedback}
+        onSubmit={handleSubmit}
+      >
+        <label className="AuthField">
+          <span>Volledige naam</span>
+          <input
+            name="fullName"
+            type="text"
+            placeholder="Bijvoorbeeld Adam Saber"
+            value={formData.fullName}
+            onChange={handleChange}
+            required
+          />
+        </label>
 
-      <main className="AuthPage">
-        <form className="AuthCard" onSubmit={handleSubmit}>
-          <p className="AuthEyebrow">Nieuw account maken</p>
-          <h1>Registreren</h1>
-          <p className="AuthDescription">
-            Maak een account aan en start direct met budgetteren.
-          </p>
+        <label className="AuthField">
+          <span>Rol</span>
+          <select name="role" value={formData.role} onChange={handleChange}>
+            <option value="child">Kind</option>
+            <option value="parent">Ouder</option>
+          </select>
+        </label>
 
-          {feedback.message && (
-            <p className={`AuthFeedback ${feedback.type}`}>{feedback.message}</p>
-          )}
+        <label className="AuthField">
+          <span>E-mail</span>
+          <input
+            name="email"
+            type="email"
+            placeholder="naam@email.nl"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </label>
 
-          <label className="AuthField">
-            <span>Volledige naam</span>
-            <input
-              name="fullName"
-              type="text"
-              placeholder="Bijvoorbeeld Adam Saber"
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-            />
-          </label>
+        <label className="AuthField">
+          <span>Wachtwoord</span>
+          <input
+            name="REDACTED_PASSWORD"
+            type="REDACTED_PASSWORD"
+            placeholder="Maak een wachtwoord"
+            value={formData.REDACTED_PASSWORD}
+            onChange={handleChange}
+            required
+          />
+        </label>
 
-          <label className="AuthField">
-            <span>Rol</span>
-            <select name="role" value={formData.role} onChange={handleChange}>
-              <option value="child">Kind</option>
-              <option value="parent">Ouder</option>
-            </select>
-          </label>
+        <button className="AuthButton" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Account wordt aangemaakt..." : "Account maken"}
+        </button>
 
-          <label className="AuthField">
-            <span>E-mail</span>
-            <input
-              name="email"
-              type="email"
-              placeholder="naam@email.nl"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <label className="AuthField">
-            <span>Wachtwoord</span>
-            <input
-              name="REDACTED_PASSWORD"
-              type="REDACTED_PASSWORD"
-              placeholder="Maak een wachtwoord"
-              value={formData.REDACTED_PASSWORD}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <button className="AuthButton" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Account wordt aangemaakt..." : "Account maken"}
-          </button>
-
-          <p className="AuthSwitch">
-            Heb je al een account? <Link to="/login">Log dan in</Link>
-          </p>
-        </form>
-      </main>
-    </>
+        <p className="AuthSwitch">
+          Heb je al een account? <Link to="/login">Log dan in</Link>
+        </p>
+      </AuthCard>
+    </AuthPageLayout>
   );
 }
 

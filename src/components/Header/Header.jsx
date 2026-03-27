@@ -1,27 +1,35 @@
-import "./Header.css";
-import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LogIn, LogOut, UserRound, UserRoundPlus } from "lucide-react";
 import appConfig from "../../config/appConfig";
-import { clearStoredSession, getStoredSession } from "../../utils/authStorage";
+import { clearStoredSession } from "../../utils/authStorage";
+import { useSession } from "../../hooks/useSession";
+import "./Header.css";
+
+function HeaderActionLink({ to, variant, icon, label }) {
+  const IconComponent = icon;
+
+  return (
+    <Link className={`Header-link ${variant}`} to={to}>
+      <IconComponent size={16} strokeWidth={2} />
+      <span>{label}</span>
+    </Link>
+  );
+}
+
+function HeaderActionButton({ onClick, variant, icon, label }) {
+  const IconComponent = icon;
+
+  return (
+    <button className={`Header-link ${variant}`} type="button" onClick={onClick}>
+      <IconComponent size={16} strokeWidth={2} />
+      <span>{label}</span>
+    </button>
+  );
+}
 
 function Header() {
   const navigate = useNavigate();
-  const [session, setSession] = useState(() => getStoredSession());
-
-  useEffect(() => {
-    const syncSession = () => {
-      setSession(getStoredSession());
-    };
-
-    window.addEventListener("storage", syncSession);
-    window.addEventListener("auth-changed", syncSession);
-
-    return () => {
-      window.removeEventListener("storage", syncSession);
-      window.removeEventListener("auth-changed", syncSession);
-    };
-  }, []);
+  const session = useSession();
 
   function handleLogout() {
     clearStoredSession();
@@ -36,34 +44,42 @@ function Header() {
 
           <div className="Header-brand-copy">
             <span className="Header-brand-title">{appConfig.appName}</span>
-            <span className="Header-brand-subtitle">Budgetteren met digitale potjes</span>
+            <span className="Header-brand-subtitle">
+              Budgetteren met digitale potjes
+            </span>
           </div>
         </Link>
 
         <nav className="Header-actions">
           {session ? (
             <>
-              <Link className="Header-link Header-link-primary" to="/account">
-                <UserRound size={16} strokeWidth={2} />
-                <span>Profiel</span>
-              </Link>
-
-              <button className="Header-link Header-link-secondary" type="button" onClick={handleLogout}>
-                <LogOut size={16} strokeWidth={2} />
-                <span>Uitloggen</span>
-              </button>
+              <HeaderActionLink
+                to="/account"
+                variant="Header-link-primary"
+                icon={UserRound}
+                label="Profiel"
+              />
+              <HeaderActionButton
+                onClick={handleLogout}
+                variant="Header-link-secondary"
+                icon={LogOut}
+                label="Uitloggen"
+              />
             </>
           ) : (
             <>
-              <Link className="Header-link Header-link-secondary" to="/login">
-                <LogIn size={16} strokeWidth={2} />
-                <span>Inloggen</span>
-              </Link>
-
-              <Link className="Header-link Header-link-primary" to="/register">
-                <UserRoundPlus size={16} strokeWidth={2} />
-                <span>Registreren</span>
-              </Link>
+              <HeaderActionLink
+                to="/login"
+                variant="Header-link-secondary"
+                icon={LogIn}
+                label="Inloggen"
+              />
+              <HeaderActionLink
+                to="/register"
+                variant="Header-link-primary"
+                icon={UserRoundPlus}
+                label="Registreren"
+              />
             </>
           )}
         </nav>

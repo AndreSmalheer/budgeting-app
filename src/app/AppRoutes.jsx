@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import { ProtectedRoute, PublicRoute } from "../components/routes/RouteGuards";
+import { useSession } from "../hooks/useSession";
 import LandingPage from "../pages/LandingPage/LandingPage";
 import StarterInhoud from "../pages/Starter-inhoud/Starter-inhoud";
 import HomePage from "../pages/HomePage/HomePage";
@@ -13,45 +15,14 @@ import {
   potjes as initialPotjes,
   transacties as initialTransacties,
 } from "../config/data";
-import { getStoredSession } from "../utils/authStorage";
-
-function ProtectedRoute({ children, isAllowed }) {
-  const location = useLocation();
-
-  return isAllowed ? (
-    children
-  ) : (
-    <Navigate to="/login" replace state={{ from: location }} />
-  );
-}
-
-function PublicRoute({ children, isLoggedIn }) {
-  const location = useLocation();
-  const redirectTarget = location.state?.from?.pathname || "/";
-
-  return !isLoggedIn ? children : <Navigate to={redirectTarget} replace />;
-}
 
 function AppRoutes() {
   const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS === "true";
+  const session = useSession();
+  const loggedIn = Boolean(session);
 
   const [potjes, setPotjes] = useState(initialPotjes);
   const [transacties, setTransacties] = useState(initialTransacties);
-  const [loggedIn, setLoggedIn] = useState(() => Boolean(getStoredSession()));
-
-  useEffect(() => {
-    function syncSession() {
-      setLoggedIn(Boolean(getStoredSession()));
-    }
-
-    window.addEventListener("storage", syncSession);
-    window.addEventListener("auth-changed", syncSession);
-
-    return () => {
-      window.removeEventListener("storage", syncSession);
-      window.removeEventListener("auth-changed", syncSession);
-    };
-  }, []);
 
   const canAccessProtectedRoutes = loggedIn || DEV_BYPASS;
 
