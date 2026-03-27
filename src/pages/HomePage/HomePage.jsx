@@ -46,7 +46,7 @@ function RecentTransactions({ transacties, potjes }) {
     <div className="SpendingOverview">
       <div className="recent-transactions__header">
         <h2 className="recent-transactions__title">Recent</h2>
-        <h2 className="recent-transactions__see-all">See All</h2>
+        <h2 className="recent-transactions__see-all">Alles</h2>
       </div>
 
       <div className="recent-transactions">
@@ -113,7 +113,7 @@ function HomePage({ potjes = [], transacties = [] }) {
 
       <div className="Balance-container Mobile">
         <div>
-          <h1>Balance</h1>
+          <h1>Saldo</h1>
           <div className="Balance-items">
             <div className="Balance-item positive">
               <span className="Balance-icon"></span>
@@ -136,7 +136,7 @@ function HomePage({ potjes = [], transacties = [] }) {
       <div className="budget-container Mobile">
         <div className="budget-header">
           <h1 className="budget-title">Budget</h1>
-          <h2 className="budget-see-all">See All</h2>
+          <h2 className="budget-see-all">Alles</h2>
         </div>
 
         <div className="budget-items">

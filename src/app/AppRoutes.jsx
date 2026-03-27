@@ -8,6 +8,7 @@ import PotjeToevoegen from "../pages/PotjeToevoegen/PotjeToevoegen";
 import LoginPage from "../pages/LoginPage/LoginPage";
 import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import AccountPage from "../pages/AccountPage/AccountPage";
+import SeeAllPage from "../pages/SeeAllPage/SeeAllPage";
 import {
   potjes as initialPotjes,
   transacties as initialTransacties,
@@ -62,6 +63,15 @@ function AppRoutes() {
           <Route path="/home-page" element={<HomePage/>} />
         </>
       )}
+
+      <Route
+        path="/see-all"
+        element={
+            <PublicRoute loggedIn={loggedIn}>
+                <SeeAllPage/>
+            </PublicRoute>
+        }
+        />
 
       <Route
         path="/login"
