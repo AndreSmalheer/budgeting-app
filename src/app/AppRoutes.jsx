@@ -57,6 +57,12 @@ function AppRoutes() {
         }
       />
 
+      {DEV_BYPASS && (
+        <>
+          <Route path="/home-page" element={<HomePage/>} />
+        </>
+      )}
+
       <Route
         path="/login"
         element={
