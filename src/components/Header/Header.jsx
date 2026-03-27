@@ -31,7 +31,7 @@ function Header() {
     <header className="Header-shell">
       <div className="Header">
         <Link className="Header-brand" to="/">
-          <img className="Header-logo" src="/favicon.svg" alt="BudgetMaatje logo" />
+          <img className="Header-logo" src="/icon-512.png" alt="BudgetMaatje logo" />
 
           <div className="Header-brand-copy">
             <span className="Header-brand-title">{appConfig.appName}</span>
