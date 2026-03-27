@@ -374,6 +374,10 @@
     opacity: 0.7;
 }
 
+.transaction-list.budget-details-page{
+    width: 90vw;
+}
+
 @media (min-width: 650px) {
     .afnemen-container {
         max-width: 1100px;

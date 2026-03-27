@@ -176,7 +176,7 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
         </button>
       </div>
 
-      <div className="transaction-list">
+      <div className="transaction-list budget-details-page">
         <div className="transaction-list__header">
           <h3 className="transaction-list__title">Transacties</h3>
         </div>
