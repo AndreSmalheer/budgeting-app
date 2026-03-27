@@ -11,14 +11,23 @@ import { potjes as initialPotjes, transacties as initialTransacties } from "../c
 function AppRoutes() {
     const [potjes, setPotjes] = useState(initialPotjes);
     const [transacties, setTransacties] = useState(initialTransacties);
+    const [loggedIn, setLoggedIn] = useState(true)
 
   return (
     <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route
+        path="/"
+        element={loggedIn ? <HomePage potjes={potjes} transacties={transacties} /> : <StarterInhoud />}
+        />
+
         <Route path="/potje-toevoegen" element={<PotjeToevogen setPotjes={setPotjes}/>} />
+
         <Route path="/home-page" element={<HomePage potjes={potjes} transacties={transacties} />} />
+
         <Route path="/starter-inhoud" element={<StarterInhoud />} />
+
         <Route path="/budget-details/:id"  element={<BudgetDetails potjes={potjes} transacties={transacties} setTransacties={setTransacties}/>} />
+
     </Routes>
   );
 }

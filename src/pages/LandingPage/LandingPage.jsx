@@ -1,6 +1,6 @@
 import Header from "../../components/Header/Header"
 
-function LandingPage() {
+function LandingPage({loggedIn}) {
     return (
         <>
             <Header />
