@@ -117,6 +117,8 @@ function HomePage({ potjes = [], transacties = [] }) {
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 3);
 
+console.log(potjes)
+
   return (
     <>
       <Header />

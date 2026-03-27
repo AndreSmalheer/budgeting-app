@@ -68,7 +68,7 @@ function AppRoutes() {
         path="/see-all/transacties"
         element={
           <ProtectedRoute loggedIn={loggedIn}>
-            <SeeAllPage type="transacties" potjes={potjes} transacties={transacties} />
+            <SeeAllPage type="transacties" potjes={potjes} transacties={transacties} setPotjes={setPotjes} setTransacties={setTransacties} />
           </ProtectedRoute>
         }
       />
@@ -77,7 +77,7 @@ function AppRoutes() {
         path="/see-all/potjes"
         element={
           <ProtectedRoute loggedIn={loggedIn}>
-            <SeeAllPage type="potjes" potjes={potjes} transacties={transacties} />
+            <SeeAllPage type="potjes" potjes={potjes} transacties={transacties} setPotjes={setPotjes} setTransacties={setTransacties} />
           </ProtectedRoute>
         }
       />
