@@ -75,7 +75,7 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
 
   const potje = potjes.find((p) => p.id === id);
   const potjeTransacties = transacties.filter((t) => t.potjeId === id);
-  const icon = potje.icon;
+  const icon = potje.icon
   const Icon =
     Icons[
       icon
@@ -83,6 +83,7 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join("")
     ] || Icons.Circle;
+
 
   const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
   const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState("");
@@ -108,8 +109,8 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
       prev.map((p) =>
         p.id === id
           ? { ...p, budget: Math.max(0, Number(p.budget) - value) }
-          : p,
-      ),
+          : p
+      )
     );
 
     setBudgetAfhalenAmount("");
@@ -133,6 +134,8 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
     budgetAfhalenNaam.trim() !== "" &&
     Number(budgetAfhalenAmount) > 0 &&
     Number(budgetAfhalenAmount) <= remaining;
+
+
 
   if (!potje) return <p>Potje niet gevonden</p>;
 
@@ -178,30 +181,34 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
           <h3 className="transaction-list__title">Transacties</h3>
         </div>
 
-        {potjeTransacties.map((t) => (
-          <div key={t.id} className="transaction-potje">
-            <div className="transaction__icon">
-              <Icon />
-            </div>
+        {potjeTransacties.length === 0 ? (
+          <p className="empty-state">Geen transacties voor dit potje</p>
+        ) : (
+          potjeTransacties.map((t) => (
+            <div key={t.id} className="transaction-potje">
+              <div className="transaction__icon">
+                <Icon />
+              </div>
 
-            <div className="transaction__info">
-              <p className="transaction__name">{t.description}</p>
-              <p className="transaction__meta">{t.date}</p>
-            </div>
+              <div className="transaction__info">
+                <p className="transaction__name">{t.description}</p>
+                <p className="transaction__meta">{t.date}</p>
+              </div>
 
-            <span
-              className={`transaction__amount ${
-                t.type === "expense" ? "negative" : "positive"
-              }`}
-            >
-              {t.type === "expense" ? "-" : "+"}
-              {new Intl.NumberFormat("nl-NL", {
-                style: "currency",
-                currency: "EUR",
-              }).format(Math.abs(t.amount))}
-            </span>
-          </div>
-        ))}
+              <span
+                className={`transaction__amount ${
+                  t.type === "expense" ? "negative" : "positive"
+                }`}
+              >
+                {t.type === "expense" ? "-" : "+"}
+                {new Intl.NumberFormat("nl-NL", {
+                  style: "currency",
+                  currency: "EUR",
+                }).format(Math.abs(t.amount))}
+              </span>
+            </div>
+          ))
+        )}
       </div>
     </>
   );
