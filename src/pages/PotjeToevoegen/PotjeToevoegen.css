@@ -189,6 +189,7 @@
 }
 
 .iconPicker {
+  overflow-x: hidden !important;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
@@ -222,7 +223,6 @@
 
 
 .iconPicker {
-  display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   max-height: 320px;
