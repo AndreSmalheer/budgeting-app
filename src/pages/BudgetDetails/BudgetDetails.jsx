@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import BackBtn from "../../components/BackBtn/BackBtn";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import "./BudgetDetails.css";
+import * as Icons from "lucide-react";
 
 const GroceryIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -74,6 +75,16 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
 
   const potje = potjes.find((p) => p.id === id);
   const potjeTransacties = transacties.filter((t) => t.potjeId === id);
+  const icon = potje.icon
+  const Icon =
+    Icons[
+      icon
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join("")
+    ] || Icons.Circle;
+
+
 
   const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
   const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState("");
@@ -169,7 +180,7 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
         {potjeTransacties.map((t) => (
           <div key={t.id} className="transaction-potje">
             <div className="transaction__icon">
-              <GroceryIcon />
+                <Icon />
             </div>
 
             <div className="transaction__info">
