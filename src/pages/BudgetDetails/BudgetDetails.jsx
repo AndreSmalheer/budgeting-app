@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import BackBtn from "../../components/BackBtn/BackBtn";
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import "./BudgetDetails.css";
 
 const GroceryIcon = () => (
@@ -13,112 +14,151 @@ const GroceryIcon = () => (
   </svg>
 );
 
-function BudgetDetails({ potjes, transacties, setTransacties }) {
+const COLORS = ["#00FFAE", "#ff6b6b"];
+
+function SpendingChart({ data }) {
+  return (
+    <div className="SpendingChart">
+      <div className="SpendingChart__graph">
+        <PieChart width={180} height={180}>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={48}
+            outerRadius={70}
+            paddingAngle={4}
+            dataKey="value"
+            stroke="none"
+          >
+            {data.map((_, i) => (
+              <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
+            ))}
+          </Pie>
+
+          <Tooltip
+            formatter={(v, name) => [
+              new Intl.NumberFormat("nl-NL", {
+                style: "currency",
+                currency: "EUR",
+              }).format(v),
+              name,
+            ]}
+          />
+        </PieChart>
+      </div>
+
+      <div className="chart-legend">
+        {data.map((item, i) => (
+          <div key={`${item.name}-${i}`} className="chart-legend__item">
+            <span
+              className="chart-legend__dot"
+              style={{ backgroundColor: COLORS[i % COLORS.length] }}
+            />
+            <span className="chart-legend__label">{item.name}</span>
+            <span className="chart-legend__value">
+              {new Intl.NumberFormat("nl-NL", {
+                style: "currency",
+                currency: "EUR",
+              }).format(item.value)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
   const { id } = useParams();
-  const [afnemenName, setAfnemenName] = useState("");
-  const [afnemenAmount, setAfnemenAmount] = useState("");
 
   const potje = potjes.find((p) => p.id === id);
   const potjeTransacties = transacties.filter((t) => t.potjeId === id);
+
+  const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
+  const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState("");
+
+  const isValidAmount =
+    budgetAfhalenNaam.trim() !== "" &&
+    Number(budgetAfhalenAmount) > 0;
+
+  const handleBudgetAfhalen = () => {
+    const value = Number(budgetAfhalenAmount);
+
+    if (!value || value <= 0) return;
+    if (!budgetAfhalenNaam.trim()) return;
+
+    const newTransaction = {
+      id: crypto.randomUUID(),
+      potjeId: id,
+      description: budgetAfhalenNaam,
+      amount: -Math.abs(value),
+      type: "expense",
+      date: new Date().toLocaleDateString("nl-NL"),
+    };
+
+    setTransacties((prev) => [newTransaction, ...prev]);
+
+    setPotjes((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? { ...p, budget: Math.max(0, Number(p.budget) - value) }
+          : p
+      )
+    );
+
+    setBudgetAfhalenAmount("");
+    setBudgetAfhalenNaam("");
+  };
+
   const budget = potje?.budget || 0;
 
-  const allTransactions = [...potjeTransacties];
-
-  const spent = allTransactions
+  const spent = potjeTransacties
     .filter((t) => t.type === "expense" || t.amount < 0)
     .reduce((s, t) => s + Math.abs(t.amount), 0);
 
   const remaining = budget - spent;
-  const progress = budget ? Math.min((spent / budget) * 100, 100) : 0;
 
-  const handleAfnemen = () => {
-    const value = Number(afnemenAmount);
-    if (!value || value <= 0) return;
+  const spendingData = [
+    { name: "Uitgegeven", value: spent },
+    { name: "Over", value: remaining < 0 ? 0 : remaining },
+  ];
 
-    const newTransaction = {
-      id: Date.now().toString(),
-      description: afnemenName || "Afnemen",
-      date: new Date().toISOString().split("T")[0],
-      amount: value,
-      type: "expense",
-      potjeId: id,
-    };
-
-    setTransacties((prev) => [newTransaction, ...prev]);
-    setAfnemenAmount("");
-    setAfnemenName("");
-  };
-
-  if (!potje) {
-    return <p>Potje niet gevonden</p>;
-  }
+  if (!potje) return <p>Potje niet gevonden</p>;
 
   return (
     <>
       <BackBtn style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }} />
 
       <div className="potje-container">
-        <div className="potje-header">
-          <div>
-            <p className="potje-label">Budget pot</p>
-            <h2 className="potje-title">{potje.name}</h2>
-            <p className="potje-label">Deze maand</p>
-          </div>
+        <SpendingChart data={spendingData} />
+      </div>
 
-          <div className="potje-amounts">
-            <p className="potje-label">Uitgegeven</p>
-            <p className="potje-spent">€ {spent.toLocaleString("nl-NL")}</p>
-            <p className="potje-remaining">
-              € {remaining.toLocaleString("nl-NL")} over
-            </p>
-          </div>
-        </div>
+      <div className="afnemen-container">
+        <input
+          className="afnemen-input"
+          type="text"
+          placeholder="Naam van transactie"
+          value={budgetAfhalenNaam}
+          onChange={(e) => setBudgetAfhalenNaam(e.target.value)}
+        />
 
-        <div className="potje-progress-track">
-          <div
-            className="potje-progress-fill"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+        <input
+          className="afnemen-input"
+          type="number"
+          inputMode="decimal"
+          placeholder="Bedrag"
+          value={budgetAfhalenAmount}
+          onChange={(e) => setBudgetAfhalenAmount(e.target.value)}
+        />
 
-        <div className="potje-stats">
-          <div className="potje-stat">
-            <p className="potje-stat-label">Budget</p>
-            <p className="potje-stat-value">€ {budget.toLocaleString("nl-NL")}</p>
-          </div>
-
-          <div className="potje-stat">
-            <p className="potje-stat-label">Transacties</p>
-            <p className="potje-stat-value">{allTransactions.length}</p>
-          </div>
-
-          <div className="potje-stat">
-            <p className="potje-stat-label">Gem./week</p>
-            <p className="potje-stat-value">€ {Math.round(spent / 4)}</p>
-          </div>
-        </div>
-
-        <div className="afnemen-container">
-          <input
-            type="text"
-            value={afnemenName}
-            onChange={(e) => setAfnemenName(e.target.value)}
-            placeholder="Naam (bv. boodschappen)"
-            className="afnemen-input"
-          />
-
-          <input
-            type="number"
-            value={afnemenAmount}
-            onChange={(e) => setAfnemenAmount(e.target.value)}
-            placeholder="Afnemen bedrag"
-            className="afnemen-input"
-          />
-
-          <button onClick={handleAfnemen} className="afnemen-button">
+        <button
+          className={`afnemen-button ${!isValidAmount ? "disabled" : ""}`}
+          onClick={handleBudgetAfhalen}
+          disabled={!isValidAmount}
+        >
             Afnemen
-          </button>
-        </div>
+        </button>
       </div>
 
       <div className="transaction-list">
@@ -126,7 +166,7 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
           <h3 className="transaction-list__title">Transacties</h3>
         </div>
 
-        {allTransactions.map((t) => (
+        {potjeTransacties.map((t) => (
           <div key={t.id} className="transaction-potje">
             <div className="transaction__icon">
               <GroceryIcon />
@@ -142,7 +182,11 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
                 t.type === "expense" ? "negative" : "positive"
               }`}
             >
-              {t.type === "expense" ? "-" : "+"}€{t.amount}
+              {t.type === "expense" ? "-" : "+"}
+              {new Intl.NumberFormat("nl-NL", {
+                style: "currency",
+                currency: "EUR",
+              }).format(Math.abs(t.amount))}
             </span>
           </div>
         ))}

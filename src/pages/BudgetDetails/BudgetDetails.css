@@ -252,3 +252,126 @@
         margin: 0 auto;
     }
 }
+
+
+.SpendingChart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.SpendingChart__graph {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-legend {
+    width: 100%;
+    display: grid;
+    gap: 8px;
+}
+
+.chart-legend__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #3a3f5c;
+    padding: 8px 10px;
+    border-radius: 6px;
+}
+
+.chart-legend__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+}
+
+.chart-legend__label {
+    flex: 1;
+    margin-left: 8px;
+    color: white;
+    font-size: 12px;
+}
+
+.chart-legend__value {
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.afnemen-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 20px;
+    padding: 12px;
+    background: #2b2f45;
+    border-radius: 12px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 23px 24px 24px;
+}
+
+.afnemen-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: #3a3f5c;
+    color: white;
+    font-size: 14px;
+}
+
+.afnemen-button {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    background: #00FFAE;
+    color: #0b1b16;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.afnemen-button:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.afnemen-button:active {
+    transform: translateY(0px);
+}
+
+.afnemen-button {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    background: #00FFAE;
+    color: #0b1b16;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.afnemen-button:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.afnemen-button:active {
+    transform: translateY(0px);
+}
+
+/* disabled state */
+.afnemen-button.disabled {
+    background: #4b5563;
+    color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}
