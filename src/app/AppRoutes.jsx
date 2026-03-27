@@ -32,6 +32,7 @@ function AppRoutes() {
         path="/budget-details/:id"
         element={
           <BudgetDetails
+            setPotjes={setPotjes}
             potjes={potjes}
             transacties={transacties}
             setTransacties={setTransacties}
