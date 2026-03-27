@@ -13,10 +13,15 @@ import { potjes as initialPotjes, transacties as initialTransacties } from "../c
 function AppRoutes() {
   const [potjes, setPotjes] = useState(initialPotjes);
   const [transacties, setTransacties] = useState(initialTransacties);
+  const [loggedIn, setLoggedIn] = useState(false)
 
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route
+      path="/"
+      element={loggedIn ? <HomePage potjes={potjes} transacties={transacties} /> : <LandingPage/>}
+      />
+
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/account" element={<AccountPage />} />
