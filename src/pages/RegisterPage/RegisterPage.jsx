@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import { registerAccount } from "../../services/api/client";
 import { saveStoredSession } from "../../utils/authStorage";
@@ -7,6 +7,7 @@ import "../LoginPage/AuthPage.css";
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     fullName: "",
     role: "child",
@@ -14,7 +15,9 @@ function RegisterPage() {
     REDACTED_PASSWORD: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
+
+  const redirectTarget = location.state?.from?.pathname || "/";
 
   function handleChange(event) {
     setFormData({
@@ -22,8 +25,8 @@ function RegisterPage() {
       [event.target.name]: event.target.value,
     });
 
-    if (feedback) {
-      setFeedback("");
+    if (feedback.message) {
+      setFeedback({ type: "", message: "" });
     }
   }
 
@@ -31,7 +34,7 @@ function RegisterPage() {
     event.preventDefault();
 
     setIsSubmitting(true);
-    setFeedback("");
+    setFeedback({ type: "", message: "" });
 
     try {
       const response = await registerAccount(formData);
@@ -43,9 +46,18 @@ function RegisterPage() {
         role: response.user.role,
       });
 
-      navigate("/home-page");
+      setFeedback({
+        type: "success",
+        message: "Je account is aangemaakt. Je wordt doorgestuurd...",
+      });
+
+      navigate(redirectTarget, { replace: true });
     } catch (error) {
-      setFeedback(error.message || "Registreren is niet gelukt.");
+      setFeedback({
+        type: "error",
+        message:
+          error.message || "Account aanmaken is niet gelukt. Probeer het opnieuw.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -58,12 +70,14 @@ function RegisterPage() {
       <main className="AuthPage">
         <form className="AuthCard" onSubmit={handleSubmit}>
           <p className="AuthEyebrow">Nieuw account maken</p>
-          <h1>Register</h1>
+          <h1>Registreren</h1>
           <p className="AuthDescription">
-            Maak een nieuw account aan in MongoDB. Deze pagina gebruikt nu de nieuwe Node backend.
+            Maak een account aan en start direct met budgetteren.
           </p>
 
-          {feedback && <p className="AuthFeedback error">{feedback}</p>}
+          {feedback.message && (
+            <p className={`AuthFeedback ${feedback.type}`}>{feedback.message}</p>
+          )}
 
           <label className="AuthField">
             <span>Volledige naam</span>
@@ -112,6 +126,10 @@ function RegisterPage() {
           <button className="AuthButton" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Account wordt aangemaakt..." : "Account maken"}
           </button>
+
+          <p className="AuthSwitch">
+            Heb je al een account? <Link to="/login">Log dan in</Link>
+          </p>
         </form>
       </main>
     </>

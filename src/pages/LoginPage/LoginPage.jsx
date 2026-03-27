@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import { loginAccount } from "../../services/api/client";
 import { saveStoredSession } from "../../utils/authStorage";
@@ -7,12 +7,15 @@ import "./AuthPage.css";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: "",
     REDACTED_PASSWORD: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
+
+  const redirectTarget = location.state?.from?.pathname || "/";
 
   function handleChange(event) {
     setFormData({
@@ -20,8 +23,8 @@ function LoginPage() {
       [event.target.name]: event.target.value,
     });
 
-    if (feedback) {
-      setFeedback("");
+    if (feedback.message) {
+      setFeedback({ type: "", message: "" });
     }
   }
 
@@ -29,7 +32,7 @@ function LoginPage() {
     event.preventDefault();
 
     setIsSubmitting(true);
-    setFeedback("");
+    setFeedback({ type: "", message: "" });
 
     try {
       const response = await loginAccount(formData);
@@ -41,9 +44,17 @@ function LoginPage() {
         role: response.user.role,
       });
 
-      navigate("/home-page");
+      setFeedback({
+        type: "success",
+        message: "Je bent ingelogd. Je wordt doorgestuurd...",
+      });
+
+      navigate(redirectTarget, { replace: true });
     } catch (error) {
-      setFeedback(error.message || "Inloggen is niet gelukt.");
+      setFeedback({
+        type: "error",
+        message: error.message || "Inloggen is niet gelukt. Probeer het opnieuw.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -56,12 +67,14 @@ function LoginPage() {
       <main className="AuthPage">
         <form className="AuthCard" onSubmit={handleSubmit}>
           <p className="AuthEyebrow">Inloggen op je account</p>
-          <h1>Login</h1>
+          <h1>Inloggen</h1>
           <p className="AuthDescription">
-            Log in met je account uit MongoDB. Deze pagina gebruikt nu de nieuwe Node backend.
+            Log in met je account om verder te gaan waar je was gebleven.
           </p>
 
-          {feedback && <p className="AuthFeedback error">{feedback}</p>}
+          {feedback.message && (
+            <p className={`AuthFeedback ${feedback.type}`}>{feedback.message}</p>
+          )}
 
           <label className="AuthField">
             <span>E-mail</span>
@@ -90,6 +103,10 @@ function LoginPage() {
           <button className="AuthButton" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Bezig met inloggen..." : "Inloggen"}
           </button>
+
+          <p className="AuthSwitch">
+            Nog geen account? <Link to="/register">Maak er een aan</Link>
+          </p>
         </form>
       </main>
     </>

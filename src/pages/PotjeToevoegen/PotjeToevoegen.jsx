@@ -1,7 +1,7 @@
-import { useState, useMemo, useDeferredValue, memo, useCallback } from "react";
+import { memo, useCallback, useDeferredValue, useMemo, useState } from "react";
 import * as Icons from "lucide-react";
-import "./PotjeToevoegen.css";
 import BackBtn from "../../components/BackBtn/BackBtn";
+import "./PotjeToevoegen.css";
 
 const budgetIconNames = [
   "ShoppingCart",
@@ -114,10 +114,11 @@ const IconOption = memo(function IconOption(props) {
     <button
       type="button"
       className={`iconOption ${active ? "active" : ""}`}
+      aria-label={`Kies icoon ${name}`}
+      title={`Kies icoon ${name}`}
       onClick={() => onSelect(name)}
     >
-      <IconComponent size={22} />
-      <span>{name}</span>
+      <IconComponent size={22} strokeWidth={2} />
     </button>
   );
 });
@@ -142,9 +143,7 @@ export default function PotjeToevoegen({ setPotjes }) {
       return iconEntries;
     }
 
-    return iconEntries.filter(([name]) =>
-      name.toLowerCase().includes(query)
-    );
+    return iconEntries.filter(([name]) => name.toLowerCase().includes(query));
   }, [deferredSearch]);
 
   const handleSelectIcon = useCallback((name) => {
@@ -154,9 +153,11 @@ export default function PotjeToevoegen({ setPotjes }) {
   const handleSubmit = () => {
     if (!canSubmit) return;
 
+    const potjeNaam = naam.trim();
+
     const newPotje = {
       id: Date.now().toString(),
-      name: naam.trim(),
+      name: potjeNaam,
       budget: doelNum,
       icon: selectedIcon,
     };
@@ -178,8 +179,8 @@ export default function PotjeToevoegen({ setPotjes }) {
 
       <div className="wrap">
         <div className="header section s1">
-          <p className="eyebrow">Nieuw budget</p>
-          <h1 className="title">Waar wil je je budget voor gebruiken?</h1>
+          <p className="eyebrow">Nieuw potje</p>
+          <h1 className="title">Waar wil je dit budgetpotje voor gebruiken?</h1>
         </div>
 
         <div className="fields section s2">
@@ -187,9 +188,9 @@ export default function PotjeToevoegen({ setPotjes }) {
             <label className="label">Naam</label>
             <input
               className={`input ${focused === "naam" ? "focus" : ""}`}
-              placeholder="bijv. Boodschappen"
+              placeholder="Bijvoorbeeld boodschappen"
               value={naam}
-              onChange={(e) => setNaam(e.target.value)}
+              onChange={(event) => setNaam(event.target.value)}
               onFocus={() => setFocused("naam")}
               onBlur={() => setFocused(null)}
             />
@@ -204,7 +205,7 @@ export default function PotjeToevoegen({ setPotjes }) {
                 placeholder="1.500"
                 inputMode="decimal"
                 value={doel}
-                onChange={(e) => setDoel(e.target.value)}
+                onChange={(event) => setDoel(event.target.value)}
                 onFocus={() => setFocused("doel")}
                 onBlur={() => setFocused(null)}
               />
@@ -216,9 +217,9 @@ export default function PotjeToevoegen({ setPotjes }) {
 
             <input
               className="input"
-              placeholder="Zoek icoon..."
+              placeholder="Zoek een icoon..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(event) => setSearch(event.target.value)}
               autoComplete="off"
               spellCheck="false"
               style={{ marginBottom: "10px" }}
@@ -248,12 +249,12 @@ export default function PotjeToevoegen({ setPotjes }) {
               cursor: canSubmit ? "pointer" : "not-allowed",
             }}
           >
-            Aanmaken
+            Potje aanmaken
           </button>
         </div>
       </div>
 
-      {submitted && <div className="toast">✓ {naam} aangemaakt</div>}
+      {submitted && <div className="toast">Potje aangemaakt</div>}
     </div>
   );
 }

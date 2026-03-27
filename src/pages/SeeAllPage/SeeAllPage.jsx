@@ -1,33 +1,18 @@
-import BackBtn from "../../components/BackBtn/BackBtn";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Trash2 } from "lucide-react";
+import BackBtn from "../../components/BackBtn/BackBtn";
+import { LucideIcon } from "../../utils/icons";
 import "./SeeAllPage.css";
-import * as Icons from "lucide-react";
 
-const TrashIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M3 6h18"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <path
-      d="M8 6V4h8v2"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <path
-      d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </svg>
-);
+function formatCurrency(value) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+  }).format(value);
+}
 
-function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
+function SeeAllPage({ type, potjes, setPotjes, transacties }) {
   const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
 
@@ -44,19 +29,8 @@ function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
   };
 
   const confirmDelete = () => {
-    console.log(`potje verwijderen ${deleteId}`);
-
-    setPotjes((prev) => prev.filter((p) => p.id !== deleteId));
-
+    setPotjes((prev) => prev.filter((potje) => potje.id !== deleteId));
     setDeleteId(null);
-  };
-
-  const handleDeletePotje = (id) => {
-    console.log(`potje verwijderen ${id}`);
-  };
-
-  const handleDeleteClick = (id) => {
-    setDeleteId(id);
   };
 
   return (
@@ -70,36 +44,24 @@ function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
 
             <div className="recent-transactions">
               {sortedTransacties.length === 0 && (
-                <p className="empty-state">Nog geen transacties</p>
+                <p className="empty-state">Er zijn nog geen transacties.</p>
               )}
 
-              {sortedTransacties.map((t) => {
-                const potjeName =
-                  potjes.find((p) => p.id === t.potjeId)?.name || "Geen potje";
-
-                const potje = potjes.find((p) => p.id === t.potjeId);
-                const iconName = potje?.icon || "";
-
-                const isExpense = t.type === "expense";
-
-                const Icon =
-                  Icons[
-                    iconName
-                      .split("-")
-                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                      .join("")
-                  ] || Icons.Circle;
+              {sortedTransacties.map((transaction) => {
+                const potje = potjes.find((item) => item.id === transaction.potjeId);
+                const potjeName = potje?.name || "Zonder potje";
+                const isExpense = transaction.type === "expense";
 
                 return (
-                  <div key={t.id} className="transaction">
+                  <div key={transaction.id} className="transaction">
                     <div className="transaction__icon">
-                      <Icon />
+                      <LucideIcon name={potje?.icon} size={18} strokeWidth={2} />
                     </div>
 
                     <div className="transaction__info">
-                      <p className="transaction__name">{t.description}</p>
+                      <p className="transaction__name">{transaction.description}</p>
                       <p className="transaction__meta">
-                        {potjeName} · {t.date}
+                        {potjeName} · {transaction.date}
                       </p>
                     </div>
 
@@ -108,8 +70,8 @@ function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
                         isExpense ? "negative" : "positive"
                       }`}
                     >
-                      {isExpense ? "-" : "+"}€
-                      {Math.abs(t.amount).toLocaleString("nl-NL")}
+                      {isExpense ? "-" : "+"}
+                      {formatCurrency(Math.abs(transaction.amount))}
                     </span>
                   </div>
                 );
@@ -124,43 +86,37 @@ function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
 
             <div className="potjes-list">
               {sortedPotjes.length === 0 && (
-                <p className="empty-state">Nog geen potjes</p>
+                <p className="empty-state">Er zijn nog geen potjes.</p>
               )}
 
-              {sortedPotjes.map((p) => {
-                const Icon =
-                  Icons[
-                    p.icon
-                      .split("-")
-                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                      .join("")
-                  ] || Icons.Circle;
-
+              {sortedPotjes.map((potje) => {
                 return (
                   <div
-                    key={p.id}
+                    key={potje.id}
                     className="transaction"
-                    onClick={() => navigate(`/budget-details/${p.id}`)}
+                    onClick={() => navigate(`/budget-details/${potje.id}`)}
                   >
                     <div className="transaction__icon">
-                      <Icon />
+                      <LucideIcon name={potje.icon} size={18} strokeWidth={2} />
                     </div>
 
                     <div className="transaction__info">
-                      <p className="transaction__name">{p.name}</p>
+                      <p className="transaction__name">{potje.name}</p>
                       <p className="transaction__meta">
-                        Budget · €{p.budget.toLocaleString("nl-NL")}
+                        Budget · {formatCurrency(potje.budget)}
                       </p>
                     </div>
 
                     <button
                       className="delete-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(p.id);
+                      type="button"
+                      aria-label={`Verwijder ${potje.name}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setDeleteId(potje.id);
                       }}
                     >
-                      <TrashIcon />
+                      <Trash2 size={18} strokeWidth={2} />
                     </button>
                   </div>
                 );
@@ -174,7 +130,7 @@ function SeeAllPage({ type, potjes, setPotjes, transacties, setTransacties }) {
         <div className="modal-overlay">
           <div className="modal">
             <h2>Weet je het zeker?</h2>
-            <p>Dit potje wordt permanent verwijderd.</p>
+            <p>Dit potje wordt definitief verwijderd.</p>
 
             <div className="modal-actions">
               <button className="btn-cancel" onClick={cancelDelete}>

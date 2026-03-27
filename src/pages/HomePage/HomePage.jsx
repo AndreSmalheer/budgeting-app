@@ -1,11 +1,19 @@
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import Potjes from "../../components/Potjes/Potjes";
 import Header from "../../components/Header/Header";
 import "./HomePage.css";
-import { Link } from "react-router-dom";
 
 const COLORS = ["#534AB7", "#1D9E75", "#EF9F27", "#D4537E", "#888780"];
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+  }).format(value);
+}
 
 function SpendingChart({ data }) {
   return (
@@ -27,7 +35,7 @@ function SpendingChart({ data }) {
             ))}
           </Pie>
           <Tooltip
-            formatter={(v) => `€${v.toLocaleString("nl-NL")}`}
+            formatter={(value) => formatCurrency(value)}
             contentStyle={{
               fontSize: 10,
               padding: "2px 6px",
@@ -45,7 +53,7 @@ function RecentTransactions({ transacties, potjes }) {
   return (
     <div className="SpendingOverview">
       <div className="recent-transactions__header">
-        <h2 className="recent-transactions__title">Recent</h2>
+        <h2 className="recent-transactions__title">Recente transacties</h2>
         <Link
           to="/see-all/transacties"
           className="recent-transactions__see-all"
@@ -61,27 +69,24 @@ function RecentTransactions({ transacties, potjes }) {
           [...transacties]
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 4)
-            .map((t) => (
-              <div key={t.id} className="transaction">
+            .map((transaction) => (
+              <div key={transaction.id} className="transaction">
                 <div className="transaction__info">
-                  <p className="transaction__name">{t.description}</p>
+                  <p className="transaction__name">{transaction.description}</p>
                   <p className="transaction__meta">
-                    {potjes.find((p) => p.id === t.potjeId)?.name ||
-                      "Geen potje"}{" "}
-                    · {t.date}
+                    {potjes.find((potje) => potje.id === transaction.potjeId)
+                      ?.name || "Zonder potje"}{" "}
+                    · {transaction.date}
                   </p>
                 </div>
 
                 <span
                   className={`transaction__amount ${
-                    t.type === "expense" ? "negative" : "positive"
+                    transaction.type === "expense" ? "negative" : "positive"
                   }`}
                 >
-                  {t.type === "expense" ? "-" : "+"}€
-                  {new Intl.NumberFormat("nl-NL", {
-                    style: "currency",
-                    currency: "EUR",
-                  }).format(Math.abs(t.amount))}
+                  {transaction.type === "expense" ? "-" : "+"}
+                  {formatCurrency(Math.abs(transaction.amount))}
                 </span>
               </div>
             ))
@@ -92,35 +97,35 @@ function RecentTransactions({ transacties, potjes }) {
 }
 
 function HomePage({ potjes = [], transacties = [] }) {
-  const { incomeTotal, expenseTotal, spendingData } =
-    useMemo(() => {
-      const incomeTotal = potjes.reduce((sum, p) => sum + (p.budget || 0), 0);
+  const { incomeTotal, expenseTotal, spendingData } = useMemo(() => {
+    const incomeTotal = potjes.reduce((sum, potje) => sum + (potje.budget || 0), 0);
 
-      const expenseTotal = transacties
-        .filter((t) => t.type === "expense")
-        .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const expenseTotal = transacties
+      .filter((transaction) => transaction.type === "expense")
+      .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
 
-      const spendingData = potjes
-        .map((p) => {
-          const spent = transacties
-            .filter((t) => t.potjeId === p.id && t.type === "expense")
-            .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const spendingData = potjes
+      .map((potje) => {
+        const spent = transacties
+          .filter(
+            (transaction) =>
+              transaction.potjeId === potje.id && transaction.type === "expense",
+          )
+          .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
 
-          return {
-            name: p.name,
-            value: spent,
-          };
-        })
-        .filter((item) => item.value > 0);
+        return {
+          name: potje.name,
+          value: spent,
+        };
+      })
+      .filter((item) => item.value > 0);
 
-      return { incomeTotal, expenseTotal, spendingData };
-    }, [potjes, transacties]);
+    return { incomeTotal, expenseTotal, spendingData };
+  }, [potjes, transacties]);
 
-    const recentPotjes = [...potjes]
+  const recentPotjes = [...potjes]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 3);
-
-console.log(potjes)
 
   return (
     <>
@@ -132,15 +137,11 @@ console.log(potjes)
           <div className="Balance-items">
             <div className="Balance-item positive">
               <span className="Balance-icon"></span>
-              <h2 className="Balance-value">
-                    € {incomeTotal.toLocaleString("nl-NL")}
-              </h2>
+              <h2 className="Balance-value">{formatCurrency(incomeTotal)}</h2>
             </div>
             <div className="Balance-item negative">
               <span className="Balance-icon"></span>
-              <h2 className="Balance-value">
-                € {expenseTotal.toLocaleString("nl-NL")}
-              </h2>
+              <h2 className="Balance-value">{formatCurrency(expenseTotal)}</h2>
             </div>
           </div>
         </div>
@@ -157,49 +158,37 @@ console.log(potjes)
         </div>
 
         <div className="budget-items">
-          {recentPotjes.map((p) => {
+          {recentPotjes.map((potje) => {
             const spent = transacties
-              .filter((t) => t.potjeId === p.id && t.type === "expense")
-              .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+              .filter(
+                (transaction) =>
+                  transaction.potjeId === potje.id && transaction.type === "expense",
+              )
+              .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
 
-            const progress = p.budget
-              ? Math.min((spent / p.budget) * 100, 100)
+            const progress = potje.budget
+              ? Math.min((spent / potje.budget) * 100, 100)
               : 0;
 
             return (
               <Potjes
-                key={p.id}
-                id={p.id}
-                name={p.name}
-                budget={p.budget}
+                key={potje.id}
+                id={potje.id}
+                name={potje.name}
+                budget={potje.budget}
                 spent={spent}
                 progress={progress}
-                icon={p.icon}
+                icon={potje.icon}
               />
             );
           })}
 
-          <Link to="/potje-toevoegen" className="plus-icon">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 5V19"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <path
-                d="M5 12H19"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
+          <Link
+            to="/potje-toevoegen"
+            className="plus-icon"
+            aria-label="Nieuw potje toevoegen"
+          >
+            <Plus size={24} strokeWidth={2} />
           </Link>
         </div>
       </div>

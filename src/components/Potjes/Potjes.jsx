@@ -1,7 +1,7 @@
 import "./Potjes.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import * as Icons from "lucide-react";
+import { LucideIcon } from "../../utils/icons";
 
 function Potjes({ id, progress, name, budget, spent, icon }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -11,14 +11,6 @@ function Potjes({ id, progress, name, budget, spent, icon }) {
   style: "currency",
   currency: "EUR",
   }).format(remaining);
-
-  const Icon =
-    Icons[
-      icon
-        .split("-")
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join("")
-    ] || Icons.Circle;
 
   useEffect(() => {
     const handleResize = () => {
@@ -45,13 +37,13 @@ function Potjes({ id, progress, name, budget, spent, icon }) {
       >
         <div className="Potje-image-wrapper">
           <div className="Potje-image">
-            <Icon />
+            <LucideIcon name={icon} size={22} strokeWidth={2} />
           </div>
         </div>
       </div>
 
       <h1 className="Potje-title">{name}</h1>
-      <h2 className="Potje-subtitle">{formattedRemaining} Over</h2>
+      <h2 className="Potje-subtitle">{formattedRemaining} resterend</h2>
     </div>
   );
 }

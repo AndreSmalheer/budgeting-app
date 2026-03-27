@@ -1,5 +1,5 @@
-import { Route, Routes } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import LandingPage from "../pages/LandingPage/LandingPage";
 import StarterInhoud from "../pages/Starter-inhoud/Starter-inhoud";
 import HomePage from "../pages/HomePage/HomePage";
@@ -14,7 +14,23 @@ import {
   transacties as initialTransacties,
 } from "../config/data";
 import { getStoredSession } from "../utils/authStorage";
-import { Navigate } from "react-router-dom";
+
+function ProtectedRoute({ children, isAllowed }) {
+  const location = useLocation();
+
+  return isAllowed ? (
+    children
+  ) : (
+    <Navigate to="/login" replace state={{ from: location }} />
+  );
+}
+
+function PublicRoute({ children, isLoggedIn }) {
+  const location = useLocation();
+  const redirectTarget = location.state?.from?.pathname || "/";
+
+  return !isLoggedIn ? children : <Navigate to={redirectTarget} replace />;
+}
 
 function AppRoutes() {
   const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS === "true";
@@ -22,14 +38,6 @@ function AppRoutes() {
   const [potjes, setPotjes] = useState(initialPotjes);
   const [transacties, setTransacties] = useState(initialTransacties);
   const [loggedIn, setLoggedIn] = useState(() => Boolean(getStoredSession()));
-
-  function ProtectedRoute({ loggedIn, children }) {
-    return loggedIn || DEV_BYPASS ? children : <Navigate to="/login" />;
-  }
-
-  function PublicRoute({ loggedIn, children }) {
-    return !loggedIn ? children : <Navigate to="/" />;
-  }
 
   useEffect(() => {
     function syncSession() {
@@ -45,6 +53,8 @@ function AppRoutes() {
     };
   }, []);
 
+  const canAccessProtectedRoutes = loggedIn || DEV_BYPASS;
+
   return (
     <Routes>
       <Route
@@ -59,16 +69,22 @@ function AppRoutes() {
       />
 
       {DEV_BYPASS && (
-        <>
-          <Route path="/home-page" element={<HomePage transacties={transacties} potjes={potjes} />} />
-        </>
+        <Route
+          path="/home-page"
+          element={<HomePage transacties={transacties} potjes={potjes} />}
+        />
       )}
 
       <Route
         path="/see-all/transacties"
         element={
-          <ProtectedRoute loggedIn={loggedIn}>
-            <SeeAllPage type="transacties" potjes={potjes} transacties={transacties} setPotjes={setPotjes} setTransacties={setTransacties} />
+          <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
+            <SeeAllPage
+              type="transacties"
+              potjes={potjes}
+              transacties={transacties}
+              setPotjes={setPotjes}
+            />
           </ProtectedRoute>
         }
       />
@@ -76,8 +92,13 @@ function AppRoutes() {
       <Route
         path="/see-all/potjes"
         element={
-          <ProtectedRoute loggedIn={loggedIn}>
-            <SeeAllPage type="potjes" potjes={potjes} transacties={transacties} setPotjes={setPotjes} setTransacties={setTransacties} />
+          <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
+            <SeeAllPage
+              type="potjes"
+              potjes={potjes}
+              transacties={transacties}
+              setPotjes={setPotjes}
+            />
           </ProtectedRoute>
         }
       />
@@ -85,7 +106,7 @@ function AppRoutes() {
       <Route
         path="/login"
         element={
-          <PublicRoute loggedIn={loggedIn}>
+          <PublicRoute isLoggedIn={loggedIn}>
             <LoginPage />
           </PublicRoute>
         }
@@ -94,7 +115,7 @@ function AppRoutes() {
       <Route
         path="/register"
         element={
-          <PublicRoute loggedIn={loggedIn}>
+          <PublicRoute isLoggedIn={loggedIn}>
             <RegisterPage />
           </PublicRoute>
         }
@@ -103,7 +124,7 @@ function AppRoutes() {
       <Route
         path="/account"
         element={
-          <ProtectedRoute loggedIn={loggedIn}>
+          <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
             <AccountPage />
           </ProtectedRoute>
         }
@@ -112,7 +133,7 @@ function AppRoutes() {
       <Route
         path="/potje-toevoegen"
         element={
-          <ProtectedRoute loggedIn={loggedIn}>
+          <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
             <PotjeToevoegen setPotjes={setPotjes} />
           </ProtectedRoute>
         }
@@ -121,7 +142,7 @@ function AppRoutes() {
       <Route
         path="/starter-inhoud"
         element={
-          <ProtectedRoute loggedIn={loggedIn}>
+          <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
             <StarterInhoud />
           </ProtectedRoute>
         }
@@ -130,7 +151,7 @@ function AppRoutes() {
       <Route
         path="/budget-details/:id"
         element={
-          <ProtectedRoute loggedIn={loggedIn}>
+          <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
             <BudgetDetails
               setPotjes={setPotjes}
               potjes={potjes}

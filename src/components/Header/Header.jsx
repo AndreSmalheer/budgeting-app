@@ -1,6 +1,7 @@
 import "./Header.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { LogIn, LogOut, UserRound, UserRoundPlus } from "lucide-react";
 import appConfig from "../../config/appConfig";
 import { clearStoredSession, getStoredSession } from "../../utils/authStorage";
 
@@ -43,21 +44,25 @@ function Header() {
           {session ? (
             <>
               <Link className="Header-link Header-link-primary" to="/account">
-                Ga naar account
+                <UserRound size={16} strokeWidth={2} />
+                <span>Profiel</span>
               </Link>
 
               <button className="Header-link Header-link-secondary" type="button" onClick={handleLogout}>
-                Uitloggen
+                <LogOut size={16} strokeWidth={2} />
+                <span>Uitloggen</span>
               </button>
             </>
           ) : (
             <>
               <Link className="Header-link Header-link-secondary" to="/login">
-                Login
+                <LogIn size={16} strokeWidth={2} />
+                <span>Inloggen</span>
               </Link>
 
               <Link className="Header-link Header-link-primary" to="/register">
-                Register
+                <UserRoundPlus size={16} strokeWidth={2} />
+                <span>Registreren</span>
               </Link>
             </>
           )}

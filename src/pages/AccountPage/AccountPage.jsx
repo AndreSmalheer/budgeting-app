@@ -4,6 +4,12 @@ import "./AccountPage.css";
 
 function AccountPage() {
   const session = getStoredSession();
+  const roleLabel =
+    session?.role === "parent"
+      ? "Ouder"
+      : session?.role === "child"
+        ? "Kind"
+        : "Nog niet ingesteld";
 
   return (
     <>
@@ -11,8 +17,8 @@ function AccountPage() {
 
       <main className="AccountPage">
         <section className="AccountCard">
-          <p className="AccountEyebrow">Placeholder account page</p>
-          <h1>Account</h1>
+          <p className="AccountEyebrow">Jouw profiel</p>
+          <h1>Accountgegevens</h1>
 
           {session ? (
             <div className="AccountInfo">
@@ -23,7 +29,7 @@ function AccountPage() {
                 <strong>E-mail:</strong> {session.email}
               </p>
               <p>
-                <strong>Rol:</strong> {session.role}
+                <strong>Rol:</strong> {roleLabel}
               </p>
             </div>
           ) : (
