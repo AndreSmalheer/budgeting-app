@@ -8,13 +8,25 @@ import PotjeToevoegen from "../pages/PotjeToevoegen/PotjeToevoegen";
 import LoginPage from "../pages/LoginPage/LoginPage";
 import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import AccountPage from "../pages/AccountPage/AccountPage";
-import { potjes as initialPotjes, transacties as initialTransacties } from "../config/data";
+import {
+  potjes as initialPotjes,
+  transacties as initialTransacties,
+} from "../config/data";
 import { getStoredSession } from "../utils/authStorage";
+import { Navigate } from "react-router-dom";
 
 function AppRoutes() {
   const [potjes, setPotjes] = useState(initialPotjes);
   const [transacties, setTransacties] = useState(initialTransacties);
   const [loggedIn, setLoggedIn] = useState(() => Boolean(getStoredSession()));
+
+  function ProtectedRoute({ loggedIn, children }) {
+    return loggedIn ? children : <Navigate to="/login" />;
+  }
+
+  function PublicRoute({ loggedIn, children }) {
+    return !loggedIn ? children : <Navigate to="/" />;
+  }
 
   useEffect(() => {
     function syncSession() {
@@ -34,24 +46,73 @@ function AppRoutes() {
     <Routes>
       <Route
         path="/"
-        element={loggedIn ? <HomePage potjes={potjes} transacties={transacties} /> : <LandingPage />}
+        element={
+          loggedIn ? (
+            <HomePage potjes={potjes} transacties={transacties} />
+          ) : (
+            <LandingPage />
+          )
+        }
       />
 
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/account" element={<AccountPage />} />
-      <Route path="/potje-toevoegen" element={<PotjeToevoegen setPotjes={setPotjes} />} />
-      <Route path="/home-page" element={<HomePage potjes={potjes} transacties={transacties} />} />
-      <Route path="/starter-inhoud" element={<StarterInhoud />} />
+      {/* Public routes */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute loggedIn={loggedIn}>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/register"
+        element={
+          <PublicRoute loggedIn={loggedIn}>
+            <RegisterPage />
+          </PublicRoute>
+        }
+      />
+
+      {/* Protected routes */}
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute loggedIn={loggedIn}>
+            <AccountPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/potje-toevoegen"
+        element={
+          <ProtectedRoute loggedIn={loggedIn}>
+            <PotjeToevoegen setPotjes={setPotjes} />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/starter-inhoud"
+        element={
+          <ProtectedRoute loggedIn={loggedIn}>
+            <StarterInhoud />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/budget-details/:id"
         element={
-          <BudgetDetails
-            setPotjes={setPotjes}
-            potjes={potjes}
-            transacties={transacties}
-            setTransacties={setTransacties}
-          />
+          <ProtectedRoute loggedIn={loggedIn}>
+            <BudgetDetails
+              setPotjes={setPotjes}
+              potjes={potjes}
+              transacties={transacties}
+              setTransacties={setTransacties}
+            />
+          </ProtectedRoute>
         }
       />
     </Routes>
