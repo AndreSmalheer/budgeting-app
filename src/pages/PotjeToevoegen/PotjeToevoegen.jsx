@@ -99,7 +99,9 @@ const budgetIconNames = [
   "CircleHelp",
 ];
 
-const iconEntries = budgetIconNames
+const uniqueNames = [...new Set(budgetIconNames)];
+
+const iconEntries = uniqueNames
   .filter((name) => Icons[name])
   .slice(0, 100)
   .map((name) => [name, Icons[name]]);
