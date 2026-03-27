@@ -38,7 +38,7 @@ function RegisterPage() {
 
       saveStoredSession({
         id: response.user.id,
-        fullName: response.user.full_name,
+        fullName: response.user.fullName,
         email: response.user.email,
         role: response.user.role,
       });
@@ -60,8 +60,7 @@ function RegisterPage() {
           <p className="AuthEyebrow">Nieuw account maken</p>
           <h1>Register</h1>
           <p className="AuthDescription">
-            Maak een nieuw account aan in je eigen database. Deze pagina gebruikt nu de echte PHP
-            backend en lokale MAMP database.
+            Maak een nieuw account aan in MongoDB. Deze pagina gebruikt nu de nieuwe Node backend.
           </p>
 
           {feedback && <p className="AuthFeedback error">{feedback}</p>}

@@ -1,13 +1,19 @@
 import appConfig from "../../config/appConfig";
 
 async function apiRequest(path, options = {}) {
-  const response = await fetch(`${appConfig.apiBaseUrl}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    ...options,
-  });
+  let response;
+
+  try {
+    response = await fetch(`${appConfig.apiBaseUrl}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+      ...options,
+    });
+  } catch {
+    throw new Error("De nieuwe MongoDB backend is nog niet gekoppeld.");
+  }
 
   const data = await response.json().catch(() => ({}));
 
@@ -27,14 +33,14 @@ export async function getDatabaseStatus() {
 }
 
 export async function registerAccount(formData) {
-  return apiRequest("/register", {
+  return apiRequest("/auth/register", {
     method: "POST",
     body: JSON.stringify(formData),
   });
 }
 
 export async function loginAccount(formData) {
-  return apiRequest("/login", {
+  return apiRequest("/auth/login", {
     method: "POST",
     body: JSON.stringify(formData),
   });

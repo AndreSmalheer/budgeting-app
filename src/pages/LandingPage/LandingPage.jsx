@@ -7,8 +7,8 @@ import "./LandingPage.css";
 function LandingPage() {
   const [connectionStatus, setConnectionStatus] = useState({
     type: "loading",
-    title: "Connectie controleren...",
-    message: "De app probeert te verbinden met de backend en database.",
+    title: "Backend controleren...",
+    message: "De app probeert te verbinden met de nieuwe Node en MongoDB backend.",
   });
 
   useEffect(() => {
@@ -21,13 +21,13 @@ function LandingPage() {
 
           setConnectionStatus({
             type: "success",
-            title: "Database verbonden",
-            message: `De backend en database zijn bereikbaar. Database: ${databaseStatus.database_name || "onbekend"}.`,
+            title: "MongoDB verbonden",
+            message: `De backend en database zijn bereikbaar. Database: ${databaseStatus.databaseName || "onbekend"}.`,
           });
         } catch (error) {
           setConnectionStatus({
             type: "error",
-            title: "Backend werkt, database nog niet",
+            title: "Backend werkt, MongoDB nog niet",
             message: error.message || "De backend reageert wel, maar de databaseverbinding lukt nog niet.",
           });
         }
@@ -35,7 +35,7 @@ function LandingPage() {
         setConnectionStatus({
           type: "error",
           title: "Geen verbinding met de backend",
-          message: "De frontend kan de PHP API niet bereiken. Controleer of je lokale of schoolserver draait.",
+          message: "Start eerst de nieuwe backend met Node en vul daarna je MongoDB .env in.",
         });
       }
     }
@@ -52,7 +52,9 @@ function LandingPage() {
           <div className="LandingHero-copy">
             <div className={`ConnectionStatus ${connectionStatus.type}`}>
               <p className="ConnectionStatus-title">{connectionStatus.title}</p>
-              <p className="ConnectionStatus-message">{connectionStatus.message}</p>
+              <p className="ConnectionStatus-message">
+                {connectionStatus.message}
+              </p>
             </div>
 
             <p className="LandingHero-eyebrow">Voor jongeren en ouders</p>

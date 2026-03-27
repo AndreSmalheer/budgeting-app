@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LandingPage from "../pages/LandingPage/LandingPage";
 import StarterInhoud from "../pages/Starter-inhoud/Starter-inhoud";
 import HomePage from "../pages/HomePage/HomePage";
@@ -9,17 +9,32 @@ import LoginPage from "../pages/LoginPage/LoginPage";
 import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import AccountPage from "../pages/AccountPage/AccountPage";
 import { potjes as initialPotjes, transacties as initialTransacties } from "../config/data";
+import { getStoredSession } from "../utils/authStorage";
 
 function AppRoutes() {
   const [potjes, setPotjes] = useState(initialPotjes);
   const [transacties, setTransacties] = useState(initialTransacties);
-  const [loggedIn, setLoggedIn] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(() => Boolean(getStoredSession()));
+
+  useEffect(() => {
+    function syncSession() {
+      setLoggedIn(Boolean(getStoredSession()));
+    }
+
+    window.addEventListener("storage", syncSession);
+    window.addEventListener("auth-changed", syncSession);
+
+    return () => {
+      window.removeEventListener("storage", syncSession);
+      window.removeEventListener("auth-changed", syncSession);
+    };
+  }, []);
 
   return (
     <Routes>
       <Route
-      path="/"
-      element={loggedIn ? <HomePage potjes={potjes} transacties={transacties} /> : <LandingPage/>}
+        path="/"
+        element={loggedIn ? <HomePage potjes={potjes} transacties={transacties} /> : <LandingPage />}
       />
 
       <Route path="/login" element={<LoginPage />} />

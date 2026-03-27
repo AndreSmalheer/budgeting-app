@@ -36,7 +36,7 @@ function LoginPage() {
 
       saveStoredSession({
         id: response.user.id,
-        fullName: response.user.full_name,
+        fullName: response.user.fullName,
         email: response.user.email,
         role: response.user.role,
       });
@@ -58,8 +58,7 @@ function LoginPage() {
           <p className="AuthEyebrow">Inloggen op je account</p>
           <h1>Login</h1>
           <p className="AuthDescription">
-            Log in met een account uit je eigen database. De frontend gebruikt nu de echte PHP
-            backend en lokale MAMP database.
+            Log in met je account uit MongoDB. Deze pagina gebruikt nu de nieuwe Node backend.
           </p>
 
           {feedback && <p className="AuthFeedback error">{feedback}</p>}

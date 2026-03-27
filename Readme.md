@@ -7,7 +7,7 @@ Schoolproject voor een mobile-first budget app voor jongeren en ouders.
 - `src/`
   React frontend
 - `backend/`
-  PHP API basis
+  Node/Express backend voor MongoDB
 - `docs/`
   Korte projectdocumentatie
 
@@ -18,13 +18,17 @@ npm install
 npm run dev
 ```
 
-## Backend basis
+## Backend starten
 
-De backend staat klaar in `backend/` met een simpele route-structuur voor:
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-- registratie
-- login
-- ouder-kind koppeling
-- potjes
-- transacties
-- goedkeuringen
+## Huidige status
+
+- Oude PHP/phpMyAdmin backend is verwijderd
+- Node/Express basis voor MongoDB staat klaar
+- Register en login routes zijn voorbereid voor MongoDB
+- Vul zelf nog `backend/.env` in met je eigen MongoDB URI
