@@ -6,7 +6,6 @@
 
 .page {
   min-height: 100vh;
-  max-height: 90vh;
   background: #2F3349;
   display: flex;
   justify-content: center;
