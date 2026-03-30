@@ -15,7 +15,7 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
   );
 
   const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
-  const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState("");
+  const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState(`${potje.name} afschrijving`);
 
   const handleBudgetAfhalen = () => {
     const value = Number(budgetAfhalenAmount);
