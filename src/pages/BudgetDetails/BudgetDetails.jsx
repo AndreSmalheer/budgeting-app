@@ -6,16 +6,32 @@ import BudgetTransactionsSection from "../../components/budget/BudgetTransaction
 import BudgetWithdrawForm from "../../components/budget/BudgetWithdrawForm";
 import "./BudgetDetails.css";
 
-function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
+function BudgetDetails({ potjes, transacties, setTransacties }) {
   const { id } = useParams();
 
   const potje = potjes.find((item) => item.id === id);
+
   const potjeTransacties = transacties.filter(
-    (transaction) => transaction.potjeId === id,
+    (transaction) => transaction.potjeId === id
   );
 
   const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
-  const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState(`${potje.name} afschrijving`);
+  const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState(
+    `${potje?.name || ""} afschrijving`
+  );
+
+  if (!potje) return <p>Potje niet gevonden.</p>;
+
+  const budget = Number(potje.budget) || 0;
+
+  const spent = potjeTransacties
+    .filter(
+      (transaction) =>
+        transaction.type === "expense" || transaction.amount < 0
+    )
+    .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
+
+  const remaining = budget - spent;
 
   const handleBudgetAfhalen = () => {
     const value = Number(budgetAfhalenAmount);
@@ -34,25 +50,9 @@ function BudgetDetails({ potjes, transacties, setTransacties, setPotjes }) {
 
     setTransacties((prev) => [newTransaction, ...prev]);
 
-    setPotjes((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, budget: Math.max(0, Number(item.budget) - value) }
-          : item,
-      ),
-    );
-
     setBudgetAfhalenAmount("");
-    setBudgetAfhalenNaam("");
+    setBudgetAfhalenNaam(`${potje.name} afschrijving`);
   };
-
-  if (!potje) return <p>Potje niet gevonden.</p>;
-
-  const budget = potje.budget || 0;
-  const spent = potjeTransacties
-    .filter((transaction) => transaction.type === "expense" || transaction.amount < 0)
-    .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
-  const remaining = budget - spent;
 
   const spendingData = [
     { name: "Uitgegeven", value: spent },
