@@ -48,7 +48,7 @@ function SeeAllPage({ type, potjes, setPotjes, transacties }) {
     <div className="see-all-page">
       <BackBtn />
 
-      <div className="SpendingOverview">
+      <div className={`SpendingOverview ${type === "potjes" ? "potjes" : "transacties"}`}>
         {type === "transacties" && (
           <TransactionSection
             title="Alle transacties"
