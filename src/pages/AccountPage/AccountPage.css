@@ -169,7 +169,7 @@
 }
 
 .AccountInfo__row:hover {
-  background: #f4faf9;
+    background-color: gray;
 }
 
 .AccountInfo__icon {
