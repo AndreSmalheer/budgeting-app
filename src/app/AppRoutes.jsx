@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { ProtectedRoute, PublicRoute } from "../components/routes/RouteGuards";
 import { useSession } from "../hooks/useSession";
@@ -11,20 +11,49 @@ import LoginPage from "../pages/LoginPage/LoginPage";
 import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import AccountPage from "../pages/AccountPage/AccountPage";
 import SeeAllPage from "../pages/SeeAllPage/SeeAllPage";
-import {
-  potjes as initialPotjes,
-  transacties as initialTransacties,
-} from "../config/data";
+import { getPots, getTransactions } from "../services/api/client";
 
 function AppRoutes() {
   const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS === "true";
   const session = useSession();
   const loggedIn = Boolean(session);
-
-  const [potjes, setPotjes] = useState(initialPotjes);
-  const [transacties, setTransacties] = useState(initialTransacties);
+  const [potjes, setPotjes] = useState([]);
+  const [transacties, setTransacties] = useState([]);
+  const [isBudgetLoading, setIsBudgetLoading] = useState(false);
+  const [budgetError, setBudgetError] = useState("");
 
   const canAccessProtectedRoutes = loggedIn || DEV_BYPASS;
+
+  const loadBudgetData = useCallback(async () => {
+    if (!session?.id) {
+      setPotjes([]);
+      setTransacties([]);
+      setBudgetError("");
+      setIsBudgetLoading(false);
+      return;
+    }
+
+    setIsBudgetLoading(true);
+    setBudgetError("");
+
+    try {
+      const [potsResponse, transactionsResponse] = await Promise.all([
+        getPots(session.id),
+        getTransactions(session.id),
+      ]);
+
+      setPotjes(potsResponse.pots || []);
+      setTransacties(transactionsResponse.transactions || []);
+    } catch (error) {
+      setBudgetError(error.message || "De budgetgegevens konden niet geladen worden.");
+    } finally {
+      setIsBudgetLoading(false);
+    }
+  }, [session?.id]);
+
+  useEffect(() => {
+    loadBudgetData();
+  }, [loadBudgetData]);
 
   return (
     <Routes>
@@ -32,7 +61,12 @@ function AppRoutes() {
         path="/"
         element={
           loggedIn ? (
-            <HomePage potjes={potjes} transacties={transacties} />
+            <HomePage
+              potjes={potjes}
+              transacties={transacties}
+              isLoading={isBudgetLoading}
+              errorMessage={budgetError}
+            />
           ) : (
             <LandingPage />
           )
@@ -42,7 +76,14 @@ function AppRoutes() {
       {DEV_BYPASS && (
         <Route
           path="/home-page"
-          element={<HomePage transacties={transacties} potjes={potjes} />}
+          element={
+            <HomePage
+              transacties={transacties}
+              potjes={potjes}
+              isLoading={isBudgetLoading}
+              errorMessage={budgetError}
+            />
+          }
         />
       )}
 
@@ -54,7 +95,25 @@ function AppRoutes() {
               type="transacties"
               potjes={potjes}
               transacties={transacties}
-              setPotjes={setPotjes}
+              isLoading={isBudgetLoading}
+              errorMessage={budgetError}
+              onPotDeleted={loadBudgetData}
+            />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/see-all/transacties/pot/:id"
+        element={
+          <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
+            <SeeAllPage
+              type="transacties"
+              potjes={potjes}
+              transacties={transacties}
+              isLoading={isBudgetLoading}
+              errorMessage={budgetError}
+              onPotDeleted={loadBudgetData}
             />
           </ProtectedRoute>
         }
@@ -68,7 +127,9 @@ function AppRoutes() {
               type="potjes"
               potjes={potjes}
               transacties={transacties}
-              setPotjes={setPotjes}
+              isLoading={isBudgetLoading}
+              errorMessage={budgetError}
+              onPotDeleted={loadBudgetData}
             />
           </ProtectedRoute>
         }
@@ -105,7 +166,7 @@ function AppRoutes() {
         path="/potje-toevoegen"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            <PotjeToevoegen setPotjes={setPotjes} />
+            <PotjeToevoegen onPotCreated={loadBudgetData} />
           </ProtectedRoute>
         }
       />
@@ -124,10 +185,11 @@ function AppRoutes() {
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
             <BudgetDetails
-              setPotjes={setPotjes}
               potjes={potjes}
               transacties={transacties}
-              setTransacties={setTransacties}
+              isLoading={isBudgetLoading}
+              errorMessage={budgetError}
+              onTransactionCreated={loadBudgetData}
             />
           </ProtectedRoute>
         }

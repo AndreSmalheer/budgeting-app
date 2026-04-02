@@ -23,7 +23,8 @@ export async function connectToDatabase() {
     { parentId: 1, childId: 1 },
     { unique: true },
   );
-  await database.collection("pots").createIndex({ childId: 1 });
+  await database.collection("pots").createIndex({ userId: 1, createdAt: -1 });
+  await database.collection("transactions").createIndex({ userId: 1, createdAt: -1 });
   await database.collection("transactions").createIndex({ potId: 1, createdAt: -1 });
 
   return database;

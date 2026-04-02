@@ -1,16 +1,14 @@
 import "./Potjes.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LucideIcon } from "../../utils/icons";
+import { getIconTheme, LucideIcon } from "../../utils/icons";
+import { formatCurrency } from "../../utils/formatters";
 
-function Potjes({ id, progress, name, budget, spent, icon }) {
+function Potjes({ id, progress, name, balance, icon }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
-  const remaining = budget - spent;
-  const formattedRemaining = new Intl.NumberFormat("nl-NL", {
-  style: "currency",
-  currency: "EUR",
-  }).format(remaining);
+  const formattedRemaining = formatCurrency(balance);
+  const iconTheme = getIconTheme(icon);
 
   useEffect(() => {
     const handleResize = () => {
@@ -33,11 +31,25 @@ function Potjes({ id, progress, name, budget, spent, icon }) {
     >
       <div
         className="Potje-progress-circle"
-        style={{ "--progress": `${progress}%` }}
+        style={{
+          "--progress": `${progress}%`,
+          "--progress-color": iconTheme.ring,
+        }}
       >
         <div className="Potje-image-wrapper">
-          <div className="Potje-image">
-            <LucideIcon name={icon} size={22} strokeWidth={2} />
+          <div
+            className="Potje-image"
+            style={{
+              background: iconTheme.surface,
+              borderColor: iconTheme.border,
+            }}
+          >
+            <LucideIcon
+              name={icon}
+              size={22}
+              strokeWidth={2}
+              color={iconTheme.iconColor}
+            />
           </div>
         </div>
       </div>

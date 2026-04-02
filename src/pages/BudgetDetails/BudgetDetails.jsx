@@ -1,68 +1,160 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import BackBtn from "../../components/BackBtn/BackBtn";
 import BudgetDetailsChart from "../../components/budget/BudgetDetailsChart";
 import BudgetTransactionsSection from "../../components/budget/BudgetTransactionsSection";
 import BudgetWithdrawForm from "../../components/budget/BudgetWithdrawForm";
+import { useSession } from "../../hooks/useSession";
+import { createTransaction } from "../../services/api/client";
+import { formatDate } from "../../utils/formatters";
 import "./BudgetDetails.css";
 
-function BudgetDetails({ potjes, transacties, setTransacties }) {
+function BudgetDetails({
+  potjes,
+  transacties,
+  isLoading = false,
+  errorMessage = "",
+  onTransactionCreated,
+}) {
   const { id } = useParams();
+  const session = useSession();
 
   const potje = potjes.find((item) => item.id === id);
 
   const potjeTransacties = transacties.filter(
-    (transaction) => transaction.potjeId === id
+    (transaction) => transaction.potId === id
   );
 
   const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
   const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState(
     `${potje?.name || ""} afschrijving`
   );
+  const [feedback, setFeedback] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!potje) return <p>Potje niet gevonden.</p>;
+  useEffect(() => {
+    if (potje?.name && !budgetAfhalenNaam) {
+      setBudgetAfhalenNaam(`${potje.name} afschrijving`);
+    }
+  }, [potje?.name, budgetAfhalenNaam]);
 
-  const budget = Number(potje.budget) || 0;
+  const budget = Number(potje?.targetAmount) || 0;
+  const remaining = Number(potje?.currentBalance) || 0;
+  const depositTotal = potjeTransacties
+    .filter((transaction) => transaction.type === "deposit")
+    .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
+  const expenseTotal = potjeTransacties
+    .filter((transaction) => transaction.type === "expense")
+    .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
 
-  const spent = potjeTransacties
-    .filter(
-      (transaction) =>
-        transaction.type === "expense" || transaction.amount < 0
-    )
-    .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
+  const historyData = useMemo(() => {
+    const sortedTransactions = [...potjeTransacties].sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+    );
 
-  const remaining = budget - spent;
+    let runningBalance = budget;
 
-  const handleBudgetAfhalen = () => {
+    const points = [
+      {
+        shortLabel: "Start",
+        fullLabel: potje?.createdAt
+          ? `Start · ${formatDate(potje.createdAt)}`
+          : "Start",
+        balance: runningBalance,
+      },
+    ];
+
+    sortedTransactions.forEach((transaction, index) => {
+      runningBalance +=
+        transaction.type === "deposit"
+          ? Number(transaction.amount || 0)
+          : -Number(transaction.amount || 0);
+
+      points.push({
+        shortLabel:
+          sortedTransactions.length > 5
+            ? String(index + 1)
+            : new Intl.DateTimeFormat("nl-NL", {
+                day: "2-digit",
+                month: "2-digit",
+              }).format(new Date(transaction.createdAt)),
+        fullLabel: `${transaction.type === "deposit" ? "Toegevoegd" : "Uitgave"} · ${formatDate(
+          transaction.createdAt,
+        )}`,
+        balance: runningBalance,
+      });
+    });
+
+    if (points.length === 1) {
+      points.push({
+        shortLabel: "Nu",
+        fullLabel: "Huidige stand",
+        balance: remaining,
+      });
+    } else {
+      points.push({
+        shortLabel: "Nu",
+        fullLabel: "Huidige stand",
+        balance: remaining,
+      });
+    }
+
+    return points;
+  }, [budget, potje?.createdAt, potjeTransacties, remaining]);
+
+  if (isLoading) return <p style={{ padding: "20px" }}>Potje laden...</p>;
+  if (errorMessage) return <p style={{ padding: "20px" }}>{errorMessage}</p>;
+  if (!potje) return <p style={{ padding: "20px" }}>Potje niet gevonden.</p>;
+
+  async function handleTransactionSubmit(type) {
     const value = Number(budgetAfhalenAmount);
 
     if (!value || value <= 0) return;
     if (!budgetAfhalenNaam.trim()) return;
+    if (!session?.id) return;
 
-    const newTransaction = {
-      id: crypto.randomUUID(),
-      potjeId: id,
-      description: budgetAfhalenNaam,
-      amount: -Math.abs(value),
-      type: "expense",
-      date: new Date().toISOString(),
-    };
+    setIsSubmitting(true);
+    setFeedback("");
 
-    setTransacties((prev) => [newTransaction, ...prev]);
+    try {
+      await createTransaction({
+        userId: session.id,
+        potId: id,
+        description: budgetAfhalenNaam.trim(),
+        amount: value,
+        type,
+      });
 
-    setBudgetAfhalenAmount("");
-    setBudgetAfhalenNaam(`${potje.name} afschrijving`);
-  };
+      await onTransactionCreated?.();
 
-  const spendingData = [
-    { name: "Uitgegeven", value: spent },
-    { name: "Resterend", value: remaining < 0 ? 0 : remaining },
-  ];
+      setBudgetAfhalenAmount("");
+      setBudgetAfhalenNaam(
+        type === "deposit"
+          ? `${potje.name} bijschrijving`
+          : `${potje.name} afschrijving`,
+      );
+    } catch (error) {
+      setFeedback(error.message || "De transactie kon niet worden opgeslagen.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
-  const isValidAmount =
+  function handleBudgetAfhalen() {
+    return handleTransactionSubmit("expense");
+  }
+
+  function handleBudgetToevoegen() {
+    return handleTransactionSubmit("deposit");
+  }
+
+  const hasValidInput =
     budgetAfhalenNaam.trim() !== "" &&
     Number(budgetAfhalenAmount) > 0 &&
-    Number(budgetAfhalenAmount) <= remaining;
+    !isSubmitting;
+
+  const isWithdrawValid = hasValidInput && Number(budgetAfhalenAmount) <= remaining;
+  const isDepositValid = hasValidInput;
 
   return (
     <>
@@ -71,21 +163,33 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
       />
 
       <div className="potje-container">
-        <BudgetDetailsChart data={spendingData} />
+        <BudgetDetailsChart
+          historyData={historyData}
+          currentBalance={remaining}
+          targetAmount={budget}
+          depositTotal={depositTotal}
+          expenseTotal={expenseTotal}
+        />
       </div>
+
+      {feedback && <p style={{ padding: "0 20px" }}>{feedback}</p>}
 
       <BudgetWithdrawForm
         amount={budgetAfhalenAmount}
         name={budgetAfhalenNaam}
-        isValid={isValidAmount}
+        isDepositValid={isDepositValid}
+        isWithdrawValid={isWithdrawValid}
         onAmountChange={(event) => setBudgetAfhalenAmount(event.target.value)}
         onNameChange={(event) => setBudgetAfhalenNaam(event.target.value)}
-        onSubmit={handleBudgetAfhalen}
+        onDepositSubmit={handleBudgetToevoegen}
+        onWithdrawSubmit={handleBudgetAfhalen}
+        isSubmitting={isSubmitting}
       />
 
       <BudgetTransactionsSection
         transactions={potjeTransacties}
         iconName={potje.icon}
+        potId={potje.id}
       />
     </>
   );

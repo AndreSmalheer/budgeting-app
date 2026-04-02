@@ -1,10 +1,13 @@
 function BudgetWithdrawForm({
   amount,
   name,
-  isValid,
+  isDepositValid,
+  isWithdrawValid,
   onAmountChange,
   onNameChange,
-  onSubmit,
+  onDepositSubmit,
+  onWithdrawSubmit,
+  isSubmitting = false,
 }) {
   return (
     <div className="afnemen-container">
@@ -25,14 +28,25 @@ function BudgetWithdrawForm({
         onChange={onAmountChange}
       />
 
-      <button
-        className={`afnemen-button ${!isValid ? "disabled" : ""}`}
-        type="button"
-        onClick={onSubmit}
-        disabled={!isValid}
-      >
-        Bedrag afhalen
-      </button>
+      <div className="afnemen-actions">
+        <button
+          className={`afnemen-button toevoegen ${!isDepositValid ? "disabled" : ""}`}
+          type="button"
+          onClick={onDepositSubmit}
+          disabled={!isDepositValid || isSubmitting}
+        >
+          Geld toevoegen
+        </button>
+
+        <button
+          className={`afnemen-button afhalen ${!isWithdrawValid ? "disabled" : ""}`}
+          type="button"
+          onClick={onWithdrawSubmit}
+          disabled={!isWithdrawValid || isSubmitting}
+        >
+          Bedrag afhalen
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,9 @@
 import { memo, useCallback, useDeferredValue, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as Icons from "lucide-react";
 import BackBtn from "../../components/BackBtn/BackBtn";
+import { useSession } from "../../hooks/useSession";
+import { createPot } from "../../services/api/client";
 import "./PotjeToevoegen.css";
 
 const budgetIconNames = [
@@ -123,13 +126,17 @@ const IconOption = memo(function IconOption(props) {
   );
 });
 
-export default function PotjeToevoegen({ setPotjes }) {
+export default function PotjeToevoegen({ onPotCreated }) {
+  const navigate = useNavigate();
+  const session = useSession();
   const [naam, setNaam] = useState("");
   const [doel, setDoel] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [focused, setFocused] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState("ShoppingCart");
   const [search, setSearch] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState("");
 
   const doelNum = parseFloat(doel.replace(",", ".")) || 0;
   const canSubmit = naam.trim().length > 0 && doelNum > 0;
@@ -150,27 +157,34 @@ export default function PotjeToevoegen({ setPotjes }) {
     setSelectedIcon(name);
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
 
-    const potjeNaam = naam.trim();
+    setIsSubmitting(true);
+    setFeedback("");
 
-    const newPotje = {
-      id: Date.now().toString(),
-      name: potjeNaam,
-      budget: doelNum,
-      icon: selectedIcon,
-    };
+    try {
+      await createPot({
+        userId: session?.id,
+        name: naam.trim(),
+        icon: selectedIcon,
+        amount: doelNum,
+      });
 
-    setPotjes((prev) => [newPotje, ...prev]);
+      await onPotCreated?.();
 
-    setNaam("");
-    setDoel("");
-    setSearch("");
-    setSelectedIcon("ShoppingCart");
-
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 2800);
+      setNaam("");
+      setDoel("");
+      setSearch("");
+      setSelectedIcon("ShoppingCart");
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 2800);
+      navigate("/");
+    } catch (error) {
+      setFeedback(error.message || "Het potje kon niet worden aangemaakt.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -184,6 +198,8 @@ export default function PotjeToevoegen({ setPotjes }) {
         </div>
 
         <div className="fields section s2">
+          {feedback && <p className="empty-state">{feedback}</p>}
+
           <div className="fieldWrap">
             <label className="label">Naam</label>
             <input
@@ -242,14 +258,14 @@ export default function PotjeToevoegen({ setPotjes }) {
         <div className="section s4">
           <button
             className="btn"
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSubmitting}
             onClick={handleSubmit}
             style={{
-              opacity: canSubmit ? 1 : 0.35,
-              cursor: canSubmit ? "pointer" : "not-allowed",
+              opacity: canSubmit && !isSubmitting ? 1 : 0.35,
+              cursor: canSubmit && !isSubmitting ? "pointer" : "not-allowed",
             }}
           >
-            Potje aanmaken
+            {isSubmitting ? "Potje opslaan..." : "Potje aanmaken"}
           </button>
         </div>
       </div>

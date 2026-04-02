@@ -1,7 +1,9 @@
 import cors from "cors";
 import express from "express";
 import authRoutes from "./routes/authRoutes.js";
+import potsRoutes from "./routes/potsRoutes.js";
 import systemRoutes from "./routes/systemRoutes.js";
+import transactionsRoutes from "./routes/transactionsRoutes.js";
 import { config } from "./config/env.js";
 
 const app = express();
@@ -38,6 +40,8 @@ app.get("/", (request, response) => {
 
 app.use("/api", systemRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/pots", potsRoutes);
+app.use("/api/transactions", transactionsRoutes);
 
 app.use((request, response) => {
   response.status(404).json({

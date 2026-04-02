@@ -1,42 +1,77 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Trash2 } from "lucide-react";
 import BackBtn from "../../components/BackBtn/BackBtn";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import PotListItem from "../../components/Potjes/PotListItem";
 import TransactionItem from "../../components/transactions/TransactionItem";
 import TransactionSection from "../../components/transactions/TransactionSection";
+import { useSession } from "../../hooks/useSession";
+import { deletePot as deletePotRequest } from "../../services/api/client";
+import { formatDate } from "../../utils/formatters";
 import "./SeeAllPage.css";
 
-function SeeAllPage({ type, potjes, setPotjes, transacties }) {
+function SeeAllPage({
+  type,
+  potjes,
+  transacties,
+  isLoading = false,
+  errorMessage = "",
+  onPotDeleted,
+}) {
+  const { id: filterPotId } = useParams();
   const [deleteId, setDeleteId] = useState(null);
+  const [feedback, setFeedback] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
+  const session = useSession();
 
-  const sortedTransacties = [...transacties].sort(
-    (a, b) => new Date(b.date) - new Date(a.date),
-  );
+  const sortedTransacties = useMemo(() => {
+    const baseTransactions = filterPotId
+      ? transacties.filter((transaction) => transaction.potId === filterPotId)
+      : transacties;
+
+    return [...baseTransactions].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [filterPotId, transacties]);
 
   const sortedPotjes = [...potjes].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
   );
+  const selectedPot = filterPotId
+    ? potjes.find((potje) => potje.id === filterPotId)
+    : null;
 
   function cancelDelete() {
     setDeleteId(null);
   }
 
-  function confirmDelete() {
-    setPotjes((prev) => prev.filter((potje) => potje.id !== deleteId));
-    setDeleteId(null);
+  async function confirmDelete() {
+    if (!deleteId || !session?.id) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setFeedback("");
+
+    try {
+      await deletePotRequest(session.id, deleteId);
+      await onPotDeleted?.();
+      setDeleteId(null);
+    } catch (error) {
+      setFeedback(error.message || "Het potje kon niet worden verwijderd.");
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   const transactionItems = sortedTransacties.map((transaction) => {
-    const potje = potjes.find((item) => item.id === transaction.potjeId);
+    const potje = potjes.find((item) => item.id === transaction.potId);
 
     return (
       <TransactionItem
         key={transaction.id}
         description={transaction.description}
-        meta={`${potje?.name || "Zonder potje"} · ${transaction.date}`}
+        meta={`${potje?.name || "Zonder potje"} · ${formatDate(transaction.createdAt)}`}
         amount={transaction.amount}
         isExpense={transaction.type === "expense"}
         iconName={potje?.icon}
@@ -47,12 +82,21 @@ function SeeAllPage({ type, potjes, setPotjes, transacties }) {
   return (
     <div className="see-all-page">
       <BackBtn />
+      {isLoading && <p className="empty-state">Gegevens laden...</p>}
+      {!isLoading && errorMessage && <p className="empty-state">{errorMessage}</p>}
+      {feedback && <p className="empty-state">{feedback}</p>}
 
       <div className={`SpendingOverview ${type === "potjes" ? "potjes" : "transacties"}`}>
         {type === "transacties" && (
           <TransactionSection
-            title="Alle transacties"
-            emptyText="Er zijn nog geen transacties."
+            title={
+              selectedPot ? `Alle transacties van ${selectedPot.name}` : "Alle transacties"
+            }
+            emptyText={
+              selectedPot
+                ? "Er zijn nog geen transacties voor dit potje."
+                : "Er zijn nog geen transacties."
+            }
             items={transactionItems}
             className="SpendingOverview"
           />
@@ -71,7 +115,7 @@ function SeeAllPage({ type, potjes, setPotjes, transacties }) {
                 <PotListItem
                   key={potje.id}
                   name={potje.name}
-                  budget={potje.budget}
+                  budget={potje.currentBalance}
                   iconName={potje.icon}
                   onClick={() => navigate(`/budget-details/${potje.id}`)}
                   action={
@@ -79,6 +123,7 @@ function SeeAllPage({ type, potjes, setPotjes, transacties }) {
                       className="delete-btn"
                       type="button"
                       aria-label={`Verwijder ${potje.name}`}
+                      disabled={isDeleting}
                       onClick={(event) => {
                         event.stopPropagation();
                         setDeleteId(potje.id);
@@ -99,7 +144,7 @@ function SeeAllPage({ type, potjes, setPotjes, transacties }) {
           title="Weet je het zeker?"
           description="Dit potje wordt definitief verwijderd."
           cancelLabel="Annuleren"
-          confirmLabel="Verwijderen"
+          confirmLabel={isDeleting ? "Bezig..." : "Verwijderen"}
           onCancel={cancelDelete}
           onConfirm={confirmDelete}
         />

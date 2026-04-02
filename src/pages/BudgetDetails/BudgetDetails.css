@@ -114,6 +114,13 @@
     margin: 0;
 }
 
+.transaction-list__see-all {
+    color: #d1fae5;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
 .transaction-list__month {
     color: #888;
     font-size: 12px;
@@ -220,6 +227,7 @@
     gap: 10px;
     margin: 12px 0 18px;
     width: 90vw;
+    align-items: stretch;
 }
 
 .afnemen-input {
@@ -232,14 +240,46 @@
     color: white;
 }
 
+.afnemen-actions {
+    display: flex;
+    gap: 10px;
+}
+
 .afnemen-button {
     padding: 10px 14px;
     border-radius: 10px;
     border: none;
     cursor: pointer;
+    font-weight: 600;
+}
+
+.afnemen-button.toevoegen {
     background: #00FFAE;
     color: #085041;
-    font-weight: 600;
+}
+
+.afnemen-button.afhalen {
+    background: #ffd2d7;
+    color: #7f1d1d;
+}
+
+.afnemen-button.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+@media (max-width: 650px) {
+    .afnemen-container {
+        flex-direction: column;
+    }
+
+    .afnemen-actions {
+        width: 100%;
+    }
+
+    .afnemen-button {
+        flex: 1;
+    }
 }
 
 @media (min-width: 650px) {
@@ -258,8 +298,8 @@
 .SpendingChart {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 12px;
+    align-items: stretch;
+    gap: 16px;
 }
 
 .SpendingChart__graph {
@@ -272,34 +312,164 @@
     width: 100%;
     display: grid;
     gap: 8px;
+    max-width: 420px;
 }
 
 .chart-legend__item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #3a3f5c;
-    padding: 8px 10px;
-    border-radius: 6px;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(58, 63, 92, 0.95), rgba(47, 51, 73, 0.95));
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .chart-legend__dot {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 999px;
+    flex-shrink: 0;
+}
+
+.chart-legend__copy {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .chart-legend__label {
-    flex: 1;
-    margin-left: 8px;
     color: white;
     font-size: 12px;
+    font-weight: 600;
+}
+
+.chart-legend__share {
+    color: #94a3b8;
+    font-size: 11px;
 }
 
 .chart-legend__value {
     color: #cbd5e1;
     font-size: 12px;
     font-weight: 600;
+    flex-shrink: 0;
+}
+
+.chart-legend__item--empty {
+    justify-content: center;
+    color: #94a3b8;
+}
+
+.donut-chart-shell {
+    position: relative;
+    display: grid;
+    place-items: center;
+}
+
+.donut-chart-center {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    max-width: 62%;
+}
+
+.donut-chart-center__label {
+    color: #94a3b8;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.donut-chart-center__value {
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.BudgetTrend {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.BudgetTrend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.BudgetTrend-eyebrow {
+    margin: 0 0 6px;
+    color: #8ec5bb;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.BudgetTrend-header h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(28px, 8vw, 36px);
+    line-height: 1.05;
+}
+
+.BudgetTrend-subtitle {
+    margin: 6px 0 0;
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 360px;
+}
+
+.BudgetTrend-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.BudgetTrend-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(58, 63, 92, 0.95), rgba(47, 51, 73, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.BudgetTrend-stat span {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.BudgetTrend-stat strong {
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.3;
+}
+
+.BudgetTrend-stat--positive strong {
+    color: #99f6e4;
+}
+
+.BudgetTrend-stat--negative strong {
+    color: #fda4af;
+}
+
+.BudgetTrend-chartWrap {
+    width: 100%;
+    height: 240px;
+    padding: 8px 0 0;
 }
 
 .afnemen-container {
@@ -383,5 +553,15 @@
         max-width: 1100px;
         margin: 15px auto;
         max-width: 1100px;
+    }
+}
+
+@media (max-width: 650px) {
+    .BudgetTrend-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .BudgetTrend-chartWrap {
+        height: 220px;
     }
 }

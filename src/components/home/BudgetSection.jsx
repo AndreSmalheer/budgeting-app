@@ -17,12 +17,13 @@ function BudgetSection({ potjes, transacties }) {
           const spent = transacties
             .filter(
               (transaction) =>
-                transaction.potjeId === potje.id && transaction.type === "expense",
+                transaction.potId === potje.id && transaction.type === "expense",
             )
-            .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
+            .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
 
-          const progress = potje.budget
-            ? Math.min((spent / potje.budget) * 100, 100)
+          const totalEverInPot = Number(potje.currentBalance || 0) + spent;
+          const progress = totalEverInPot
+            ? Math.min((spent / totalEverInPot) * 100, 100)
             : 0;
 
           return (
@@ -30,8 +31,7 @@ function BudgetSection({ potjes, transacties }) {
               key={potje.id}
               id={potje.id}
               name={potje.name}
-              budget={potje.budget}
-              spent={spent}
+              balance={Number(potje.currentBalance || 0)}
               progress={progress}
               icon={potje.icon}
             />

@@ -10,7 +10,7 @@ function PotListItem({ name, budget, iconName, onClick, action }) {
 
       <div className="transaction__info">
         <p className="transaction__name">{name}</p>
-        <p className="transaction__meta">Budget · {formatCurrency(budget)}</p>
+        <p className="transaction__meta">Saldo · {formatCurrency(budget)}</p>
       </div>
 
       {action}

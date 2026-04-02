@@ -3,50 +3,127 @@
 }
 
 .Balance-container.Mobile {
-    padding-top: clamp(20px, 3vw, 15px);
     display: flex;
-    justify-content: space-between;
-    padding-left: clamp(20px, 5vw, 75px);
-    padding-right: clamp(20px, 5vw, 75px);
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px clamp(20px, 5vw, 75px) 0;
+}
+
+.Balance-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.Balance-eyebrow {
+    margin: 0;
+    color: #8ec5bb;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .Balance-container.Mobile h1 {
     margin: 0;
     color: white;
-    font-weight: 500;
-    font-size: clamp(24px, 8vw, 32px);
+    font-weight: 600;
+    font-size: clamp(28px, 9vw, 36px);
+    line-height: 1.05;
 }
 
-.Balance-items {
-    padding-top: clamp(4px, 1vw, 6px);
-    padding-left: clamp(10px, 2vw, 14px);
+.Balance-total {
+    margin: 4px 0 0;
+    color: #ffffff;
+    font-size: clamp(30px, 10vw, 42px);
+    font-weight: 700;
+}
+
+.Balance-summary {
     display: grid;
-    gap: clamp(4px, 1vw, 6px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
 }
 
-.Balance-item {
+.Balance-summary-card {
     display: flex;
-    align-items: center;
-    gap: clamp(6px, 1.5vw, 8px);
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 14px 16px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(32, 37, 58, 0.96), rgba(23, 27, 44, 0.96));
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.Balance-item.positive h2 { color: #00AB06; }
-.Balance-item.negative h2 { color: #BF0104; }
-.Balance-item.negative .Balance-icon { transform: rotate(180deg); }
-
-.Balance-icon {
-    width: clamp(12px, 2vw, 14px);
-    height: clamp(14px, 2.5vw, 16px);
-    display: inline-block;
-    background-image: url('/arrow.png');
-    background-size: cover;
-    background-repeat: no-repeat;
+.Balance-summary-card.positive {
+    box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.12);
 }
 
-.Balance-value {
+.Balance-summary-card.negative {
+    box-shadow: inset 0 0 0 1px rgba(251, 113, 133, 0.12);
+}
+
+.Balance-summary-label {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.Balance-summary-value {
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.25;
+}
+
+.Balance-chart-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(28, 33, 52, 0.98), rgba(21, 25, 41, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.Balance-chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.Balance-chart-header h2 {
     margin: 0;
-    font-size: clamp(20px, 3vw, 24px);
-    font-weight: 400;
+    color: #ffffff;
+    font-size: 18px;
+}
+
+.Balance-chart-header p {
+    margin: 4px 0 0;
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.Balance-chart-badge {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(45, 212, 191, 0.12);
+    color: #99f6e4;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.Balance-chart-wrap {
+    width: 100%;
+    height: 250px;
+}
+
+.Balance-chart-empty {
+    padding: 18px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 .SpendingOverview {
@@ -117,20 +194,6 @@
 
 .transaction__amount.negative { color: #BF0104; }
 .transaction__amount.positive { color: #00AB06; }
-
-.Graph {
-    margin-top: 2vh;
-    width: clamp(130px, 22vw, 151px);
-    height: clamp(120px, 20vw, 133px);
-    overflow: hidden;
-}
-
-.SpendingChart {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: -1vh;
-}
 
 .budget-container.Mobile {
     display: flex;
