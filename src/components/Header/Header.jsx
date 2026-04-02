@@ -1,64 +1,90 @@
+import { Link, useNavigate } from "react-router-dom";
+import { LogIn, LogOut, UserRound, UserRoundPlus } from "lucide-react";
+import appConfig from "../../config/appConfig";
+import { clearStoredSession } from "../../utils/authStorage";
+import { useSession } from "../../hooks/useSession";
 import "./Header.css";
-import { useState, useEffect } from "react";
 
-function Header() {
-  const [loggedIn, setLoggedIn] = useState(true);
-  const [isPopUpActive, setPopUpActive] = useState(false);
-  const [activeLi, setActiveLi] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  const togglePopUp = () => {
-    setPopUpActive(prev => !prev);
-  };
-
-  const handleLiClick = (index) => {
-    setActiveLi(index);
-  };
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+function HeaderActionLink({ to, variant, icon, label }) {
+  const IconComponent = icon;
 
   return (
-    <div className="Header-container">
-      <div className={`Header ${isMobile ? "Mobile" : "Desktop"}`}>
-        <img className="icon" src="/favicon.svg" />
-        <h1>Naam App</h1>
+    <Link className={`Header-link ${variant}`} to={to}>
+      <IconComponent size={16} strokeWidth={2} />
+      <span>{label}</span>
+    </Link>
+  );
+}
 
-        {loggedIn ? (
-          <div className="loggin-container" onClick={togglePopUp}>
-            <img className="profile-icon" src="/profile-icon-placeholder.png" />
-          </div>
-        ) : (
-          <div className="loggin-container">
-            <h1>Logging</h1>
-            <img className="logging-icon" src="/loggin.png" />
-          </div>
-        )}
+function HeaderActionButton({ onClick, variant, icon, label }) {
+  const IconComponent = icon;
 
-        <div className={`logged-in-pop-up ${isPopUpActive ? "active" : ""}`}>
-          <ul>
-            <li
-              className={activeLi === 0 ? "active" : ""}
-              onClick={() => handleLiClick(0)}
-            >
-              Action
-            </li>
-            <li
-              className={activeLi === 1 ? "active" : ""}
-              onClick={() => handleLiClick(1)}
-            >
-              Logout
-            </li>
-          </ul>
-        </div>
+  return (
+    <button className={`Header-link ${variant}`} type="button" onClick={onClick}>
+      <IconComponent size={16} strokeWidth={2} />
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function Header() {
+  const navigate = useNavigate();
+  const session = useSession();
+
+  function handleLogout() {
+    clearStoredSession();
+    navigate("/");
+  }
+
+  return (
+    <header className="Header-shell">
+      <div className="Header">
+        <Link className="Header-brand" to="/">
+          <img className="Header-logo" src="/icon-512.png" alt="BudgetMaatje logo" />
+
+          <div className="Header-brand-copy">
+            <span className="Header-brand-title">{appConfig.appName}</span>
+            <span className="Header-brand-subtitle">
+              Budgetteren met digitale potjes
+            </span>
+          </div>
+        </Link>
+
+        <nav className="Header-actions">
+          {session ? (
+            <>
+              <HeaderActionLink
+                to="/account"
+                variant="Header-link-primary"
+                icon={UserRound}
+                label="Profiel"
+              />
+              <HeaderActionButton
+                onClick={handleLogout}
+                variant="Header-link-secondary"
+                icon={LogOut}
+                label="Uitloggen"
+              />
+            </>
+          ) : (
+            <>
+              <HeaderActionLink
+                to="/login"
+                variant="Header-link-secondary"
+                icon={LogIn}
+                label="Inloggen"
+              />
+              <HeaderActionLink
+                to="/register"
+                variant="Header-link-primary"
+                icon={UserRoundPlus}
+                label="Registreren"
+              />
+            </>
+          )}
+        </nav>
       </div>
-    </div>
+    </header>
   );
 }
 

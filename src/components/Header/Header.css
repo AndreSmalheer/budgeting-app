@@ -1,208 +1,115 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-.Header-container{
+.Header-shell {
     display: flex;
-    height: fit-content;
-    width: 100vw;
     justify-content: center;
+    padding: 16px 16px 0;
 }
 
-.Header{
-    background-color: #00FFAE;
+.Header {
+    width: min(100%, 960px);
     display: flex;
     align-items: center;
-    box-sizing: border-box;
-    padding-left: clamp(12px, 2vw, 16px);
-    padding-top: clamp(8px, 1.5vw, 10px);
-    padding-bottom: clamp(8px, 1.5vw, 10px);
-    padding-right: clamp(12px, 2vw, 20px);
-    position: relative;
-
-    & h1{
-        font-family: 'Poppins', sans-serif;
-    }
-
-    & .logged-in-pop-up{
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background-color: #31e5aa;
-        width: max-content;
-        min-width: clamp(100px, 20vw, 120px);
-        z-index: 10;
-        display: none;
-        opacity: 0;
-        transform: translateY(clamp(-8px, -1vw, -10px));
-
-        & ul{
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-
-            & li{
-                font-family: 'Poppins', sans-serif;
-                max-width: 90%;
-
-            }
-        }
-
-        &.active{
-            display: block;
-            animation: popDown 0.3s ease forwards;
-        }
-    }
-
-    & .loggin-container{
-        display: flex;
-    }
-
-    &.Desktop{
-        width: clamp(500px, 60%, 642px);
-        height: clamp(60px, 6vw, 75px);
-        border-radius: clamp(10px, 1.5vw, 14px);
-        margin-top: clamp(16px, 3vh, 20px);
-
-        & .icon{
-            width: clamp(45px, 6vw, 57px);
-            height: clamp(45px, 6vw, 57px);
-        }
-
-        & h1{
-            font-size: clamp(18px, 3vw, 24px);
-            padding-left: clamp(8px, 1.5vw, 12px);
-            cursor: default;
-        }
-
-        & .loggin-container{
-            margin: 0 auto;
-            margin-right: 0;
-            align-items: center;
-            gap: clamp(10px, 2vw, 15px);
-            cursor: pointer;
-
-            & .profile-icon{
-                width: clamp(40px, 5vw, 50px);
-                height: clamp(40px, 5vw, 50px);
-                border-radius: 50%;
-
-                &:hover{
-                    cursor: pointer;
-                }
-            }
-
-            & .logging-icon{
-                width: clamp(30px, 5vw, 40px);
-                height: clamp(30px, 5vw, 40px);
-            }
-
-        }
-
-        & .logged-in-pop-up{
-            border-radius: clamp(10px, 1.5vw, 14px);
-            margin-top: clamp(6px, 1vw, 8px);
-            width: clamp(140px, 15vw, 169px);
-            height: clamp(70px, 10vw, 82px);
-
-            & ul{
-                padding-left: clamp(10px, 2vw, 13px);
-                padding-top: clamp(8px, 1.5vw, 10px);
-                padding-bottom: clamp(5px, 1vw, 7px);
-                gap: clamp(2px, 0.5vw, 3px);
-
-                & li{
-                    font-size: clamp(16px, 2.5vw, 20px);
-                    border-radius: clamp(4px, 1vw, 5px);
-                    padding-left: clamp(4px, 1vw, 5px);
-
-                    &:hover{
-                        cursor: pointer;
-                        background-color: #28c797;
-                    }
-
-                    &.active{
-                        background-color: #1fa67c;
-                    }
-                }
-            }
-        }
-    }
-
-    &.Mobile{
-        border-radius: clamp(22px, 6vw, 27px);
-        width: clamp(300px, 90%, 400px);
-        height: clamp(50px, 7vw, 70px);
-        margin-top: clamp(12px, 3vw, 17px);
-
-        & .icon{
-            width: clamp(20px, 6vw, 25px);
-            height: clamp(20px, 6vw, 25px);
-        }
-
-        & h1{
-            padding-left: clamp(4px, 1vw, 5px);
-            font-size: clamp(12px, 3.5vw, 16px);
-            cursor: default;
-        }
-
-        & .loggin-container{
-            margin: 0 auto;
-            margin-right: 0;
-            gap: clamp(4px, 1vw, 5px);
-
-            & .profile-icon{
-                width: clamp(32px, 6vw, 50px);
-                height: clamp(32px, 6vw, 50px);
-                border-radius: 50%;
-            }
-
-            & .logging-icon{
-                width: clamp(16px, 5vw, 20px);
-                height: clamp(16px, 5vw, 20px);
-                position: relative;
-                top: clamp(5px, 1.5vw, 7px);
-            }
-        }
-
-        & .logged-in-pop-up{
-            border-radius: clamp(10px, 3vw, 12px);
-            margin-top: clamp(6px, 1vw, 8px);
-            cursor: default;
-
-            & ul{
-                padding-left: clamp(10px, 3vw, 13px);
-                padding-top: clamp(4px, 1vw, 5px);
-                padding-bottom: clamp(6px, 1vw, 7px);
-                gap: clamp(2px, 0.5vw, 3px);
-                left: clamp(-6px, -1vw, -5px);
-
-                & li{
-                    font-size: clamp(11px, 2.5vw, 13px);
-                    border-radius: clamp(4px, 1vw, 5px);
-                    padding-left: clamp(4px, 1vw, 5px);
-
-                    &.active{
-                        background-color: #28c797;
-                    }
-                }
-            }
-        }
-    }
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #1f6f78 0%, #2ca58d 100%);
+    box-shadow: 0 14px 32px rgba(12, 26, 45, 0.18);
 }
 
-@keyframes popDown {
-    0% {
-        opacity: 0;
-        transform: translateY(clamp(-10px, -1vw, -10px)) scaleY(0.95);
+.Header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.Header-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background-color: rgba(255, 255, 255, 0.18);
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+.Header-brand-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.Header-brand-title,
+.Header-brand-subtitle,
+.Header-link {
+    font-family: 'Poppins', sans-serif;
+}
+
+.Header-brand-title {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.Header-brand-subtitle {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.72rem;
+    font-weight: 500;
+}
+
+.Header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.Header-link {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+}
+
+.Header-link:hover {
+    transform: translateY(-1px);
+}
+
+.Header-link-primary {
+    background-color: #ffffff;
+    color: #15464d;
+}
+
+.Header-link-secondary {
+    background-color: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+}
+
+@media (max-width: 640px) {
+    .Header {
+        flex-direction: column;
+        align-items: stretch;
     }
-    60% {
-        opacity: 1;
-        transform: translateY(clamp(5px, 1vw, 5px)) scaleY(1.02);
+
+    .Header-actions {
+        width: 100%;
     }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scaleY(1);
+
+    .Header-link {
+        flex: 1;
+        text-align: center;
+    }
+
+    .Header-brand-subtitle {
+        display: none;
     }
 }

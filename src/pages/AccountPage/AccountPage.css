@@ -1,0 +1,259 @@
+.AccountPage {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 16px 64px;
+  overflow: hidden;
+}
+
+.AccountPage__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.AccountPage__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: 0.18;
+}
+
+.AccountPage__blob--1 {
+  width: 420px;
+  height: 420px;
+  top: -80px;
+  right: -100px;
+  background: radial-gradient(circle, #207567 0%, transparent 70%);
+}
+
+.AccountPage__blob--2 {
+  width: 320px;
+  height: 320px;
+  bottom: 40px;
+  left: -80px;
+  background: radial-gradient(circle, #16313f 0%, transparent 70%);
+  animation: blobDrift 16s ease-in-out infinite alternate-reverse;
+}
+
+.AccountCard {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 480px);
+  border-radius: 24px;
+  padding: 32px 28px 28px;
+  background-color: rgba(31, 111, 120, 0.1);
+  box-shadow:
+    0 1px 2px rgba(13, 29, 43, 0.04),
+    0 8px 24px rgba(13, 29, 43, 0.08),
+    0 32px 64px rgba(13, 29, 43, 0.06);
+  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.AccountCard__hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 0;
+}
+
+.AccountCard__heroText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.AccountCard__eyebrow {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: white;
+  /* color: #207567; */
+}
+
+.AccountCard__name {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: white;
+  /* color: #16313f; */
+  line-height: 1.2;
+}
+
+.AccountAvatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #207567 0%, #16313f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AccountAvatar__initials {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.AccountAvatar__ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.AccountRoleBadge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eaf4f2;
+  color: #207567;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.AccountDivider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e5eef0 20%, #e5eef0 80%, transparent);
+  margin: 24px 0;
+}
+
+.AccountInfo {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.AccountInfo__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  transition: background 0.15s ease;
+  animation: rowIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.AccountInfo__row:nth-child(1) { animation-delay: 0.08s; }
+.AccountInfo__row:nth-child(2) { animation-delay: 0.14s; }
+.AccountInfo__row:nth-child(3) { animation-delay: 0.20s; }
+
+@keyframes rowIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.AccountInfo__row:hover {
+    background-color: gray;
+}
+
+.AccountInfo__icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #eaf4f2;
+  color: #207567;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AccountInfo__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.AccountInfo__label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #8aacb3;
+}
+
+.AccountInfo__value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: white;
+  /* color: #16313f; */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.AccountEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 0 16px;
+  text-align: center;
+}
+
+.AccountEmpty__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #eaf4f2;
+  color: #207567;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AccountEmpty p {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  color: #5a7a84;
+}
+
+@media (max-width: 400px) {
+  .AccountCard {
+    padding: 24px 18px 22px;
+    border-radius: 20px;
+  }
+
+  .AccountCard__name {
+    font-size: 1.15rem;
+  }
+
+  .AccountAvatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .AccountAvatar__initials {
+    font-size: 1.1rem;
+  }
+}

@@ -1,0 +1,118 @@
+.AuthPage {
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 40px;
+}
+
+.AuthCard {
+    width: min(100%, 460px);
+    display: grid;
+    gap: 16px;
+    padding: 24px 20px;
+    border-radius: 28px;
+    background: linear-gradient(180deg, #f7fbfc 0%, #e8f4f3 100%);
+    box-shadow: 0 18px 36px rgba(13, 29, 43, 0.12);
+    box-sizing: border-box;
+}
+
+.AuthCard h1,
+.AuthEyebrow,
+.AuthDescription,
+.AuthField span,
+.AuthField input,
+.AuthField select,
+.AuthButton {
+    font-family: 'Poppins', sans-serif;
+}
+
+.AuthCard h1 {
+    margin: 0;
+    color: #16313f;
+}
+
+.AuthEyebrow {
+    margin: 0;
+    color: #207567;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.AuthDescription {
+    margin: -4px 0 0;
+    color: #46616b;
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.AuthFeedback {
+    margin: 0;
+    border-radius: 16px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.AuthFeedback.error {
+    background-color: #ffe5e5;
+    color: #842d2d;
+}
+
+.AuthFeedback.success {
+    background-color: #ddf6e7;
+    color: #175b35;
+}
+
+.AuthField {
+    display: grid;
+    gap: 8px;
+}
+
+.AuthField span {
+    color: #16313f;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.AuthField input,
+.AuthField select {
+    width: 100%;
+    border: 1px solid #c7d8dc;
+    border-radius: 16px;
+    padding: 14px 16px;
+    background-color: #ffffff;
+    color: #16313f;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+.AuthButton {
+    border: none;
+    border-radius: 18px;
+    padding: 14px 18px;
+    background-color: #207567;
+    color: #ffffff;
+    font-size: 0.96rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.AuthButton:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.AuthSwitch {
+    margin: -2px 0 0;
+    color: #46616b;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.AuthSwitch a {
+    color: #207567;
+    font-weight: 600;
+    text-decoration: none;
+}

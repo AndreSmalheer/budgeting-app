@@ -1,0 +1,140 @@
+.LandingPage {
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 40px;
+}
+
+.LandingHero {
+    width: min(100%, 960px);
+    display: grid;
+    gap: 18px;
+}
+
+.LandingHero-copy,
+.LandingHero-card {
+    border-radius: 28px;
+    padding: 24px 20px;
+    box-sizing: border-box;
+}
+
+.LandingHero-copy {
+    background: linear-gradient(180deg, #f5fff7 0%, #dcf7ea 100%);
+    color: #16313f;
+}
+
+.ConnectionStatus {
+    margin-bottom: 18px;
+    border-radius: 20px;
+    padding: 14px 16px;
+}
+
+.ConnectionStatus.loading {
+    background-color: #eef4ff;
+    color: #214170;
+}
+
+.ConnectionStatus.success {
+    background-color: #d9f6e8;
+    color: #136045;
+}
+
+.ConnectionStatus.error {
+    background-color: #ffe5e5;
+    color: #842d2d;
+}
+
+.ConnectionStatus-title,
+.ConnectionStatus-message {
+    margin: 0;
+}
+
+.ConnectionStatus-title {
+    font-weight: 700;
+}
+
+.ConnectionStatus-message {
+    margin-top: 6px;
+}
+
+.LandingHero-card {
+    background-color: #16313f;
+    color: #ffffff;
+}
+
+.LandingHero-eyebrow {
+    margin: 0 0 10px;
+    color: #207567;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.LandingHero h1,
+.LandingHero h2,
+.LandingHero p,
+.LandingHero li,
+.LandingHero-button {
+    font-family: 'Poppins', sans-serif;
+}
+
+.LandingHero h1 {
+    margin: 0;
+    font-size: clamp(2rem, 7vw, 3.4rem);
+    line-height: 1.05;
+}
+
+.LandingHero h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.LandingHero p {
+    margin: 14px 0 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.LandingHero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.LandingHero-button {
+    border-radius: 999px;
+    padding: 14px 18px;
+    text-align: center;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.LandingHero-button.primary {
+    background-color: #207567;
+    color: #ffffff;
+}
+
+.LandingHero-button.secondary {
+    background-color: #ffffff;
+    color: #16313f;
+}
+
+.LandingHero-card ul {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 10px;
+}
+
+@media (min-width: 820px) {
+    .LandingHero {
+        grid-template-columns: 1.35fr 0.9fr;
+        align-items: stretch;
+    }
+
+    .LandingHero-copy,
+    .LandingHero-card {
+        padding: 32px 28px;
+    }
+}

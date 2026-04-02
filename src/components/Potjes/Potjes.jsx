@@ -1,8 +1,16 @@
 import "./Potjes.css";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { LucideIcon } from "../../utils/icons";
 
-function Potjes() {
+function Potjes({ id, progress, name, budget, spent, icon }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
+  const remaining = budget - spent;
+  const formattedRemaining = new Intl.NumberFormat("nl-NL", {
+  style: "currency",
+  currency: "EUR",
+  }).format(remaining);
 
   useEffect(() => {
     const handleResize = () => {
@@ -13,18 +21,31 @@ function Potjes() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-    return (
-        <div className={`Potje ${isMobile ? "Mobile" : "Desktop"}`}>
-            <div className="Potje-progress-circle">
-                <div className="Potje-image-wrapper">
-                    <img className="Potje-image" src="/spaarvarken.png" />
-                </div>
-            </div>
+  function handleCLick() {
+    navigate(`/budget-details/${id}`);
+  }
 
-            <h1 className="Potje-title">Title</h1>
-            <h2 className="Potje-subtitle">200 Over</h2>
+  return (
+    <div
+      className={`Potje ${isMobile ? "Mobile" : "Desktop"}`}
+      id={id}
+      onClick={handleCLick}
+    >
+      <div
+        className="Potje-progress-circle"
+        style={{ "--progress": `${progress}%` }}
+      >
+        <div className="Potje-image-wrapper">
+          <div className="Potje-image">
+            <LucideIcon name={icon} size={22} strokeWidth={2} />
+          </div>
         </div>
-    )
+      </div>
+
+      <h1 className="Potje-title">{name}</h1>
+      <h2 className="Potje-subtitle">{formattedRemaining} resterend</h2>
+    </div>
+  );
 }
 
 export default Potjes;

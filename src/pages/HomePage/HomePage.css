@@ -1,75 +1,239 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+#root {
+    overflow-x: hidden;
+}
 
-.Balance-container{
+.Balance-container.Mobile {
+    padding-top: clamp(20px, 3vw, 15px);
+    display: flex;
+    justify-content: space-between;
+    padding-left: clamp(20px, 5vw, 75px);
+    padding-right: clamp(20px, 5vw, 75px);
+}
 
-    &.Mobile{
-        padding-left: clamp(10px, 1.5vw, 15px);
-        padding-right: clamp(10px, 1.5vw, 15px);
-        padding-top: clamp(20px, 3vw, 15px);
-        display: flex;
-        justify-content: center;
-        gap: clamp(20px, 25vw, 200px);
+.Balance-container.Mobile h1 {
+    margin: 0;
+    color: white;
+    font-weight: 500;
+    font-size: clamp(24px, 8vw, 32px);
+}
 
-        & h1{
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            color: white;
-            font-weight: 500;
-            font-size: clamp(24px, 8vw, 32px);
-        }
+.Balance-items {
+    padding-top: clamp(4px, 1vw, 6px);
+    padding-left: clamp(10px, 2vw, 14px);
+    display: grid;
+    gap: clamp(4px, 1vw, 6px);
+}
 
-        .Balance-items{
-            padding-top: clamp(4px, 1vw, 6px);
-            padding-left: clamp(10px, 2vw, 14px);
-            display: grid;
-            gap: clamp(4px, 1vw, 6px);
-        }
+.Balance-item {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 1.5vw, 8px);
+}
 
-        .Balance-item{
-            display: flex;
-            align-items: center;
-            gap: clamp(6px, 1.5vw, 8px);
+.Balance-item.positive h2 { color: #00AB06; }
+.Balance-item.negative h2 { color: #BF0104; }
+.Balance-item.negative .Balance-icon { transform: rotate(180deg); }
 
-            &.positive{
-                & h2{
-                    color: #00AB06;
-                }
-            }
+.Balance-icon {
+    width: clamp(12px, 2vw, 14px);
+    height: clamp(14px, 2.5vw, 16px);
+    display: inline-block;
+    background-image: url('/arrow.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
 
-            &.negetive{
-                & h2{
-                    color: #BF0104;
-                }
+.Balance-value {
+    margin: 0;
+    font-size: clamp(20px, 3vw, 24px);
+    font-weight: 400;
+}
 
-                & .Balance-icon{
-                    transform: rotate(180deg);
-                }
-            }
-        }
+.SpendingOverview {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(20px, 5vw, 75px);
+    padding-top: 16px;
+    width: 100%;
+}
 
-        .Balance-icon {
-            width: clamp(12px, 2vw, 14px);
-            height: clamp(14px, 2.5vw, 16px);
-            display: inline-block;
+.recent-transactions__header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
 
-            background-image: url('/arrow.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-        }
+.recent-transactions__title {
+    color: white;
+    font-size: clamp(24px, 8vw, 32px);
+    margin: 0;
+    padding: 0;
+}
 
-        .Balance-value{
-            margin: 0;
-            padding: 0;
-            font-size: clamp(20px, 3vw, 24px);
-            font-weight: 400;
-        }
+.recent-transactions__see-all {
+    color: #e5e7eb;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: clamp(20px, 5vw, 26px);
+    text-decoration: none;
+    font-weight: 600;
+}
 
-        .Grapgh{
-            margin-top: 2vh;
-            width: clamp(130px, 22vw, 151px);
-            height: clamp(120px, 20vw, 133px);
-            background-color: gray;
-        }
+.transaction {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
+}
+
+.transaction__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.transaction__name {
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.transaction__meta {
+    color: #888;
+    font-size: 11px;
+}
+
+.transaction__amount {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.transaction__amount.negative { color: #BF0104; }
+.transaction__amount.positive { color: #00AB06; }
+
+.Graph {
+    margin-top: 2vh;
+    width: clamp(130px, 22vw, 151px);
+    height: clamp(120px, 20vw, 133px);
+    overflow: hidden;
+}
+
+.SpendingChart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -1vh;
+}
+
+.budget-container.Mobile {
+    display: flex;
+    flex-direction: column;
+}
+
+.budget-container.Mobile .budget-header {
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    padding: 0 clamp(20px, 5vw, 75px);
+    margin-top: clamp(20px, 5vw, 40px);
+}
+
+.budget-container.Mobile .budget-items {
+    display: flex;
+    gap: clamp(10px, 4vw, 50px);
+    padding: 0 clamp(25px, 6vw, 80px);
+    margin-top: clamp(24px, 6vw, 48px);
+    margin-bottom: clamp(24px, 6vw, 48px);
+}
+
+.budget-see-all{
+    color: #e5e7eb;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: clamp(20px, 5vw, 26px);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+
+@media (max-width: 410px) {
+    .budget-container.Mobile .budget-header {
+        padding: 0 20px;
+    }
+}
+
+.plus-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  transition: all 0.2s ease;
+}
+
+.plus-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.plus-icon:active {
+  transform: scale(0.95);
+}
+
+.recent-transactions{
+    margin-left: clamp(6px, 2vw, 12px);
+}
+
+.no-transactions{
+    text-align: center;
+    padding: 50px 16px;
+    font-size: 14px;
+    opacity: 0.7;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    margin-top: 20px;
+    backdrop-filter: blur(6px);
+}
+
+
+@media (min-width: 650px) {
+    .Balance-container.Mobile{
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .budget-container.Mobile{
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .SpendingOverview{
+        max-width: 1100px;
+        margin: 0 auto;
     }
 }

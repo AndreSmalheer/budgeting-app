@@ -1,33 +1,33 @@
 # Backend basis
 
-Deze map is de backend voor jullie schoolproject.
+Deze map bevat nu een simpele Node/Express backend die klaar is voor MongoDB.
 
-## Mappen
+## Belangrijkste bestanden
 
-- `public/`
-  Hier komt de publieke entrypoint van de API.
-- `src/config/`
-  Database-instellingen en CORS.
-- `src/controllers/`
-  Logica per onderdeel, zoals login, potjes en transacties.
-- `src/helpers/`
-  Kleine hulpfuncties voor JSON responses en request data.
+- `backend/package.json`
+- `backend/.env.example`
+- `backend/src/server.js`
+- `backend/src/app.js`
+- `backend/src/config/database.js`
+- `backend/src/controllers/authController.js`
 
-## Basis API routes
+## Routes
 
 - `GET /api/health`
-- `POST /api/register`
-- `POST /api/login`
-- `POST /api/link-parent-child`
-- `GET /api/pots`
-- `POST /api/pots`
-- `GET /api/transactions`
-- `POST /api/transactions`
-- `GET /api/approvals`
-- `PATCH /api/approvals`
+- `GET /api/db-status`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
 
-## Advies voor jullie team
+## Starten
 
-- Adam werkt vooral in `backend/src/`.
-- Andre en Tim gebruiken vooral `src/pages/`, `src/components/` en `src/services/api/`.
-- Laat de frontend alleen met fetch-calls naar de PHP API praten.
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+## Wat jij nog moet doen
+
+1. Maak een MongoDB Atlas database aan.
+2. Vul `backend/.env` in.
+3. Start daarna de backend.

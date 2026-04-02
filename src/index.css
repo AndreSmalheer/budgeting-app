@@ -6,3 +6,10 @@ body {
     padding: 0;
     margin: 0;
 }
+
+@media (max-width: 768px) {
+    body{
+        overflow-x: none;
+    }
+
+}

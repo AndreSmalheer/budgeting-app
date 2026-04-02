@@ -1,21 +1,11 @@
 import "./starter-inhoud.css"
-import { useState } from "react"
 
 function StarterInhoud() {
-    const [doelgroep, setDoelgroep] = useState("ouder")
-
-    const inhoudPerDoelgroep = {
-        ouder: {
-            titel: "Voor ouders",
-            tekst: "Krijg overzicht in inkomsten en uitgaven van je gezin en stel samen spaardoelen in.",
-        },
-        kind: {
-            titel: "Voor kinderen",
-            tekst: "Leer op een leuke manier omgaan met geld en volg je spaargeld stap voor stap.",
-        },
+    function Ouder() {
     }
 
-    const huidigeInhoud = inhoudPerDoelgroep[doelgroep]
+    function Kinderen() {
+    }
 
     return(
         <>
@@ -24,28 +14,20 @@ function StarterInhoud() {
                  <img src="/spaarvarken.png" alt="spaarvarken" />
                 </div>
                 <div className="btn-group">
-                    <button
-                        className={`btn ${doelgroep === "ouder" ? "active" : ""}`}
-                        onClick={() => setDoelgroep("ouder")}
-                    >
+                    <button className="btn" onClick={Ouder}>
                         voor Ouders
                     </button>
-                    <button
-                        className={`btn ${doelgroep === "kind" ? "active" : ""}`}
-                        onClick={() => setDoelgroep("kind")}
-                    >
+                    <button className="btn" onClick={Kinderen}>
                         voor kinderen
                     </button>
                 </div>
-                <div className={`container ${doelgroep === "ouder" ? "container-ouder" : "container-kind"}`}>
-                    <div className="container-tekst">
-                        <h1>{huidigeInhoud.titel}</h1>
-                        <p>{huidigeInhoud.tekst}</p>
-                    </div>
+                <div className="container">
+                    <h1>Spaar bewust</h1>
+                    <p>Hier kunt u uw budgetten beheren en uw uitgaven bijhouden.</p>
                 </div>
             </div>
         </>
     )
 }
 
-export default StarterInhoud
+export default StarterInhoud;

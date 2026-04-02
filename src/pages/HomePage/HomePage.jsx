@@ -1,58 +1,53 @@
-import { useState, useEffect } from "react";
-import Potjes from "../../components/Potjes/Potjes";
-
+import { useMemo } from "react";
 import Header from "../../components/Header/Header";
-import "./HomePage.css"
+import BalanceOverview from "../../components/home/BalanceOverview";
+import BudgetSection from "../../components/home/BudgetSection";
+import RecentTransactionsSection from "../../components/home/RecentTransactionsSection";
+import "./HomePage.css";
 
-function HomePage() {
-    const [isMobile, setMoble] = useState(window.innerWidth < 768)
+function HomePage({ potjes = [], transacties = [] }) {
+  const { incomeTotal, expenseTotal, spendingData, recentPotjes } = useMemo(() => {
+    const incomeTotal = potjes.reduce((sum, potje) => sum + (potje.budget || 0), 0);
 
-    useEffect(() => {
-        const handleResize = () => {
-        setMoble(window.innerWidth < 768);
-    };
+    const expenseTotal = transacties
+      .filter((transaction) => transaction.type === "expense")
+      .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const spendingData = potjes
+      .map((potje) => {
+        const spent = transacties
+          .filter(
+            (transaction) =>
+              transaction.potjeId === potje.id && transaction.type === "expense",
+          )
+          .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
 
-    return (
-      <>
-        <Header />
+        return {
+          name: potje.name,
+          value: spent,
+        };
+      })
+      .filter((item) => item.value > 0);
 
-        {isMobile && (
-            <>
-            <div className="Balance-container Mobile">
-            <div>
-                <h1>Balance</h1>
+    const recentPotjes = [...potjes]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 3);
 
-                <div className="Balance-items">
-                <div className="Balance-item positive">
-                    <span className="Balance-icon"></span>
-                    <h2 className="Balance-value">200</h2>
-                </div>
+    return { incomeTotal, expenseTotal, spendingData, recentPotjes };
+  }, [potjes, transacties]);
 
-                <div className="Balance-item negetive">
-                    <span className="Balance-icon"></span>
-                    <h2 className="Balance-value">300</h2>
-                </div>
-                </div>
-            </div>
-
-            <div className="Grapgh"></div>
-            </div>
-
-            <Potjes />
-            </>
-        )}
-
-
-        {!isMobile &&(
-            <h1>Desktop placeholder</h1>
-        )}
-
-      </>
-    );
+  return (
+    <>
+      <Header />
+      <BalanceOverview
+        incomeTotal={incomeTotal}
+        expenseTotal={expenseTotal}
+        spendingData={spendingData}
+      />
+      <BudgetSection potjes={recentPotjes} transacties={transacties} />
+      <RecentTransactionsSection transacties={transacties} potjes={potjes} />
+    </>
+  );
 }
 
 export default HomePage;
