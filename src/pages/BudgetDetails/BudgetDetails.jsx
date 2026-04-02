@@ -45,7 +45,7 @@ function BudgetDetails({ potjes, transacties, setTransacties }) {
       description: budgetAfhalenNaam,
       amount: -Math.abs(value),
       type: "expense",
-      date: new Date().toLocaleDateString("nl-NL"),
+      date: new Date().toISOString(),
     };
 
     setTransacties((prev) => [newTransaction, ...prev]);
