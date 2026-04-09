@@ -59,10 +59,10 @@ function BudgetDetailsChart({
     <section className="BudgetTrend">
       <div className="BudgetTrend-header">
         <div>
-          <p className="BudgetTrend-eyebrow">Saldoverloop</p>
+          <p className="BudgetTrend-eyebrow">Potje</p>
           <h2>{formatCurrency(currentBalance)}</h2>
           <p className="BudgetTrend-subtitle">
-            Hier zie je hoe dit potje beweegt door stortingen en uitgaven.
+            {/* Hier zie je hoe dit potje beweegt door stortingen en uitgaven. */}
           </p>
         </div>
       </div>

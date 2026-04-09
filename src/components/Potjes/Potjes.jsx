@@ -33,23 +33,17 @@ function Potjes({ id, progress, name, balance, icon }) {
         className="Potje-progress-circle"
         style={{
           "--progress": `${progress}%`,
-          "--progress-color": iconTheme.ring,
+          "--progress-color": "#2ca58d",
         }}
       >
         <div className="Potje-image-wrapper">
           <div
             className="Potje-image"
             style={{
-              background: iconTheme.surface,
-              borderColor: iconTheme.border,
+              background: "#E1F5EE",
             }}
           >
-            <LucideIcon
-              name={icon}
-              size={22}
-              strokeWidth={2}
-              color={iconTheme.iconColor}
-            />
+            <LucideIcon name={icon} size={22} strokeWidth={2} color="#ffffff" />
           </div>
         </div>
       </div>

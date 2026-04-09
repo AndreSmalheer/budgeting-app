@@ -35,7 +35,9 @@ function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
           ...spendingData.slice(0, 4),
           {
             name: "Overig",
-            value: spendingData.slice(4).reduce((sum, item) => sum + item.value, 0),
+            value: spendingData
+              .slice(4)
+              .reduce((sum, item) => sum + item.value, 0),
           },
         ]
       : spendingData;
@@ -48,7 +50,7 @@ function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
   return (
     <div className="Balance-container Mobile">
       <section className="Balance-hero">
-        <p className="Balance-eyebrow">Jouw budget in beeld</p>
+        {/* <p className="Balance-eyebrow">Jouw budget in beeld</p> */}
         <h1>Saldo in je potjes</h1>
         <p className="Balance-total">{formatCurrency(incomeTotal)}</p>
       </section>
@@ -56,12 +58,16 @@ function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
       <section className="Balance-summary">
         <div className="Balance-summary-card positive">
           <span className="Balance-summary-label">Beschikbaar nu</span>
-          <strong className="Balance-summary-value">{formatCurrency(incomeTotal)}</strong>
+          <strong className="Balance-summary-value">
+            {formatCurrency(incomeTotal)}
+          </strong>
         </div>
 
         <div className="Balance-summary-card negative">
           <span className="Balance-summary-label">Totaal uitgegeven</span>
-          <strong className="Balance-summary-value">{formatCurrency(expenseTotal)}</strong>
+          <strong className="Balance-summary-value">
+            {formatCurrency(expenseTotal)}
+          </strong>
         </div>
       </section>
 
@@ -73,7 +79,9 @@ function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
           </div>
 
           <span className="Balance-chart-badge">
-            {chartRows.length > 0 ? `${chartRows.length} zichtbaar` : "Nog leeg"}
+            {chartRows.length > 0
+              ? `${chartRows.length} zichtbaar`
+              : "Nog leeg"}
           </span>
         </div>
 
@@ -107,15 +115,18 @@ function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
                 <Tooltip
                   cursor={{ fill: "rgba(148, 163, 184, 0.05)" }}
                   formatter={(value) => [formatCurrency(value), "Uitgegeven"]}
-                  labelFormatter={(_, payload) => payload?.[0]?.payload?.name || ""}
+                  labelFormatter={(_, payload) =>
+                    payload?.[0]?.payload?.name || ""
+                  }
                   contentStyle={{
                     fontSize: 11,
                     padding: "8px 10px",
                     borderRadius: 12,
                     border: "1px solid rgba(255,255,255,0.08)",
-                    background: "#1f2438",
-                    color: "#ffffff",
+                    background: "#2c314a",
                   }}
+                  labelStyle={{ color: "#ffffff" }}
+                  itemStyle={{ color: "#ffffff" }}
                 />
                 <Bar dataKey="value" radius={[10, 10, 0, 0]} barSize={22}>
                   {chartRows.map((item, index) => (

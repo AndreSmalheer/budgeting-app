@@ -24,16 +24,12 @@
 .Potje-progress-circle {
     --progress: 0%;
     --progress-color: #079166;
-    background-color: #454D76;
     border-radius: 50%;
     padding: 6px;
-    background:
-        conic-gradient(
-            var(--progress-color) var(--progress),
-            transparent var(--progress)
-        ),
-        rgba(42, 48, 76, 0.82);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+    background: conic-gradient(
+        var(--progress-color) var(--progress),
+        transparent var(--progress)
+    );
 }
 
 .Potje-image-wrapper img {
@@ -81,6 +77,6 @@
 .Potje-image svg {
   width: 26px;
   height: 26px;
-  stroke: white;
+  stroke: black;
   stroke-width: 2;
 }
