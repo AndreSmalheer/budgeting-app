@@ -7,6 +7,8 @@ function TransactionItem({
   amount,
   isExpense,
   iconName,
+  categoryLabel = "",
+  action = null,
   className = "transaction",
 }) {
   return (
@@ -17,7 +19,12 @@ function TransactionItem({
 
       <div className="transaction__info">
         <p className="transaction__name">{description}</p>
-        <p className="transaction__meta">{meta}</p>
+        <div className="transaction__meta-row">
+          <p className="transaction__meta">{meta}</p>
+          {categoryLabel && (
+            <span className="transaction__category">{categoryLabel}</span>
+          )}
+        </div>
       </div>
 
       <span
@@ -26,6 +33,8 @@ function TransactionItem({
         {isExpense ? "-" : "+"}
         {formatCurrency(Math.abs(amount))}
       </span>
+
+      {action}
     </div>
   );
 }

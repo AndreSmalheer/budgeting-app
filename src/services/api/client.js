@@ -73,11 +73,20 @@ export async function deletePot(userId, potId) {
   });
 }
 
-export async function getTransactions(userId, potId = "") {
+export async function getTransactions(userId, options = {}) {
   const params = new URLSearchParams({ userId });
+  const { potId = "", type = "", category = "" } = options;
 
   if (potId) {
     params.set("potId", potId);
+  }
+
+  if (type) {
+    params.set("type", type);
+  }
+
+  if (category && category !== "all") {
+    params.set("category", category);
   }
 
   return apiRequest(`/transactions?${params.toString()}`);

@@ -4,6 +4,7 @@ import BackBtn from "../../components/BackBtn/BackBtn";
 import BudgetDetailsChart from "../../components/budget/BudgetDetailsChart";
 import BudgetTransactionsSection from "../../components/budget/BudgetTransactionsSection";
 import BudgetWithdrawForm from "../../components/budget/BudgetWithdrawForm";
+import { TRANSACTION_CATEGORIES } from "../../config/transactionCategories";
 import { useSession } from "../../hooks/useSession";
 import { createTransaction } from "../../services/api/client";
 import { formatDate } from "../../utils/formatters";
@@ -29,6 +30,7 @@ function BudgetDetails({
   const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState(
     `${potje?.name || ""} afschrijving`
   );
+  const [budgetAfhalenCategory, setBudgetAfhalenCategory] = useState("overig");
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -123,11 +125,13 @@ function BudgetDetails({
         description: budgetAfhalenNaam.trim(),
         amount: value,
         type,
+        category: budgetAfhalenCategory,
       });
 
       await onTransactionCreated?.();
 
       setBudgetAfhalenAmount("");
+      setBudgetAfhalenCategory("overig");
       setBudgetAfhalenNaam(
         type === "deposit"
           ? `${potje.name} bijschrijving`
@@ -176,10 +180,13 @@ function BudgetDetails({
 
       <BudgetWithdrawForm
         amount={budgetAfhalenAmount}
+        category={budgetAfhalenCategory}
+        categories={TRANSACTION_CATEGORIES}
         name={budgetAfhalenNaam}
         isDepositValid={isDepositValid}
         isWithdrawValid={isWithdrawValid}
         onAmountChange={(event) => setBudgetAfhalenAmount(event.target.value)}
+        onCategoryChange={(event) => setBudgetAfhalenCategory(event.target.value)}
         onNameChange={(event) => setBudgetAfhalenNaam(event.target.value)}
         onDepositSubmit={handleBudgetToevoegen}
         onWithdrawSubmit={handleBudgetAfhalen}

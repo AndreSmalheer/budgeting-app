@@ -1,9 +1,12 @@
 function BudgetWithdrawForm({
   amount,
+  category,
+  categories = [],
   name,
   isDepositValid,
   isWithdrawValid,
   onAmountChange,
+  onCategoryChange,
   onNameChange,
   onDepositSubmit,
   onWithdrawSubmit,
@@ -27,6 +30,18 @@ function BudgetWithdrawForm({
         value={amount}
         onChange={onAmountChange}
       />
+
+      <select
+        className="afnemen-input"
+        value={category}
+        onChange={onCategoryChange}
+      >
+        {categories.map((item) => (
+          <option key={item.value} value={item.value}>
+            {item.label}
+          </option>
+        ))}
+      </select>
 
       <div className="afnemen-actions">
         <button

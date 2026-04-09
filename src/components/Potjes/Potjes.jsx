@@ -1,14 +1,13 @@
 import "./Potjes.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getIconTheme, LucideIcon } from "../../utils/icons";
+import { LucideIcon } from "../../utils/icons";
 import { formatCurrency } from "../../utils/formatters";
 
 function Potjes({ id, progress, name, balance, icon }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
   const formattedRemaining = formatCurrency(balance);
-  const iconTheme = getIconTheme(icon);
 
   useEffect(() => {
     const handleResize = () => {

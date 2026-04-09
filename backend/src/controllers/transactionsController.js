@@ -5,6 +5,8 @@ export async function getTransactions(request, response, next) {
   try {
     const userId = request.query.userId?.trim() || "";
     const potId = request.query.potId?.trim() || "";
+    const type = request.query.type?.trim() || "";
+    const category = request.query.category?.trim().toLowerCase() || "";
 
     validateUserId(userId);
 
@@ -15,6 +17,14 @@ export async function getTransactions(request, response, next) {
 
     if (potId) {
       filter.potId = potId;
+    }
+
+    if (type && ["deposit", "expense"].includes(type)) {
+      filter.type = type;
+    }
+
+    if (category && category !== "all") {
+      filter.category = category;
     }
 
     const transactions = await transactionsCollection
@@ -38,6 +48,7 @@ export async function createTransaction(request, response, next) {
     const type = request.body.type?.trim() || "";
     const description = request.body.description?.trim() || "";
     const amount = Number(request.body.amount);
+    const category = normalizeCategory(request.body.category?.trim() || "overig");
 
     validateUserId(userId);
 
@@ -93,8 +104,10 @@ export async function createTransaction(request, response, next) {
       type,
       amount,
       description,
+      category,
       status: "approved",
       createdAt: now,
+      updatedAt: now,
     };
 
     const result = await transactionsCollection.insertOne(transaction);
@@ -135,9 +148,15 @@ function mapTransaction(transaction) {
     type: transaction.type,
     amount: Number(transaction.amount || 0),
     description: transaction.description,
+    category: transaction.category || "overig",
     status: transaction.status,
     createdAt: transaction.createdAt,
+    updatedAt: transaction.updatedAt || transaction.createdAt,
   };
+}
+
+function normalizeCategory(category) {
+  return category ? category.toLowerCase() : "overig";
 }
 
 function validateUserId(userId) {
