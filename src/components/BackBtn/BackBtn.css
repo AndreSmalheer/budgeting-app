@@ -1,19 +1,20 @@
 .backBtn {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: transform 0.15s, background 0.2s;
   color: white;
+  box-shadow: 0 14px 26px rgba(9, 14, 28, 0.18);
 }
 
 .backBtn:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.08);
   transform: translateY(-1px);
 }
 

@@ -1,5 +1,5 @@
 const appConfig = {
-  appName: "BudgetMaatje",
+  appName: "BudgetApp",
   apiBaseUrl: "/api",
   approvalLimit: 40,
 };

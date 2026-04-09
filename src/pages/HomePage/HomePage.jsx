@@ -47,15 +47,17 @@ function HomePage({ potjes = [], transacties = [], isLoading = false, errorMessa
   return (
     <>
       <Header />
-      {isLoading && <p style={{ padding: "0 20px" }}>Budgetgegevens laden...</p>}
-      {!isLoading && errorMessage && <p style={{ padding: "0 20px" }}>{errorMessage}</p>}
-      <BalanceOverview
-        incomeTotal={incomeTotal}
-        expenseTotal={expenseTotal}
-        spendingData={spendingData}
-      />
-      <BudgetSection potjes={recentPotjes} transacties={transacties} />
-      <RecentTransactionsSection transacties={transacties} potjes={potjes} />
+      <main className="HomePage-shell">
+        {isLoading && <p className="page-feedback">Budgetgegevens laden...</p>}
+        {!isLoading && errorMessage && <p className="page-feedback">{errorMessage}</p>}
+        <BalanceOverview
+          incomeTotal={incomeTotal}
+          expenseTotal={expenseTotal}
+          spendingData={spendingData}
+        />
+        <BudgetSection potjes={recentPotjes} />
+        <RecentTransactionsSection transacties={transacties} potjes={potjes} />
+      </main>
     </>
   );
 }

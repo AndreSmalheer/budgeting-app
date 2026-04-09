@@ -161,10 +161,10 @@ function BudgetDetails({
   const isDepositValid = hasValidInput;
 
   return (
-    <>
-      <BackBtn
-        style={{ marginLeft: "20px", marginTop: "5px", marginBottom: "20px" }}
-      />
+    <main className="BudgetDetails-page">
+      <div className="BudgetDetails-page__back">
+        <BackBtn />
+      </div>
 
       <div className="potje-container">
         <BudgetDetailsChart
@@ -176,7 +176,7 @@ function BudgetDetails({
         />
       </div>
 
-      {feedback && <p style={{ padding: "0 20px" }}>{feedback}</p>}
+      {feedback && <p className="page-feedback">{feedback}</p>}
 
       <BudgetWithdrawForm
         amount={budgetAfhalenAmount}
@@ -198,7 +198,7 @@ function BudgetDetails({
         iconName={potje.icon}
         potId={potje.id}
       />
-    </>
+    </main>
   );
 }
 

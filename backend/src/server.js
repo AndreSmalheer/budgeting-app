@@ -3,7 +3,7 @@ import { config } from "./config/env.js";
 import { connectToDatabase } from "./config/database.js";
 
 app.listen(config.port, async () => {
-  console.log(`BudgetMaatje backend draait op http://localhost:${config.port}`);
+  console.log(`BudgetApp backend draait op http://localhost:${config.port}`);
 
   if (!config.mongodbUri) {
     console.log("MongoDB is nog niet gekoppeld. Vul eerst backend/.env in.");

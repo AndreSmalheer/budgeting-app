@@ -3,7 +3,7 @@
 }
 
 .see-all-page{
-    padding: 16px 16px 0;
+    padding: 16px var(--page-padding) 36px;
 }
 
 .SpendingOverview{
@@ -14,6 +14,14 @@
 
 .SpendingOverview.transacties{
     padding: 0;
+}
+
+.SpendingOverview .recent-transactions {
+    border-radius: 22px;
+    padding: 6px 14px 2px;
+    background: linear-gradient(180deg, rgba(50, 54, 69, 0.97), rgba(42, 45, 57, 0.98));
+    border: 1px solid var(--border-soft);
+    box-shadow: var(--surface-shadow);
 }
 
 .transaction-filters__compact {
@@ -34,7 +42,7 @@
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.04);
     color: #e5e7eb;
-    padding: 8px 12px;
+    padding: 11px 12px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -88,7 +96,7 @@
 }
 
 .potjes-list{
-    padding-left: clamp(6px, 2vw, 12px);
+    padding: 4px 0 0;
 }
 
 .delete-btn {

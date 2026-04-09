@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { LucideIcon } from "../../utils/icons";
 import { formatCurrency } from "../../utils/formatters";
 
-function Potjes({ id, progress, name, balance, icon }) {
+function Potjes({ id, name, balance, icon }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
   const formattedRemaining = formatCurrency(balance);
@@ -28,22 +28,14 @@ function Potjes({ id, progress, name, balance, icon }) {
       id={id}
       onClick={handleCLick}
     >
-      <div
-        className="Potje-progress-circle"
-        style={{
-          "--progress": `${progress}%`,
-          "--progress-color": "#2ca58d",
-        }}
-      >
-        <div className="Potje-image-wrapper">
-          <div
-            className="Potje-image"
-            style={{
-              background: "#E1F5EE",
-            }}
-          >
-            <LucideIcon name={icon} size={22} strokeWidth={2} color="#ffffff" />
-          </div>
+      <div className="Potje-image-wrapper">
+        <div
+          className="Potje-image"
+          style={{
+            background: "#E1F5EE",
+          }}
+        >
+          <LucideIcon name={icon} size={22} strokeWidth={2} color="#111111" />
         </div>
       </div>
 

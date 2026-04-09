@@ -1,15 +1,84 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #2c2e37;
-    padding: 0;
-    margin: 0;
+:root {
+  --bg-base: #252832;
+  --bg-elevated: #2d3140;
+  --bg-elevated-strong: #33384a;
+  --bg-soft: rgba(255, 255, 255, 0.04);
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #8f9bb3;
+  --accent: #2dd4bf;
+  --accent-strong: #14b8a6;
+  --danger-strong: #fb7185;
+  --success-strong: #4ade80;
+  --surface-shadow: 0 18px 50px rgba(7, 10, 18, 0.24);
+  --page-padding: clamp(18px, 5vw, 28px);
+  --section-gap: clamp(18px, 5vw, 30px);
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 14px;
 }
 
-@media (max-width: 768px) {
-    body{
-        overflow-x: none;
-    }
+html {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(45, 212, 191, 0.14), transparent 32%),
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.08), transparent 22%),
+    linear-gradient(180deg, #292d38 0%, #232630 100%);
+  color: var(--text-primary);
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.page-feedback {
+  margin: 0 var(--page-padding);
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-soft);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+body,
+input,
+select,
+button,
+textarea {
+  font-family: 'Inter', sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(45, 212, 191, 0.28);
+  color: #ffffff;
 }

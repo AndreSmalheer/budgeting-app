@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import Potjes from "../Potjes/Potjes";
 
-function BudgetSection({ potjes, transacties }) {
+function BudgetSection({ potjes }) {
   return (
     <div className="budget-container Mobile">
       <div className="budget-header">
@@ -14,25 +14,12 @@ function BudgetSection({ potjes, transacties }) {
 
       <div className="budget-items">
         {potjes.map((potje) => {
-          const spent = transacties
-            .filter(
-              (transaction) =>
-                transaction.potId === potje.id && transaction.type === "expense",
-            )
-            .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
-
-          const totalEverInPot = Number(potje.currentBalance || 0) + spent;
-          const progress = totalEverInPot
-            ? Math.min((spent / totalEverInPot) * 100, 100)
-            : 0;
-
           return (
             <Potjes
               key={potje.id}
               id={potje.id}
               name={potje.name}
               balance={Number(potje.currentBalance || 0)}
-              progress={progress}
               icon={potje.icon}
             />
           );

@@ -3,7 +3,7 @@ import { getDatabaseStatus } from "../config/database.js";
 export async function healthCheck(request, response) {
   response.json({
     success: true,
-    message: "BudgetMaatje Node backend werkt.",
+    message: "BudgetApp Node backend werkt.",
   });
 }
 
