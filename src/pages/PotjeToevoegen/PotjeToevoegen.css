@@ -154,14 +154,13 @@
 
 .btn {
   width: 100%;
-  background: linear-gradient(180deg, #55f6c6 0%, #2dd4bf 100%);
+  background: #3fe5c3;
   color: #063a30;
   border: none;
   border-radius: 18px;
   padding: 17px;
   font-size: 15px;
   font-weight: 700;
-  box-shadow: 0 14px 28px rgba(45, 212, 191, 0.18);
 }
 
 .hint {
