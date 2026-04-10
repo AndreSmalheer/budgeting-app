@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
 import {
   findUserById,
@@ -78,7 +77,10 @@ export async function linkChildToParent(request, response, next) {
       return;
     }
 
-    const child = await usersCollection.findOne({ email: childEmail, role: "child" });
+    const child = await usersCollection.findOne({
+      email: childEmail,
+      role: "child",
+    });
 
     if (!child) {
       response.status(404).json({
@@ -88,7 +90,7 @@ export async function linkChildToParent(request, response, next) {
       return;
     }
 
-    if (child._id.toString() === userId) {
+    if (String(child._id) === userId) {
       response.status(422).json({
         success: false,
         message: "Je kunt je eigen account niet koppelen als kindaccount.",
@@ -96,7 +98,9 @@ export async function linkChildToParent(request, response, next) {
       return;
     }
 
-    const existingParentLink = await linksCollection.findOne({ parentId: userId });
+    const existingParentLink = await linksCollection.findOne({
+      parentId: userId,
+    });
 
     if (existingParentLink) {
       response.status(409).json({
@@ -107,7 +111,7 @@ export async function linkChildToParent(request, response, next) {
     }
 
     const existingChildLink = await linksCollection.findOne({
-      childId: child._id.toString(),
+      childId: String(child._id),
     });
 
     if (existingChildLink) {
@@ -120,7 +124,7 @@ export async function linkChildToParent(request, response, next) {
 
     await linksCollection.insertOne({
       parentId: userId,
-      childId: child._id.toString(),
+      childId: String(child._id),
       createdAt: new Date(),
     });
 
@@ -173,7 +177,7 @@ export async function unlinkFamilyAccount(request, response, next) {
       return;
     }
 
-    await linksCollection.deleteOne({ _id: existingLink._id });
+    await linksCollection.deleteOne({ _id: parseInt(existingLink._id) });
 
     const familyStatus = await buildFamilyStatus({
       user,
@@ -206,7 +210,8 @@ export async function getLinkedChildPots(request, response, next) {
     if (!parent || parent.role !== "parent") {
       response.status(403).json({
         success: false,
-        message: "Alleen een ouderaccount kan de gekoppelde kindpotjes bekijken.",
+        message:
+          "Alleen een ouderaccount kan de gekoppelde kindpotjes bekijken.",
       });
       return;
     }
@@ -223,7 +228,7 @@ export async function getLinkedChildPots(request, response, next) {
 
     const pots = await db
       .collection("pots")
-      .find({ userId: linkedChild.child._id.toString() })
+      .find({ userId: String(linkedChild.child._id) })
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -251,7 +256,8 @@ export async function getLinkedChildTransactions(request, response, next) {
     if (!parent || parent.role !== "parent") {
       response.status(403).json({
         success: false,
-        message: "Alleen een ouderaccount kan de gekoppelde kindtransacties bekijken.",
+        message:
+          "Alleen een ouderaccount kan de gekoppelde kindtransacties bekijken.",
       });
       return;
     }
@@ -266,7 +272,7 @@ export async function getLinkedChildTransactions(request, response, next) {
       return;
     }
 
-    const filter = { userId: linkedChild.child._id.toString() };
+    const filter = { userId: String(linkedChild.child._id) };
 
     if (potId) {
       filter.potId = potId;
@@ -282,16 +288,16 @@ export async function getLinkedChildTransactions(request, response, next) {
       .sort({ createdAt: -1 })
       .toArray();
 
-    const potIds = [...new Set(transactions.map((item) => item.potId))].filter((value) =>
-      ObjectId.isValid(value),
+    const potIds = [...new Set(transactions.map((item) => item.potId))].filter(
+      (value) => value && !isNaN(value),
     );
     const pots = potIds.length
       ? await db
           .collection("pots")
-          .find({ _id: { $in: potIds.map((id) => new ObjectId(id)) } })
+          .find({ _id: { $in: potIds.map((id) => parseInt(id)) } })
           .toArray()
       : [];
-    const potMap = new Map(pots.map((pot) => [pot._id.toString(), pot]));
+    const potMap = new Map(pots.map((pot) => [String(pot._id), pot]));
 
     response.json({
       success: true,
@@ -334,28 +340,32 @@ export async function getPendingApprovals(request, response, next) {
       .sort({ createdAt: -1 })
       .toArray();
 
-    const childIds = [...new Set(pendingTransactions.map((item) => item.userId))];
-    const potIds = [...new Set(pendingTransactions.map((item) => item.potId))].filter(
-      (value) => ObjectId.isValid(value),
-    );
+    const childIds = [
+      ...new Set(pendingTransactions.map((item) => item.userId)),
+    ];
+    const potIds = [
+      ...new Set(pendingTransactions.map((item) => item.potId)),
+    ].filter((value) => value && !isNaN(value));
 
     const [children, pots] = await Promise.all([
       childIds.length
         ? db
             .collection("users")
-            .find({ _id: { $in: childIds.map((id) => new ObjectId(id)) } })
+            .find({ _id: { $in: childIds.map((id) => parseInt(id)) } })
             .toArray()
         : [],
       potIds.length
         ? db
             .collection("pots")
-            .find({ _id: { $in: potIds.map((id) => new ObjectId(id)) } })
+            .find({ _id: { $in: potIds.map((id) => parseInt(id)) } })
             .toArray()
         : [],
     ]);
 
-    const childMap = new Map(children.map((child) => [child._id.toString(), child]));
-    const potMap = new Map(pots.map((pot) => [pot._id.toString(), pot]));
+    const childMap = new Map(
+      children.map((child) => [String(child._id), child]),
+    );
+    const potMap = new Map(pots.map((pot) => [String(pot._id), pot]));
 
     response.json({
       success: true,
@@ -379,7 +389,7 @@ export async function reviewApproval(request, response, next) {
 
     validateUserId(userId);
 
-    if (!ObjectId.isValid(approvalId)) {
+    if (isNaN(approvalId)) {
       response.status(422).json({
         success: false,
         message: "Ongeldige goedkeuring.",
@@ -409,7 +419,7 @@ export async function reviewApproval(request, response, next) {
     const transactionsCollection = db.collection("transactions");
     const potsCollection = db.collection("pots");
     const transaction = await transactionsCollection.findOne({
-      _id: new ObjectId(approvalId),
+      _id: parseInt(approvalId),
       status: "pending",
       type: "expense",
       reviewParentId: userId,
@@ -427,7 +437,7 @@ export async function reviewApproval(request, response, next) {
 
     if (action === "reject") {
       await transactionsCollection.updateOne(
-        { _id: transaction._id },
+        { _id: parseInt(approvalId) },
         {
           $set: {
             status: "rejected",
@@ -445,7 +455,7 @@ export async function reviewApproval(request, response, next) {
     }
 
     const pot = await potsCollection.findOne({
-      _id: new ObjectId(transaction.potId),
+      _id: parseInt(transaction.potId),
       userId: transaction.userId,
     });
 
@@ -463,14 +473,15 @@ export async function reviewApproval(request, response, next) {
     if (nextBalance < 0) {
       response.status(422).json({
         success: false,
-        message: "Er staat niet genoeg saldo in het potje om deze opname goed te keuren.",
+        message:
+          "Er staat niet genoeg saldo in het potje om deze opname goed te keuren.",
       });
       return;
     }
 
     await Promise.all([
       transactionsCollection.updateOne(
-        { _id: transaction._id },
+        { _id: parseInt(approvalId) },
         {
           $set: {
             status: "approved",
@@ -480,7 +491,7 @@ export async function reviewApproval(request, response, next) {
         },
       ),
       potsCollection.updateOne(
-        { _id: pot._id },
+        { _id: parseInt(transaction.potId) },
         {
           $set: {
             currentBalance: nextBalance,
@@ -501,10 +512,10 @@ export async function reviewApproval(request, response, next) {
 
 async function buildFamilyStatus({ user, usersCollection, linksCollection }) {
   if (user.role === "parent") {
-    const link = await linksCollection.findOne({ parentId: user._id.toString() });
+    const link = await linksCollection.findOne({ parentId: String(user._id) });
     const child =
-      link && ObjectId.isValid(link.childId)
-        ? await usersCollection.findOne({ _id: new ObjectId(link.childId) })
+      link && link.childId && !isNaN(link.childId)
+        ? await usersCollection.findOne({ _id: parseInt(link.childId) })
         : null;
 
     return {
@@ -515,10 +526,10 @@ async function buildFamilyStatus({ user, usersCollection, linksCollection }) {
   }
 
   if (user.role === "child") {
-    const link = await linksCollection.findOne({ childId: user._id.toString() });
+    const link = await linksCollection.findOne({ childId: String(user._id) });
     const parent =
-      link && ObjectId.isValid(link.parentId)
-        ? await usersCollection.findOne({ _id: new ObjectId(link.parentId) })
+      link && link.parentId && !isNaN(link.parentId)
+        ? await usersCollection.findOne({ _id: parseInt(link.parentId) })
         : null;
 
     return {
@@ -536,7 +547,7 @@ async function buildFamilyStatus({ user, usersCollection, linksCollection }) {
 }
 
 function validateUserId(userId) {
-  if (!ObjectId.isValid(userId)) {
+  if (!userId || isNaN(userId)) {
     const error = new Error("Ongeldige gebruiker.");
     error.statusCode = 422;
     throw error;
@@ -549,7 +560,7 @@ function isValidEmail(email) {
 
 function mapPot(pot) {
   return {
-    id: pot._id.toString(),
+    id: String(pot._id),
     userId: pot.userId,
     name: pot.name,
     icon: pot.icon,
@@ -564,7 +575,7 @@ function mapTransaction(transaction, options = {}) {
   const pot = options.pot || null;
 
   return {
-    id: transaction._id.toString(),
+    id: String(transaction._id),
     userId: transaction.userId,
     potId: transaction.potId,
     type: transaction.type,

@@ -37,7 +37,7 @@ export async function registerUser(request, response, next) {
       success: true,
       message: "Registratie gelukt.",
       user: {
-        id: result.insertedId.toString(),
+        id: String(result.insertedId),
         fullName,
         email,
         role,
@@ -96,7 +96,7 @@ export async function loginUser(request, response, next) {
       success: true,
       message: "Inloggen gelukt.",
       user: {
-        id: user._id.toString(),
+        id: String(user._id),
         fullName: user.fullName,
         email: user.email,
         role: user.role,

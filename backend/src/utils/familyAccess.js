@@ -1,11 +1,9 @@
-import { ObjectId } from "mongodb";
-
 export async function findUserById(db, userId) {
-  if (!ObjectId.isValid(userId)) {
+  if (typeof userId !== "string" || isNaN(userId)) {
     return null;
   }
 
-  return db.collection("users").findOne({ _id: new ObjectId(userId) });
+  return db.collection("users").findOne({ _id: parseInt(userId) });
 }
 
 export async function getLinkedChildForParent(db, parentId) {
@@ -48,7 +46,7 @@ export async function getLinkedParentForChild(db, childId) {
 
 export function mapPublicUser(user) {
   return {
-    id: user._id.toString(),
+    id: String(user._id),
     fullName: user.fullName,
     email: user.email,
     role: user.role,

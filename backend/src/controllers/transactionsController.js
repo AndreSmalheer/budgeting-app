@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
 import { config } from "../config/env.js";
 
@@ -49,7 +48,9 @@ export async function createTransaction(request, response, next) {
     const type = request.body.type?.trim() || "";
     const description = request.body.description?.trim() || "";
     const amount = Number(request.body.amount);
-    const category = normalizeCategory(request.body.category?.trim() || "overig");
+    const category = normalizeCategory(
+      request.body.category?.trim() || "overig",
+    );
 
     validateUserId(userId);
 
@@ -66,10 +67,12 @@ export async function createTransaction(request, response, next) {
     }
 
     if (description.length < 2) {
-      throw createValidationError("Geef de transactie een naam van minimaal 2 tekens.");
+      throw createValidationError(
+        "Geef de transactie een naam van minimaal 2 tekens.",
+      );
     }
 
-    if (!ObjectId.isValid(potId)) {
+    if (isNaN(potId)) {
       throw createValidationError("Ongeldig potje-id.");
     }
 
@@ -79,7 +82,7 @@ export async function createTransaction(request, response, next) {
     const linksCollection = db.collection("parentChildLinks");
 
     const pot = await potsCollection.findOne({
-      _id: new ObjectId(potId),
+      _id: parseInt(potId),
       userId,
     });
 
@@ -100,11 +103,15 @@ export async function createTransaction(request, response, next) {
     const availableBalance = currentBalance - pendingExpenses;
 
     if (type === "expense" && availableBalance - amount < 0) {
-      throw createValidationError("Je kunt niet meer afhalen dan er in het potje zit.");
+      throw createValidationError(
+        "Je kunt niet meer afhalen dan er in het potje zit.",
+      );
     }
 
     const parentLink =
-      type === "expense" ? await linksCollection.findOne({ childId: userId }) : null;
+      type === "expense"
+        ? await linksCollection.findOne({ childId: userId })
+        : null;
     const needsApproval =
       type === "expense" &&
       Boolean(parentLink) &&
@@ -131,7 +138,7 @@ export async function createTransaction(request, response, next) {
 
     if (!needsApproval) {
       await potsCollection.updateOne(
-        { _id: pot._id, userId },
+        { _id: parseInt(potId), userId },
         {
           $set: {
             currentBalance: nextBalance,
@@ -149,7 +156,7 @@ export async function createTransaction(request, response, next) {
         _id: result.insertedId,
       }),
       pot: {
-        id: pot._id.toString(),
+        id: String(pot._id),
         currentBalance: needsApproval ? currentBalance : nextBalance,
         updatedAt: now,
       },
@@ -161,7 +168,7 @@ export async function createTransaction(request, response, next) {
 
 function mapTransaction(transaction) {
   return {
-    id: transaction._id.toString(),
+    id: String(transaction._id),
     userId: transaction.userId,
     potId: transaction.potId,
     type: transaction.type,
@@ -179,7 +186,7 @@ function normalizeCategory(category) {
 }
 
 async function getPendingExpenseTotal(transactionsCollection, userId, potId) {
-  const [pendingSummary] = await transactionsCollection
+  const result = await transactionsCollection
     .aggregate([
       {
         $match: {
@@ -198,7 +205,7 @@ async function getPendingExpenseTotal(transactionsCollection, userId, potId) {
     ])
     .toArray();
 
-  return Number(pendingSummary?.total || 0);
+  return Number(result[0]?.total || 0);
 }
 
 function getTransactionMessage(type, needsApproval) {

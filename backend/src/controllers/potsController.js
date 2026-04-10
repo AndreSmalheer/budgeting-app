@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
 
 export async function getPots(request, response, next) {
@@ -10,7 +9,10 @@ export async function getPots(request, response, next) {
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
 
-    const pots = await potsCollection.find({ userId }).sort({ createdAt: -1 }).toArray();
+    const pots = await potsCollection
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .toArray();
 
     response.json({
       success: true,
@@ -27,13 +29,13 @@ export async function getPotById(request, response, next) {
     const potId = request.params.id;
 
     validateUserId(userId);
-    validateObjectId(potId, "Ongeldig potje-id.");
+    validateId(potId, "Ongeldig potje-id.");
 
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
 
     const pot = await potsCollection.findOne({
-      _id: new ObjectId(potId),
+      _id: parseInt(potId),
       userId,
     });
 
@@ -64,7 +66,9 @@ export async function createPot(request, response, next) {
     validateUserId(userId);
 
     if (name.length < 2) {
-      throw createValidationError("Geef het potje een naam van minimaal 2 tekens.");
+      throw createValidationError(
+        "Geef het potje een naam van minimaal 2 tekens.",
+      );
     }
 
     if (!icon) {
@@ -110,14 +114,14 @@ export async function deletePot(request, response, next) {
     const potId = request.params.id;
 
     validateUserId(userId);
-    validateObjectId(potId, "Ongeldig potje-id.");
+    validateId(potId, "Ongeldig potje-id.");
 
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
     const transactionsCollection = db.collection("transactions");
 
     const result = await potsCollection.deleteOne({
-      _id: new ObjectId(potId),
+      _id: parseInt(potId),
       userId,
     });
 
@@ -145,7 +149,7 @@ export async function deletePot(request, response, next) {
 
 function mapPot(pot) {
   return {
-    id: pot._id.toString(),
+    id: String(pot._id),
     userId: pot.userId,
     name: pot.name,
     icon: pot.icon,
@@ -162,8 +166,8 @@ function validateUserId(userId) {
   }
 }
 
-function validateObjectId(value, message) {
-  if (!ObjectId.isValid(value)) {
+function validateId(value, message) {
+  if (!value || (typeof value === "string" && isNaN(value))) {
     throw createValidationError(message);
   }
 }
