@@ -46,15 +46,25 @@ function BudgetDetails({
     .filter((transaction) => transaction.type === "deposit")
     .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
   const expenseTotal = potjeTransacties
-    .filter((transaction) => transaction.type === "expense")
+    .filter(
+      (transaction) =>
+        transaction.type === "expense" && transaction.status === "approved",
+    )
     .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
 
   const historyData = useMemo(() => {
     const sortedTransactions = [...potjeTransacties].sort(
       (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
     );
+    const approvedTransactions = sortedTransactions.filter((transaction) => {
+      if (transaction.type === "deposit") {
+        return transaction.status === "approved";
+      }
 
-    let runningBalance = budget;
+      return transaction.type === "expense" && transaction.status === "approved";
+    });
+
+    let runningBalance = 0;
 
     const points = [
       {
@@ -66,7 +76,7 @@ function BudgetDetails({
       },
     ];
 
-    sortedTransactions.forEach((transaction, index) => {
+    approvedTransactions.forEach((transaction, index) => {
       runningBalance +=
         transaction.type === "deposit"
           ? Number(transaction.amount || 0)
@@ -74,7 +84,7 @@ function BudgetDetails({
 
       points.push({
         shortLabel:
-          sortedTransactions.length > 5
+          approvedTransactions.length > 5
             ? String(index + 1)
             : new Intl.DateTimeFormat("nl-NL", {
                 day: "2-digit",
@@ -87,22 +97,14 @@ function BudgetDetails({
       });
     });
 
-    if (points.length === 1) {
-      points.push({
-        shortLabel: "Nu",
-        fullLabel: "Huidige stand",
-        balance: remaining,
-      });
-    } else {
-      points.push({
-        shortLabel: "Nu",
-        fullLabel: "Huidige stand",
-        balance: remaining,
-      });
-    }
+    points.push({
+      shortLabel: "Nu",
+      fullLabel: "Huidige stand",
+      balance: remaining,
+    });
 
     return points;
-  }, [budget, potje?.createdAt, potjeTransacties, remaining]);
+  }, [potje?.createdAt, potjeTransacties, remaining]);
 
   if (isLoading) return <p style={{ padding: "20px" }}>Potje laden...</p>;
   if (errorMessage) return <p style={{ padding: "20px" }}>{errorMessage}</p>;
@@ -119,7 +121,7 @@ function BudgetDetails({
     setFeedback("");
 
     try {
-      await createTransaction({
+      const response = await createTransaction({
         userId: session.id,
         potId: id,
         description: budgetAfhalenNaam.trim(),
@@ -129,6 +131,7 @@ function BudgetDetails({
       });
 
       await onTransactionCreated?.();
+      setFeedback(response.message || "");
 
       setBudgetAfhalenAmount("");
       setBudgetAfhalenCategory("overig");

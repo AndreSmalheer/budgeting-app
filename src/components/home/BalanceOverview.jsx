@@ -28,19 +28,19 @@ function shortCurrency(value) {
   return `€${Math.round(value)}`;
 }
 
-function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
+function BalanceOverview({ incomeTotal, expenseTotal, potValueData }) {
   const chartData =
-    spendingData.length > 5
+    potValueData.length > 5
       ? [
-          ...spendingData.slice(0, 4),
+          ...potValueData.slice(0, 4),
           {
             name: "Overig",
-            value: spendingData
+            value: potValueData
               .slice(4)
               .reduce((sum, item) => sum + item.value, 0),
           },
         ]
-      : spendingData;
+      : potValueData;
 
   const chartRows = chartData.map((item) => ({
     ...item,
@@ -74,8 +74,8 @@ function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
       <section className="Balance-chart-card">
         <div className="Balance-chart-header">
           <div>
-            <h2>Uitgaven per potje</h2>
-            <p>Een rustig overzicht van waar je geld naartoe gaat</p>
+            <h2>Totaal per potje</h2>
+            <p>Een rustig overzicht van hoeveel er nu in elk potje zit</p>
           </div>
 
           <span className="Balance-chart-badge">
@@ -114,7 +114,7 @@ function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
                 />
                 <Tooltip
                   cursor={{ fill: "rgba(148, 163, 184, 0.05)" }}
-                  formatter={(value) => [formatCurrency(value), "Uitgegeven"]}
+                  formatter={(value) => [formatCurrency(value), "Huidig saldo"]}
                   labelFormatter={(_, payload) =>
                     payload?.[0]?.payload?.name || ""
                   }
@@ -141,7 +141,7 @@ function BalanceOverview({ incomeTotal, expenseTotal, spendingData }) {
           </div>
         ) : (
           <div className="Balance-chart-empty">
-            Voeg transacties toe om te zien waar je geld naartoe gaat.
+            Maak een potje aan om hier direct je huidige saldo-overzicht te zien.
           </div>
         )}
       </section>

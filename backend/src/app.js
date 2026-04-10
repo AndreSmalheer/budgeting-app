@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import authRoutes from "./routes/authRoutes.js";
+import familyRoutes from "./routes/familyRoutes.js";
 import potsRoutes from "./routes/potsRoutes.js";
 import systemRoutes from "./routes/systemRoutes.js";
 import transactionsRoutes from "./routes/transactionsRoutes.js";
@@ -21,6 +22,7 @@ app.get("/", (request, response) => {
 
 app.use("/api", systemRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/family", familyRoutes);
 app.use("/api/pots", potsRoutes);
 app.use("/api/transactions", transactionsRoutes);
 

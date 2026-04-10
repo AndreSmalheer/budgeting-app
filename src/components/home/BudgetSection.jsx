@@ -6,7 +6,7 @@ function BudgetSection({ potjes }) {
   return (
     <div className="budget-container Mobile">
       <div className="budget-header">
-        <h1 className="budget-title">Budget</h1>
+        <h1 className="budget-title">Doelpotjes</h1>
         <Link to="/see-all/potjes" className="budget-see-all">
           Alles
         </Link>
@@ -20,6 +20,7 @@ function BudgetSection({ potjes }) {
               id={potje.id}
               name={potje.name}
               balance={Number(potje.currentBalance || 0)}
+              targetAmount={Number(potje.targetAmount || 0)}
               icon={potje.icon}
             />
           );

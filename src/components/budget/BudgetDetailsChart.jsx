@@ -22,7 +22,7 @@ function getChartMax(targetAmount, currentBalance, depositTotal, expenseTotal, h
   const values = [
     Number(targetAmount || 0),
     Number(currentBalance || 0),
-    Number(targetAmount || 0) + Number(depositTotal || 0),
+    Number(depositTotal || 0),
     Number(expenseTotal || 0),
     ...historyData.map((item) => Number(item.balance || 0)),
   ].filter((value) => Number.isFinite(value));
@@ -69,11 +69,11 @@ function BudgetDetailsChart({
 
       <div className="BudgetTrend-stats">
         <div className="BudgetTrend-stat">
-          <span>Startbedrag</span>
+          <span>Doelbedrag</span>
           <strong>{formatCurrency(targetAmount)}</strong>
         </div>
         <div className="BudgetTrend-stat BudgetTrend-stat--positive">
-          <span>Toegevoegd</span>
+          <span>Gespaard</span>
           <strong>{formatCurrency(depositTotal)}</strong>
         </div>
         <div className="BudgetTrend-stat BudgetTrend-stat--negative">
@@ -134,7 +134,7 @@ function BudgetDetailsChart({
               strokeDasharray="5 5"
               ifOverflow="extendDomain"
               label={{
-                value: "Startbedrag",
+                value: "Doel",
                 position: "insideTopRight",
                 fill: "#fcd34d",
                 fontSize: 10,

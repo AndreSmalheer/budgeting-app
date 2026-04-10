@@ -46,6 +46,64 @@ export async function loginAccount(formData) {
   });
 }
 
+export async function getFamilyStatus(userId) {
+  const params = new URLSearchParams({ userId });
+
+  return apiRequest(`/family/status?${params.toString()}`);
+}
+
+export async function linkChildAccount(formData) {
+  return apiRequest("/family/link", {
+    method: "POST",
+    body: JSON.stringify(formData),
+  });
+}
+
+export async function unlinkFamilyAccount(userId) {
+  const params = new URLSearchParams({ userId });
+
+  return apiRequest(`/family/link?${params.toString()}`, {
+    method: "DELETE",
+  });
+}
+
+export async function getLinkedChildPots(userId) {
+  const params = new URLSearchParams({ userId });
+
+  return apiRequest(`/family/child/pots?${params.toString()}`);
+}
+
+export async function getLinkedChildTransactions(userId, options = {}) {
+  const params = new URLSearchParams({ userId });
+  const { potId = "", type = "" } = options;
+
+  if (potId) {
+    params.set("potId", potId);
+  }
+
+  if (type) {
+    params.set("type", type);
+  }
+
+  return apiRequest(`/family/child/transactions?${params.toString()}`);
+}
+
+export async function getPendingApprovals(userId) {
+  const params = new URLSearchParams({ userId });
+
+  return apiRequest(`/family/approvals?${params.toString()}`);
+}
+
+export async function reviewApproval(formData) {
+  return apiRequest(`/family/approvals/${formData.approvalId}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      userId: formData.userId,
+      action: formData.action,
+    }),
+  });
+}
+
 export async function getPots(userId) {
   const params = new URLSearchParams({ userId });
 

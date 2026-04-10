@@ -99,3 +99,26 @@ textarea {
   background: rgba(45, 212, 191, 0.28);
   color: #ffffff;
 }
+
+.transaction__status {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.transaction__status--approved {
+  background: rgba(74, 222, 128, 0.12);
+  color: #bbf7d0;
+}
+
+.transaction__status--pending {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fde68a;
+}
+
+.transaction__status--rejected {
+  background: rgba(251, 113, 133, 0.12);
+  color: #fecdd3;
+}

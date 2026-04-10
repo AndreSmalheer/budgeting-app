@@ -2,6 +2,10 @@ import { Link } from "react-router-dom";
 import TransactionItem from "../transactions/TransactionItem";
 import TransactionSection from "../transactions/TransactionSection";
 import { formatDate } from "../../utils/formatters";
+import {
+  getTransactionStatusLabel,
+  getTransactionStatusTone,
+} from "../../utils/transactionStatus";
 
 function RecentTransactionsSection({ transacties, potjes }) {
   const recentItems = [...transacties]
@@ -18,6 +22,8 @@ function RecentTransactionsSection({ transacties, potjes }) {
           amount={transaction.amount}
           isExpense={transaction.type === "expense"}
           iconName={potje?.icon}
+          statusLabel={getTransactionStatusLabel(transaction.status)}
+          statusTone={getTransactionStatusTone(transaction.status)}
         />
       );
     });

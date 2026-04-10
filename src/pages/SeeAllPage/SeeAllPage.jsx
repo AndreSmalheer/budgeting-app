@@ -15,6 +15,10 @@ import {
   getTransactions as getTransactionsRequest,
 } from "../../services/api/client";
 import { formatDate } from "../../utils/formatters";
+import {
+  getTransactionStatusLabel,
+  getTransactionStatusTone,
+} from "../../utils/transactionStatus";
 import "./SeeAllPage.css";
 
 function SeeAllPage({
@@ -102,6 +106,8 @@ function SeeAllPage({
         isExpense={transaction.type === "expense"}
         iconName={potje?.icon}
         categoryLabel={getTransactionCategoryLabel(transaction.category)}
+        statusLabel={getTransactionStatusLabel(transaction.status)}
+        statusTone={getTransactionStatusTone(transaction.status)}
       />
     );
   });
@@ -162,7 +168,7 @@ function SeeAllPage({
 
         {type === "potjes" && (
           <>
-            <h2 className="section-title">Alle potjes</h2>
+            <h2 className="section-title">Alle doelpotjes</h2>
 
             <div className="potjes-list">
               {sortedPotjes.length === 0 && (
@@ -173,7 +179,8 @@ function SeeAllPage({
                 <PotListItem
                   key={potje.id}
                   name={potje.name}
-                  budget={potje.currentBalance}
+                  balance={potje.currentBalance}
+                  targetAmount={potje.targetAmount}
                   iconName={potje.icon}
                   onClick={() => navigate(`/budget-details/${potje.id}`)}
                   action={

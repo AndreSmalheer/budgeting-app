@@ -8,6 +8,8 @@ function TransactionItem({
   isExpense,
   iconName,
   categoryLabel = "",
+  statusLabel = "",
+  statusTone = "approved",
   action = null,
   className = "transaction",
 }) {
@@ -35,6 +37,11 @@ function TransactionItem({
           <p className="transaction__meta">{meta}</p>
           {categoryLabel && (
             <span className="transaction__category">{categoryLabel}</span>
+          )}
+          {statusLabel && (
+            <span className={`transaction__status transaction__status--${statusTone}`}>
+              {statusLabel}
+            </span>
           )}
         </div>
       </div>

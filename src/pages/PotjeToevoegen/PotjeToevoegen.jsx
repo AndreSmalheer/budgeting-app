@@ -193,8 +193,8 @@ export default function PotjeToevoegen({ onPotCreated }) {
 
       <div className="wrap">
         <div className="header section s1">
-          <p className="eyebrow">Nieuw potje</p>
-          <h1 className="title">Waar wil je dit budgetpotje voor gebruiken?</h1>
+          <p className="eyebrow">Nieuw doelpotje</p>
+          <h1 className="title">Waar wil je voor sparen met dit doelpotje?</h1>
         </div>
 
         <div className="fields section s2">
@@ -213,7 +213,7 @@ export default function PotjeToevoegen({ onPotCreated }) {
           </div>
 
           <div className="fieldWrap">
-            <label className="label">Budget</label>
+            <label className="label">Doelbedrag</label>
             <div className="prefixWrap">
               <span className="prefix">€</span>
               <input
@@ -226,6 +226,9 @@ export default function PotjeToevoegen({ onPotCreated }) {
                 onBlur={() => setFocused(null)}
               />
             </div>
+            <p className="goalHint">
+              Je begint op €0 en spaart stap voor stap naar dit doel toe.
+            </p>
           </div>
 
           <div className="fieldWrap">
@@ -265,12 +268,12 @@ export default function PotjeToevoegen({ onPotCreated }) {
               cursor: canSubmit && !isSubmitting ? "pointer" : "not-allowed",
             }}
           >
-            {isSubmitting ? "Potje opslaan..." : "Potje aanmaken"}
+            {isSubmitting ? "Doelpotje opslaan..." : "Doelpotje aanmaken"}
           </button>
         </div>
       </div>
 
-      {submitted && <div className="toast">Potje aangemaakt</div>}
+      {submitted && <div className="toast">Doelpotje aangemaakt</div>}
     </div>
   );
 }

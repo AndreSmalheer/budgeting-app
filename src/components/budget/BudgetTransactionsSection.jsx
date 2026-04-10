@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 import TransactionItem from "../transactions/TransactionItem";
 import { formatDate } from "../../utils/formatters";
+import {
+  getTransactionStatusLabel,
+  getTransactionStatusTone,
+} from "../../utils/transactionStatus";
 
 function BudgetTransactionsSection({ transactions, iconName, potId }) {
   const visibleTransactions = transactions.slice(0, 5);
@@ -28,6 +32,8 @@ function BudgetTransactionsSection({ transactions, iconName, potId }) {
             amount={transaction.amount}
             isExpense={transaction.type === "expense"}
             iconName={iconName}
+            statusLabel={getTransactionStatusLabel(transaction.status)}
+            statusTone={getTransactionStatusTone(transaction.status)}
           />
         ))
       )}

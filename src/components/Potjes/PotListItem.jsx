@@ -1,7 +1,7 @@
 import { LucideIcon } from "../../utils/icons";
 import { formatCurrency } from "../../utils/formatters";
 
-function PotListItem({ name, budget, iconName, onClick, action }) {
+function PotListItem({ name, balance, targetAmount, iconName, onClick, action }) {
   return (
     <div className="transaction" onClick={onClick}>
       <div
@@ -17,7 +17,9 @@ function PotListItem({ name, budget, iconName, onClick, action }) {
 
       <div className="transaction__info">
         <p className="transaction__name">{name}</p>
-        <p className="transaction__meta">Saldo · {formatCurrency(budget)}</p>
+        <p className="transaction__meta">
+          Gespaard · {formatCurrency(balance)} van {formatCurrency(targetAmount)}
+        </p>
       </div>
 
       {action}

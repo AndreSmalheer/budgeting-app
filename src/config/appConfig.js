@@ -1,7 +1,7 @@
 const appConfig = {
   appName: "BudgetApp",
   apiBaseUrl: "/api",
-  approvalLimit: 40,
+  approvalLimit: 100,
 };
 
 export default appConfig;

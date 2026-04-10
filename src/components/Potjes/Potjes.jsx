@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { LucideIcon } from "../../utils/icons";
 import { formatCurrency } from "../../utils/formatters";
 
-function Potjes({ id, name, balance, icon }) {
+function Potjes({ id, name, balance, targetAmount, icon }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
-  const formattedRemaining = formatCurrency(balance);
+  const formattedSaved = formatCurrency(balance);
+  const formattedTarget = formatCurrency(targetAmount);
 
   useEffect(() => {
     const handleResize = () => {
@@ -40,7 +41,9 @@ function Potjes({ id, name, balance, icon }) {
       </div>
 
       <h1 className="Potje-title">{name}</h1>
-      <h2 className="Potje-subtitle">{formattedRemaining} resterend</h2>
+      <h2 className="Potje-subtitle">
+        {formattedSaved} van {formattedTarget}
+      </h2>
     </div>
   );
 }

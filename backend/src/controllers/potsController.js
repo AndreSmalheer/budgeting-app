@@ -84,7 +84,7 @@ export async function createPot(request, response, next) {
       name,
       icon,
       targetAmount: amount,
-      currentBalance: amount,
+      currentBalance: 0,
       createdAt: now,
       updatedAt: now,
     };
@@ -93,7 +93,7 @@ export async function createPot(request, response, next) {
 
     response.status(201).json({
       success: true,
-      message: "Potje aangemaakt.",
+      message: "Doelpotje aangemaakt.",
       pot: mapPot({
         ...newPot,
         _id: result.insertedId,

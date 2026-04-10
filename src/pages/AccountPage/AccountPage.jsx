@@ -1,11 +1,39 @@
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BackBtn from "../../components/BackBtn/BackBtn";
-import { clearStoredSession, getStoredSession } from "../../utils/authStorage";
+import { useSession } from "../../hooks/useSession";
+import {
+  getFamilyStatus,
+  getLinkedChildPots,
+  getLinkedChildTransactions,
+  getPendingApprovals,
+  linkChildAccount,
+  reviewApproval,
+  unlinkFamilyAccount,
+} from "../../services/api/client";
+import appConfig from "../../config/appConfig";
+import { clearStoredSession } from "../../utils/authStorage";
+import { formatCurrency, formatDate } from "../../utils/formatters";
+import { getTransactionStatusLabel } from "../../utils/transactionStatus";
 import "./AccountPage.css";
 
 function AccountPage() {
   const navigate = useNavigate();
-  const session = getStoredSession();
+  const session = useSession();
+  const [familyData, setFamilyData] = useState({
+    linkedParent: null,
+    linkedChild: null,
+  });
+  const [childEmail, setChildEmail] = useState("");
+  const [familyFeedback, setFamilyFeedback] = useState({ type: "", message: "" });
+  const [isFamilyLoading, setIsFamilyLoading] = useState(false);
+  const [isLinking, setIsLinking] = useState(false);
+  const [isUnlinking, setIsUnlinking] = useState(false);
+  const [linkedChildPots, setLinkedChildPots] = useState([]);
+  const [linkedChildTransactions, setLinkedChildTransactions] = useState([]);
+  const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [isChildOverviewLoading, setIsChildOverviewLoading] = useState(false);
+  const [isReviewingApproval, setIsReviewingApproval] = useState("");
   const roleLabel =
     session?.role === "parent"
       ? "Ouder"
@@ -22,9 +50,175 @@ function AccountPage() {
         .toUpperCase()
     : "?";
 
+  const loadFamilyData = useCallback(async () => {
+    if (!session?.id) {
+      return;
+    }
+
+    setIsFamilyLoading(true);
+    setFamilyFeedback({ type: "", message: "" });
+
+    try {
+      const response = await getFamilyStatus(session.id);
+
+      setFamilyData({
+        linkedParent: response.linkedParent || null,
+        linkedChild: response.linkedChild || null,
+      });
+    } catch (error) {
+      setFamilyFeedback({
+        type: "error",
+        message: error.message || "De koppeling kon niet geladen worden.",
+      });
+    } finally {
+      setIsFamilyLoading(false);
+    }
+  }, [session?.id]);
+
+  useEffect(() => {
+    loadFamilyData();
+  }, [loadFamilyData]);
+
+  const loadLinkedChildOverview = useCallback(async () => {
+    if (
+      !session?.id ||
+      session.role !== "parent" ||
+      !familyData.linkedChild?.id
+    ) {
+      setLinkedChildPots([]);
+      setLinkedChildTransactions([]);
+      setPendingApprovals([]);
+      setIsChildOverviewLoading(false);
+      return;
+    }
+
+    setIsChildOverviewLoading(true);
+
+    try {
+      const [potsResponse, transactionsResponse, approvalsResponse] = await Promise.all([
+        getLinkedChildPots(session.id),
+        getLinkedChildTransactions(session.id),
+        getPendingApprovals(session.id),
+      ]);
+
+      setLinkedChildPots(potsResponse.pots || []);
+      setLinkedChildTransactions((transactionsResponse.transactions || []).slice(0, 4));
+      setPendingApprovals(approvalsResponse.approvals || []);
+    } catch (error) {
+      setFamilyFeedback({
+        type: "error",
+        message: error.message || "De gekoppelde kindgegevens konden niet geladen worden.",
+      });
+    } finally {
+      setIsChildOverviewLoading(false);
+    }
+  }, [familyData.linkedChild?.id, session?.id, session?.role]);
+
+  useEffect(() => {
+    loadLinkedChildOverview();
+  }, [loadLinkedChildOverview]);
+
   function handleLogout() {
     clearStoredSession();
     navigate("/login");
+  }
+
+  async function handleLinkSubmit(event) {
+    event.preventDefault();
+
+    if (!session?.id || !childEmail.trim()) {
+      return;
+    }
+
+    setIsLinking(true);
+    setFamilyFeedback({ type: "", message: "" });
+
+    try {
+      const response = await linkChildAccount({
+        userId: session.id,
+        childEmail: childEmail.trim(),
+      });
+
+      setFamilyData({
+        linkedParent: response.linkedParent || null,
+        linkedChild: response.linkedChild || null,
+      });
+      setChildEmail("");
+      setFamilyFeedback({
+        type: "success",
+        message: response.message || "Het kindaccount is gekoppeld.",
+      });
+    } catch (error) {
+      setFamilyFeedback({
+        type: "error",
+        message: error.message || "Koppelen is niet gelukt.",
+      });
+    } finally {
+      setIsLinking(false);
+    }
+  }
+
+  async function handleUnlink() {
+    if (!session?.id) {
+      return;
+    }
+
+    setIsUnlinking(true);
+    setFamilyFeedback({ type: "", message: "" });
+
+    try {
+      const response = await unlinkFamilyAccount(session.id);
+
+      setFamilyData({
+        linkedParent: response.linkedParent || null,
+        linkedChild: response.linkedChild || null,
+      });
+      setLinkedChildPots([]);
+      setLinkedChildTransactions([]);
+      setPendingApprovals([]);
+      setFamilyFeedback({
+        type: "success",
+        message: response.message || "De koppeling is verwijderd.",
+      });
+    } catch (error) {
+      setFamilyFeedback({
+        type: "error",
+        message: error.message || "Loskoppelen is niet gelukt.",
+      });
+    } finally {
+      setIsUnlinking(false);
+    }
+  }
+
+  async function handleApprovalAction(approvalId, action) {
+    if (!session?.id) {
+      return;
+    }
+
+    setIsReviewingApproval(approvalId);
+    setFamilyFeedback({ type: "", message: "" });
+
+    try {
+      const response = await reviewApproval({
+        approvalId,
+        userId: session.id,
+        action,
+      });
+
+      setFamilyFeedback({
+        type: "success",
+        message: response.message || "Het opnameverzoek is verwerkt.",
+      });
+
+      await loadLinkedChildOverview();
+    } catch (error) {
+      setFamilyFeedback({
+        type: "error",
+        message: error.message || "De goedkeuring kon niet verwerkt worden.",
+      });
+    } finally {
+      setIsReviewingApproval("");
+    }
   }
 
   return (
@@ -100,6 +294,251 @@ function AccountPage() {
                   </div>
                 </li>
               </ul>
+
+              <div className="AccountDivider" aria-hidden="true" />
+
+              <section className="AccountLinkSection">
+                <div className="AccountLinkSection__header">
+                  <div>
+                    <p className="AccountCard__eyebrow">Koppeling</p>
+                    <h2 className="AccountLinkSection__title">
+                      {session.role === "parent"
+                        ? "Koppel een kindaccount"
+                        : "Jouw ouderaccount"}
+                    </h2>
+                  </div>
+                </div>
+
+                {familyFeedback.message ? (
+                  <p
+                    className={`AccountLinkFeedback ${
+                      familyFeedback.type === "error"
+                        ? "is-error"
+                        : "is-success"
+                    }`}
+                  >
+                    {familyFeedback.message}
+                  </p>
+                ) : null}
+
+                {isFamilyLoading ? (
+                  <p className="AccountLinkHint">Koppeling laden...</p>
+                ) : null}
+
+                {session.role === "parent" && familyData.linkedChild ? (
+                  <div className="AccountLinkedCard">
+                    <span className="AccountLinkedCard__label">Gekoppeld kind</span>
+                    <strong className="AccountLinkedCard__name">
+                      {familyData.linkedChild.fullName}
+                    </strong>
+                    <span className="AccountLinkedCard__meta">
+                      {familyData.linkedChild.email}
+                    </span>
+                    <button
+                      className="AccountUnlinkButton"
+                      type="button"
+                      onClick={handleUnlink}
+                      disabled={isUnlinking}
+                    >
+                      {isUnlinking ? "Bezig met loskoppelen..." : "Kind loskoppelen"}
+                    </button>
+                  </div>
+                ) : null}
+
+                {session.role === "child" && familyData.linkedParent ? (
+                  <div className="AccountLinkedCard">
+                    <span className="AccountLinkedCard__label">Gekoppelde ouder</span>
+                    <strong className="AccountLinkedCard__name">
+                      {familyData.linkedParent.fullName}
+                    </strong>
+                    <span className="AccountLinkedCard__meta">
+                      {familyData.linkedParent.email}
+                    </span>
+                    <button
+                      className="AccountUnlinkButton"
+                      type="button"
+                      onClick={handleUnlink}
+                      disabled={isUnlinking}
+                    >
+                      {isUnlinking ? "Bezig met loskoppelen..." : "Ouder loskoppelen"}
+                    </button>
+                  </div>
+                ) : null}
+
+                {session.role === "parent" && !familyData.linkedChild && !isFamilyLoading ? (
+                  <form className="AccountLinkForm" onSubmit={handleLinkSubmit}>
+                    <p className="AccountLinkHint">
+                      Vul het e-mailadres van het kind in om de accounts aan elkaar
+                      te koppelen.
+                    </p>
+
+                    <label className="AccountLinkField">
+                      <span>E-mail van het kind</span>
+                      <input
+                        type="email"
+                        placeholder="kind@email.nl"
+                        value={childEmail}
+                        onChange={(event) => setChildEmail(event.target.value)}
+                        required
+                      />
+                    </label>
+
+                    <button
+                      className="AccountLinkButton"
+                      type="submit"
+                      disabled={isLinking}
+                    >
+                      {isLinking ? "Bezig met koppelen..." : "Kind koppelen"}
+                    </button>
+                  </form>
+                ) : null}
+
+                {session.role === "child" && !familyData.linkedParent && !isFamilyLoading ? (
+                  <p className="AccountLinkHint">
+                    Je bent nog niet gekoppeld aan een ouderaccount. Laat een ouder
+                    jouw e-mailadres gebruiken op zijn of haar profielpagina.
+                  </p>
+                ) : null}
+
+                {session.role === "parent" && familyData.linkedChild ? (
+                  <div className="AccountChildOverview">
+                    <div className="AccountChildSection">
+                      <div className="AccountChildSection__header">
+                        <h3 className="AccountChildSection__title">Potjes van je kind</h3>
+                        <span className="AccountChildSection__count">
+                          {linkedChildPots.length}
+                        </span>
+                      </div>
+
+                      {isChildOverviewLoading ? (
+                        <p className="AccountLinkHint">Kindpotjes laden...</p>
+                      ) : linkedChildPots.length === 0 ? (
+                        <p className="AccountLinkHint">
+                          Je gekoppelde kind heeft nog geen doelpotjes aangemaakt.
+                        </p>
+                      ) : (
+                        <div className="AccountMiniList">
+                          {linkedChildPots.slice(0, 4).map((pot) => (
+                            <div className="AccountMiniRow" key={pot.id}>
+                              <div className="AccountMiniRow__content">
+                                <strong>{pot.name}</strong>
+                                <span>
+                                  Gespaard {formatCurrency(pot.currentBalance)} van{" "}
+                                  {formatCurrency(pot.targetAmount)}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="AccountChildSection">
+                      <div className="AccountChildSection__header">
+                        <h3 className="AccountChildSection__title">
+                          Recente transacties van je kind
+                        </h3>
+                      </div>
+
+                      {isChildOverviewLoading ? (
+                        <p className="AccountLinkHint">Kindtransacties laden...</p>
+                      ) : linkedChildTransactions.length === 0 ? (
+                        <p className="AccountLinkHint">
+                          Er zijn nog geen transacties van je gekoppelde kind.
+                        </p>
+                      ) : (
+                        <div className="AccountMiniList">
+                          {linkedChildTransactions.map((transaction) => (
+                            <div className="AccountMiniRow" key={transaction.id}>
+                              <div className="AccountMiniRow__content">
+                                <strong>{transaction.description}</strong>
+                                <span>
+                                  {transaction.potName || "Zonder potje"} ·{" "}
+                                  {formatDate(transaction.createdAt)}
+                                </span>
+                              </div>
+                              <div className="AccountMiniRow__side">
+                                <span
+                                  className={`AccountMiniAmount ${
+                                    transaction.type === "expense"
+                                      ? "is-expense"
+                                      : "is-deposit"
+                                  }`}
+                                >
+                                  {transaction.type === "expense" ? "-" : "+"}
+                                  {formatCurrency(transaction.amount)}
+                                </span>
+                                <span className="AccountMiniStatus">
+                                  {getTransactionStatusLabel(transaction.status)}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="AccountChildSection">
+                      <div className="AccountChildSection__header">
+                        <h3 className="AccountChildSection__title">Open goedkeuringen</h3>
+                        <span className="AccountChildSection__count">
+                          {pendingApprovals.length}
+                        </span>
+                      </div>
+
+                      {isChildOverviewLoading ? (
+                        <p className="AccountLinkHint">Goedkeuringen laden...</p>
+                      ) : pendingApprovals.length === 0 ? (
+                        <p className="AccountLinkHint">
+                          Er staan nu geen opnameverzoeken open boven €
+                          {appConfig.approvalLimit}.
+                        </p>
+                      ) : (
+                        <div className="AccountApprovalList">
+                          {pendingApprovals.map((approval) => (
+                            <div className="AccountApprovalCard" key={approval.id}>
+                              <div className="AccountApprovalCard__top">
+                                <div>
+                                  <strong>{approval.description}</strong>
+                                  <p>
+                                    {approval.potName} · {approval.childName}
+                                  </p>
+                                </div>
+                                <span className="AccountApprovalCard__amount">
+                                  {formatCurrency(approval.amount)}
+                                </span>
+                              </div>
+
+                              <div className="AccountApprovalCard__actions">
+                                <button
+                                  className="AccountApprovalButton is-approve"
+                                  type="button"
+                                  disabled={isReviewingApproval === approval.id}
+                                  onClick={() =>
+                                    handleApprovalAction(approval.id, "approve")
+                                  }
+                                >
+                                  Goedkeuren
+                                </button>
+                                <button
+                                  className="AccountApprovalButton is-reject"
+                                  type="button"
+                                  disabled={isReviewingApproval === approval.id}
+                                  onClick={() =>
+                                    handleApprovalAction(approval.id, "reject")
+                                  }
+                                >
+                                  Afwijzen
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+              </section>
 
               <button className="AccountLogoutButton" type="button" onClick={handleLogout}>
                 Uitloggen

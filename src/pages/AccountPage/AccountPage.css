@@ -163,6 +163,334 @@
   gap: 4px;
 }
 
+.AccountLinkSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.AccountChildOverview {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.AccountChildSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.AccountChildSection__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.AccountChildSection__title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.AccountChildSection__count {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.12);
+  color: #abfaec;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AccountMiniList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.AccountMiniRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.AccountMiniRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.AccountMiniRow__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.AccountMiniRow__content strong {
+  color: #ffffff;
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.AccountMiniRow__content span {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.AccountMiniRow__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.AccountMiniAmount {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.AccountMiniAmount.is-expense {
+  color: #fda4af;
+}
+
+.AccountMiniAmount.is-deposit {
+  color: #86efac;
+}
+
+.AccountMiniStatus {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.AccountApprovalList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.AccountApprovalCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(251, 113, 133, 0.06);
+  border: 1px solid rgba(251, 113, 133, 0.12);
+}
+
+.AccountApprovalCard__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.AccountApprovalCard__top strong {
+  color: #ffffff;
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.AccountApprovalCard__top p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.AccountApprovalCard__amount {
+  color: #fecaca;
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.AccountApprovalCard__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.AccountApprovalButton {
+  min-height: 42px;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.AccountApprovalButton.is-approve {
+  border: none;
+  background: linear-gradient(180deg, #55f6c6 0%, #2dd4bf 100%);
+  color: #063a30;
+}
+
+.AccountApprovalButton.is-reject {
+  border: 1px solid rgba(251, 113, 133, 0.2);
+  background: rgba(251, 113, 133, 0.08);
+  color: #fecdd3;
+}
+
+.AccountApprovalButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.AccountLinkSection__title {
+  margin: 4px 0 0;
+  color: #ffffff;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.AccountLinkFeedback,
+.AccountLinkHint {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.AccountLinkFeedback {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.AccountLinkFeedback.is-success {
+  background: rgba(74, 222, 128, 0.12);
+  color: #bbf7d0;
+  border-color: rgba(74, 222, 128, 0.18);
+}
+
+.AccountLinkFeedback.is-error {
+  background: rgba(251, 113, 133, 0.12);
+  color: #fecdd3;
+  border-color: rgba(251, 113, 133, 0.2);
+}
+
+.AccountLinkHint {
+  color: var(--text-secondary);
+}
+
+.AccountLinkedCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.AccountLinkedCard__label {
+  color: #8aacb3;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.AccountLinkedCard__name {
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.AccountLinkedCard__meta {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.AccountUnlinkButton {
+  margin-top: 8px;
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(251, 113, 133, 0.2);
+  background: rgba(251, 113, 133, 0.1);
+  color: #fecdd3;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.AccountUnlinkButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.AccountLinkForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.AccountLinkField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.AccountLinkField span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.AccountLinkField input {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.AccountLinkField input:focus {
+  border-color: rgba(45, 212, 191, 0.35);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.12);
+}
+
+.AccountLinkButton {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #55f6c6 0%, #2dd4bf 100%);
+  color: #063a30;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.AccountLinkButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .AccountLogoutButton {
   width: 100%;
   margin-top: 22px;

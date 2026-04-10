@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
+import { config } from "../config/env.js";
 
 export async function getTransactions(request, response, next) {
   try {
@@ -75,6 +76,7 @@ export async function createTransaction(request, response, next) {
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
     const transactionsCollection = db.collection("transactions");
+    const linksCollection = db.collection("parentChildLinks");
 
     const pot = await potsCollection.findOne({
       _id: new ObjectId(potId),
@@ -90,12 +92,26 @@ export async function createTransaction(request, response, next) {
     }
 
     const currentBalance = Number(pot.currentBalance || 0);
-    const nextBalance =
-      type === "expense" ? currentBalance - amount : currentBalance + amount;
+    const pendingExpenses = await getPendingExpenseTotal(
+      transactionsCollection,
+      userId,
+      potId,
+    );
+    const availableBalance = currentBalance - pendingExpenses;
 
-    if (type === "expense" && nextBalance < 0) {
+    if (type === "expense" && availableBalance - amount < 0) {
       throw createValidationError("Je kunt niet meer afhalen dan er in het potje zit.");
     }
+
+    const parentLink =
+      type === "expense" ? await linksCollection.findOne({ childId: userId }) : null;
+    const needsApproval =
+      type === "expense" &&
+      Boolean(parentLink) &&
+      amount > Number(config.approvalLimit || 40);
+
+    const nextBalance =
+      type === "expense" ? currentBalance - amount : currentBalance + amount;
 
     const now = new Date();
     const transaction = {
@@ -105,33 +121,36 @@ export async function createTransaction(request, response, next) {
       amount,
       description,
       category,
-      status: "approved",
+      status: needsApproval ? "pending" : "approved",
+      reviewParentId: needsApproval ? parentLink.parentId : null,
       createdAt: now,
       updatedAt: now,
     };
 
     const result = await transactionsCollection.insertOne(transaction);
 
-    await potsCollection.updateOne(
-      { _id: pot._id, userId },
-      {
-        $set: {
-          currentBalance: nextBalance,
-          updatedAt: now,
+    if (!needsApproval) {
+      await potsCollection.updateOne(
+        { _id: pot._id, userId },
+        {
+          $set: {
+            currentBalance: nextBalance,
+            updatedAt: now,
+          },
         },
-      },
-    );
+      );
+    }
 
     response.status(201).json({
       success: true,
-      message: type === "expense" ? "Bedrag afgehaald." : "Bedrag toegevoegd.",
+      message: getTransactionMessage(type, needsApproval),
       transaction: mapTransaction({
         ...transaction,
         _id: result.insertedId,
       }),
       pot: {
         id: pot._id.toString(),
-        currentBalance: nextBalance,
+        currentBalance: needsApproval ? currentBalance : nextBalance,
         updatedAt: now,
       },
     });
@@ -157,6 +176,41 @@ function mapTransaction(transaction) {
 
 function normalizeCategory(category) {
   return category ? category.toLowerCase() : "overig";
+}
+
+async function getPendingExpenseTotal(transactionsCollection, userId, potId) {
+  const [pendingSummary] = await transactionsCollection
+    .aggregate([
+      {
+        $match: {
+          userId,
+          potId,
+          type: "expense",
+          status: "pending",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" },
+        },
+      },
+    ])
+    .toArray();
+
+  return Number(pendingSummary?.total || 0);
+}
+
+function getTransactionMessage(type, needsApproval) {
+  if (type === "deposit") {
+    return "Bedrag toegevoegd.";
+  }
+
+  if (needsApproval) {
+    return `Opnameverzoek verstuurd. Een ouder moet deze opname boven €${config.approvalLimit} eerst goedkeuren.`;
+  }
+
+  return "Bedrag afgehaald.";
 }
 
 function validateUserId(userId) {
