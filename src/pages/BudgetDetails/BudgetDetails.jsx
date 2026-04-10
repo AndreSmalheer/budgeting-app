@@ -9,6 +9,7 @@ import { useSession } from "../../hooks/useSession";
 import { createTransaction } from "../../services/api/client";
 import { formatDate } from "../../utils/formatters";
 import "./BudgetDetails.css";
+import ScrollToTop from "../../components/ScrollToTop/ScrollToTop";
 
 function BudgetDetails({
   potjes,
@@ -165,6 +166,7 @@ function BudgetDetails({
 
   return (
     <main className="BudgetDetails-page">
+      <scrollToTop />
       <div className="BudgetDetails-page__back">
         <BackBtn />
       </div>

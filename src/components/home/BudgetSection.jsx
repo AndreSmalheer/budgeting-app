@@ -28,7 +28,7 @@ function BudgetSection({ potjes }) {
 
         <Link
           to="/potje-toevoegen"
-          className="plus-icon"
+          className={`plus-icon ${potjes.length === 0 ? "plus-icon--no-items" : ""}`}
           aria-label="Nieuw potje toevoegen"
         >
           <Plus size={24} strokeWidth={2} />

@@ -5,6 +5,7 @@ import BackBtn from "../../components/BackBtn/BackBtn";
 import { useSession } from "../../hooks/useSession";
 import { createPot } from "../../services/api/client";
 import "./PotjeToevoegen.css";
+import ScrollToTop from "../../components/ScrollToTop/ScrollToTop";
 
 const budgetIconNames = [
   "ShoppingCart",
@@ -189,6 +190,7 @@ export default function PotjeToevoegen({ onPotCreated }) {
 
   return (
     <div className="page">
+      <ScrollToTop />
       <BackBtn style={{ position: "absolute", left: "20px", top: "5px" }} />
 
       <div className="wrap">

@@ -311,6 +311,10 @@
   top: -35px;
 }
 
+.plus-icon--no-items {
+  top: 0;
+}
+
 .plus-icon:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-1px);
