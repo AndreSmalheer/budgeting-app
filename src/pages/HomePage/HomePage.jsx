@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import Header from "../../components/Header/Header";
 import BalanceOverview from "../../components/home/BalanceOverview";
 import BudgetSection from "../../components/home/BudgetSection";
 import RecentTransactionsSection from "../../components/home/RecentTransactionsSection";
@@ -45,20 +44,17 @@ function HomePage({ potjes = [], transacties = [], isLoading = false, errorMessa
   }, [potjes, transacties]);
 
   return (
-    <>
-      <Header />
-      <main className="HomePage-shell">
-        {isLoading && <p className="page-feedback">Budgetgegevens laden...</p>}
-        {!isLoading && errorMessage && <p className="page-feedback">{errorMessage}</p>}
-        <BalanceOverview
-          incomeTotal={incomeTotal}
-          expenseTotal={expenseTotal}
-          spendingData={spendingData}
-        />
-        <BudgetSection potjes={recentPotjes} />
-        <RecentTransactionsSection transacties={transacties} potjes={potjes} />
-      </main>
-    </>
+    <main className="HomePage-shell">
+      {isLoading && <p className="page-feedback">Budgetgegevens laden...</p>}
+      {!isLoading && errorMessage && <p className="page-feedback">{errorMessage}</p>}
+      <BalanceOverview
+        incomeTotal={incomeTotal}
+        expenseTotal={expenseTotal}
+        spendingData={spendingData}
+      />
+      <BudgetSection potjes={recentPotjes} />
+      <RecentTransactionsSection transacties={transacties} potjes={potjes} />
+    </main>
   );
 }
 

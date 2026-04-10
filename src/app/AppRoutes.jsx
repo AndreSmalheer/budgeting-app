@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import AppShell from "../components/layout/AppShell";
 import { ProtectedRoute, PublicRoute } from "../components/routes/RouteGuards";
 import { useSession } from "../hooks/useSession";
 import LandingPage from "../pages/LandingPage/LandingPage";
@@ -55,20 +56,26 @@ function AppRoutes() {
     loadBudgetData();
   }, [loadBudgetData]);
 
+  function withAppShell(element) {
+    return <AppShell>{element}</AppShell>;
+  }
+
   return (
     <Routes>
       <Route
         path="/"
         element={
           loggedIn ? (
-            <HomePage
-              potjes={potjes}
-              transacties={transacties}
-              isLoading={isBudgetLoading}
-              errorMessage={budgetError}
-            />
+            withAppShell(
+              <HomePage
+                potjes={potjes}
+                transacties={transacties}
+                isLoading={isBudgetLoading}
+                errorMessage={budgetError}
+              />,
+            )
           ) : (
-            <LandingPage />
+            withAppShell(<LandingPage />)
           )
         }
       />
@@ -77,12 +84,14 @@ function AppRoutes() {
         <Route
           path="/home-page"
           element={
-            <HomePage
-              transacties={transacties}
-              potjes={potjes}
-              isLoading={isBudgetLoading}
-              errorMessage={budgetError}
-            />
+            withAppShell(
+              <HomePage
+                transacties={transacties}
+                potjes={potjes}
+                isLoading={isBudgetLoading}
+                errorMessage={budgetError}
+              />,
+            )
           }
         />
       )}
@@ -91,14 +100,16 @@ function AppRoutes() {
         path="/see-all/transacties"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            <SeeAllPage
-              type="transacties"
-              potjes={potjes}
-              transacties={transacties}
-              isLoading={isBudgetLoading}
-              errorMessage={budgetError}
-              onPotDeleted={loadBudgetData}
-            />
+            {withAppShell(
+              <SeeAllPage
+                type="transacties"
+                potjes={potjes}
+                transacties={transacties}
+                isLoading={isBudgetLoading}
+                errorMessage={budgetError}
+                onPotDeleted={loadBudgetData}
+              />,
+            )}
           </ProtectedRoute>
         }
       />
@@ -107,14 +118,16 @@ function AppRoutes() {
         path="/see-all/transacties/pot/:id"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            <SeeAllPage
-              type="transacties"
-              potjes={potjes}
-              transacties={transacties}
-              isLoading={isBudgetLoading}
-              errorMessage={budgetError}
-              onPotDeleted={loadBudgetData}
-            />
+            {withAppShell(
+              <SeeAllPage
+                type="transacties"
+                potjes={potjes}
+                transacties={transacties}
+                isLoading={isBudgetLoading}
+                errorMessage={budgetError}
+                onPotDeleted={loadBudgetData}
+              />,
+            )}
           </ProtectedRoute>
         }
       />
@@ -123,14 +136,16 @@ function AppRoutes() {
         path="/see-all/potjes"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            <SeeAllPage
-              type="potjes"
-              potjes={potjes}
-              transacties={transacties}
-              isLoading={isBudgetLoading}
-              errorMessage={budgetError}
-              onPotDeleted={loadBudgetData}
-            />
+            {withAppShell(
+              <SeeAllPage
+                type="potjes"
+                potjes={potjes}
+                transacties={transacties}
+                isLoading={isBudgetLoading}
+                errorMessage={budgetError}
+                onPotDeleted={loadBudgetData}
+              />,
+            )}
           </ProtectedRoute>
         }
       />
@@ -157,7 +172,7 @@ function AppRoutes() {
         path="/account"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            <AccountPage />
+            {withAppShell(<AccountPage />)}
           </ProtectedRoute>
         }
       />
@@ -166,7 +181,7 @@ function AppRoutes() {
         path="/potje-toevoegen"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            <PotjeToevoegen onPotCreated={loadBudgetData} />
+            {withAppShell(<PotjeToevoegen onPotCreated={loadBudgetData} />)}
           </ProtectedRoute>
         }
       />
@@ -175,7 +190,7 @@ function AppRoutes() {
         path="/starter-inhoud"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            <StarterInhoud />
+            {withAppShell(<StarterInhoud />)}
           </ProtectedRoute>
         }
       />
@@ -184,13 +199,15 @@ function AppRoutes() {
         path="/budget-details/:id"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            <BudgetDetails
-              potjes={potjes}
-              transacties={transacties}
-              isLoading={isBudgetLoading}
-              errorMessage={budgetError}
-              onTransactionCreated={loadBudgetData}
-            />
+            {withAppShell(
+              <BudgetDetails
+                potjes={potjes}
+                transacties={transacties}
+                isLoading={isBudgetLoading}
+                errorMessage={budgetError}
+                onTransactionCreated={loadBudgetData}
+              />,
+            )}
           </ProtectedRoute>
         }
       />

@@ -1,40 +1,20 @@
-import { Link, useNavigate } from "react-router-dom";
-import { LogIn, LogOut, UserRound, UserRoundPlus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { UserRound } from "lucide-react";
 import appConfig from "../../config/appConfig";
-import { clearStoredSession } from "../../utils/authStorage";
 import { useSession } from "../../hooks/useSession";
 import "./Header.css";
 
-function HeaderActionLink({ to, variant, icon, label }) {
-  const IconComponent = icon;
-
+function HeaderActionLink({ to, label }) {
   return (
-    <Link className={`Header-link ${variant}`} to={to}>
-      <IconComponent size={16} strokeWidth={2} />
+    <Link className="Header-profileBtn" to={to}>
+      <UserRound size={16} strokeWidth={2.2} />
       <span>{label}</span>
     </Link>
   );
 }
 
-function HeaderActionButton({ onClick, variant, icon, label }) {
-  const IconComponent = icon;
-
-  return (
-    <button className={`Header-link ${variant}`} type="button" onClick={onClick}>
-      <IconComponent size={16} strokeWidth={2} />
-      <span>{label}</span>
-    </button>
-  );
-}
-
 function Header() {
-  const navigate = useNavigate();
   const session = useSession();
-
-  function handleLogout() {
-    clearStoredSession();
-    navigate("/");
-  }
 
   return (
     <header className="Header-shell">
@@ -51,37 +31,7 @@ function Header() {
         </Link>
 
         <nav className="Header-actions">
-          {session ? (
-            <>
-              <HeaderActionLink
-                to="/account"
-                variant="Header-link-primary"
-                icon={UserRound}
-                label="Profiel"
-              />
-              <HeaderActionButton
-                onClick={handleLogout}
-                variant="Header-link-secondary"
-                icon={LogOut}
-                label="Uitloggen"
-              />
-            </>
-          ) : (
-            <>
-              <HeaderActionLink
-                to="/login"
-                variant="Header-link-secondary"
-                icon={LogIn}
-                label="Inloggen"
-              />
-              <HeaderActionLink
-                to="/register"
-                variant="Header-link-primary"
-                icon={UserRoundPlus}
-                label="Registreren"
-              />
-            </>
-          )}
+          <HeaderActionLink to={session ? "/account" : "/login"} label="Profiel" />
         </nav>
       </div>
     </header>

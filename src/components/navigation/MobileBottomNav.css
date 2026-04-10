@@ -1,0 +1,84 @@
+.MobileBottomNav {
+  position: fixed;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: min(calc(100% - 48px), 340px);
+  z-index: 40;
+  animation: bottomNavRiseIn 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.MobileBottomNav__inner {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 7px;
+  border-radius: 22px;
+  background: rgba(8, 10, 16, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 22px 48px rgba(6, 10, 18, 0.4);
+  backdrop-filter: blur(18px);
+}
+
+.MobileBottomNav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 48px;
+  padding: 6px 4px;
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.MobileBottomNav__item.is-active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.MobileBottomNav__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.MobileBottomNav__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.MobileBottomNav__label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+@keyframes bottomNavRiseIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (min-width: 861px) {
+  .MobileBottomNav {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .MobileBottomNav,
+  .MobileBottomNav__item {
+    animation: none;
+    transition: none;
+  }
+}
