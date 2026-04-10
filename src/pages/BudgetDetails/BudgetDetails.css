@@ -284,6 +284,16 @@ select.afnemen-input option {
   box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.12);
 }
 
+.afnemen-input::-webkit-outer-spin-button,
+.afnemen-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.afnemen-input {
+    -moz-appearance: textfield;
+}
+
 .afnemen-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
