@@ -320,6 +320,10 @@
   transform: translateY(0);
 }
 
+.plus-icon--no-items {
+  top: 0;
+}
+
 .recent-transactions {
   border-radius: 22px;
   padding: 6px 18px 2px;
