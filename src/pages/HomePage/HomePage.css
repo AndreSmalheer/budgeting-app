@@ -25,6 +25,7 @@
   flex-direction: column;
   gap: 18px;
   padding: 14px var(--page-padding) 0;
+  width: 100%;
 }
 
 .Balance-hero {
@@ -100,6 +101,7 @@
   background: linear-gradient(180deg, rgba(50, 54, 69, 0.97), rgba(42, 45, 57, 0.98));
   border: 1px solid var(--border-soft);
   box-shadow: var(--surface-shadow);
+  width: 100%;
 }
 
 .Balance-chart-header {
@@ -260,7 +262,7 @@
 .budget-container.Mobile .budget-items {
   display: flex;
   gap: 18px;
-  padding: 4px var(--page-padding) 6px;
+  padding: 4px 0 6px;
   margin-top: 0;
   margin-bottom: 0;
   overflow-x: auto;
@@ -312,7 +314,7 @@
 
 .recent-transactions {
   border-radius: 22px;
-  padding: 6px 14px 2px;
+  padding: 6px 18px 2px;
   background: linear-gradient(180deg, rgba(50, 54, 69, 0.97), rgba(42, 45, 57, 0.98));
   border: 1px solid var(--border-soft);
   box-shadow: var(--surface-shadow);
@@ -333,7 +335,7 @@
 
 @media (max-width: 410px) {
   .budget-container.Mobile .budget-header {
-    padding: 0 18px;
+    padding: 0;
   }
 }
 

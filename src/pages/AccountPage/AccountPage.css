@@ -8,6 +8,20 @@
   overflow: hidden;
 }
 
+.AccountPage__content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 480px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.AccountPage__topbar {
+  display: flex;
+  align-items: center;
+}
+
 .AccountPage__bg {
   position: absolute;
   inset: 0;
@@ -41,11 +55,11 @@
 
 .AccountCard {
   position: relative;
-  z-index: 1;
-  width: min(100%, 480px);
   border-radius: 24px;
   padding: 32px 28px 28px;
-  background-color: rgba(31, 111, 120, 0.1);
+  background:
+    linear-gradient(180deg, rgba(50, 54, 69, 0.96), rgba(42, 45, 57, 0.98));
+  border: 1px solid var(--border-soft);
   box-shadow:
     0 1px 2px rgba(13, 29, 43, 0.04),
     0 8px 24px rgba(13, 29, 43, 0.08),
@@ -126,17 +140,17 @@
   align-self: flex-start;
   padding: 3px 10px;
   border-radius: 999px;
-  background: #eaf4f2;
-  color: #207567;
-  font-family: 'Poppins', sans-serif;
+  background: rgba(45, 212, 191, 0.13);
+  color: #abfaec;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.03em;
+  border: 1px solid rgba(45, 212, 191, 0.18);
 }
 
 .AccountDivider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, #e5eef0 20%, #e5eef0 80%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14) 20%, rgba(255, 255, 255, 0.14) 80%, transparent);
   margin: 24px 0;
 }
 
@@ -169,7 +183,7 @@
 }
 
 .AccountInfo__row:hover {
-    background-color: gray;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .AccountInfo__icon {
@@ -177,11 +191,12 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #eaf4f2;
-  color: #207567;
+  background: rgba(45, 212, 191, 0.13);
+  color: #abfaec;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(45, 212, 191, 0.18);
 }
 
 .AccountInfo__content {
@@ -224,11 +239,12 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #eaf4f2;
-  color: #207567;
+  background: rgba(45, 212, 191, 0.13);
+  color: #abfaec;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(45, 212, 191, 0.18);
 }
 
 .AccountEmpty p {
@@ -239,6 +255,10 @@
 }
 
 @media (max-width: 400px) {
+  .AccountPage {
+    padding: 28px 16px 48px;
+  }
+
   .AccountCard {
     padding: 24px 18px 22px;
     border-radius: 20px;
