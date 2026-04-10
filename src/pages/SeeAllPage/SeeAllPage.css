@@ -20,7 +20,7 @@
 .SpendingOverview .recent-transactions {
     border-radius: 22px;
     padding: 6px 14px 2px;
-    background: linear-gradient(180deg, rgba(50, 54, 69, 0.97), rgba(42, 45, 57, 0.98));
+    background: #2E3140;
     border: 1px solid var(--border-soft);
     box-shadow: var(--surface-shadow);
 }

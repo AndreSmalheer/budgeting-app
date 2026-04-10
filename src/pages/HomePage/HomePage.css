@@ -297,6 +297,8 @@
   box-shadow: var(--surface-shadow);
   transition: all 0.2s ease;
   flex-shrink: 0;
+  position: relative;
+  top: -35px;
 }
 
 .plus-icon:hover {
