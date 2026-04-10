@@ -4,30 +4,11 @@ import authRoutes from "./routes/authRoutes.js";
 import potsRoutes from "./routes/potsRoutes.js";
 import systemRoutes from "./routes/systemRoutes.js";
 import transactionsRoutes from "./routes/transactionsRoutes.js";
-import { config } from "./config/env.js";
 
 const app = express();
 
-const allowedOrigins = new Set([
-  config.clientUrl,
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://localhost:4173",
-  "http://127.0.0.1:4173",
-]);
-
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.has(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      callback(new Error("Deze origin is niet toegestaan door CORS."));
-    },
-  }),
-);
+// Voor lokale development en testen op telefoon/PWA laten we alle origins toe.
+app.use(cors());
 
 app.use(express.json());
 
