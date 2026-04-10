@@ -1,4 +1,4 @@
-import { ArrowLeftRight, PiggyBank, UserRound } from "lucide-react";
+import { ArrowLeftRight, House, PiggyBank, UserRound } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useSession } from "../../hooks/useSession";
 import "./MobileBottomNav.css";
@@ -10,6 +10,12 @@ function MobileBottomNav() {
   const hasSession = Boolean(session);
 
   const items = [
+    {
+      label: "Home",
+      icon: House,
+      to: "/",
+      isActive: location.pathname === "/" || location.pathname === "/home-page",
+    },
     {
       label: "Potjes",
       icon: PiggyBank,

@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
-import { UserRound } from "lucide-react";
+import { LogIn, UserRound } from "lucide-react";
 import appConfig from "../../config/appConfig";
 import { useSession } from "../../hooks/useSession";
 import "./Header.css";
 
-function HeaderActionLink({ to, label }) {
+function HeaderActionLink({ to, label, session }) {
+  const Icon = session ? UserRound : LogIn;
+
   return (
     <Link className="Header-profileBtn" to={to}>
-      <UserRound size={16} strokeWidth={2.2} />
+      <Icon size={16} strokeWidth={2.2} />
       <span>{label}</span>
     </Link>
   );
@@ -31,7 +33,11 @@ function Header() {
         </Link>
 
         <nav className="Header-actions">
-          <HeaderActionLink to={session ? "/account" : "/login"} label="Profiel" />
+          <HeaderActionLink
+            to={session ? "/account" : "/login"}
+            label={session ? "Account" : "Inloggen"}
+            session={session}
+          />
         </nav>
       </div>
     </header>
