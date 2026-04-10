@@ -1,29 +1,9 @@
 .AppShell {
   min-height: 100vh;
-  position: relative;
-}
-
-.AppShell::before {
-  content: "";
-  position: fixed;
-  inset: 0 0 auto 0;
-  height: min(36vh, 320px);
-  background:
-    radial-gradient(circle at top right, rgba(45, 212, 191, 0.12), transparent 58%),
-    radial-gradient(circle at top left, rgba(96, 165, 250, 0.08), transparent 46%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.AppShell > * {
-  position: relative;
-  z-index: 1;
 }
 
 .AppShell__content {
-  width: min(100%, 1240px);
-  margin: 0 auto;
-  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: 104px;
 }
 
 .AppShell__content > * {
@@ -43,7 +23,7 @@
 
 @media (min-width: 861px) {
   .AppShell__content {
-    padding-bottom: 44px;
+    padding-bottom: 40px;
   }
 }
 

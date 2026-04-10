@@ -166,34 +166,32 @@ function BudgetDetails({
         <BackBtn />
       </div>
 
-      <div className="BudgetDetails-page__top">
-        <div className="potje-container">
-          <BudgetDetailsChart
-            historyData={historyData}
-            currentBalance={remaining}
-            targetAmount={budget}
-            depositTotal={depositTotal}
-            expenseTotal={expenseTotal}
-          />
-        </div>
-
-        <BudgetWithdrawForm
-          amount={budgetAfhalenAmount}
-          category={budgetAfhalenCategory}
-          categories={TRANSACTION_CATEGORIES}
-          name={budgetAfhalenNaam}
-          isDepositValid={isDepositValid}
-          isWithdrawValid={isWithdrawValid}
-          onAmountChange={(event) => setBudgetAfhalenAmount(event.target.value)}
-          onCategoryChange={(event) => setBudgetAfhalenCategory(event.target.value)}
-          onNameChange={(event) => setBudgetAfhalenNaam(event.target.value)}
-          onDepositSubmit={handleBudgetToevoegen}
-          onWithdrawSubmit={handleBudgetAfhalen}
-          isSubmitting={isSubmitting}
+      <div className="potje-container">
+        <BudgetDetailsChart
+          historyData={historyData}
+          currentBalance={remaining}
+          targetAmount={budget}
+          depositTotal={depositTotal}
+          expenseTotal={expenseTotal}
         />
       </div>
 
       {feedback && <p className="page-feedback">{feedback}</p>}
+
+      <BudgetWithdrawForm
+        amount={budgetAfhalenAmount}
+        category={budgetAfhalenCategory}
+        categories={TRANSACTION_CATEGORIES}
+        name={budgetAfhalenNaam}
+        isDepositValid={isDepositValid}
+        isWithdrawValid={isWithdrawValid}
+        onAmountChange={(event) => setBudgetAfhalenAmount(event.target.value)}
+        onCategoryChange={(event) => setBudgetAfhalenCategory(event.target.value)}
+        onNameChange={(event) => setBudgetAfhalenNaam(event.target.value)}
+        onDepositSubmit={handleBudgetToevoegen}
+        onWithdrawSubmit={handleBudgetAfhalen}
+        isSubmitting={isSubmitting}
+      />
 
       <BudgetTransactionsSection
         transactions={potjeTransacties}
