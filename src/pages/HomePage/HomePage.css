@@ -9,6 +9,12 @@
   padding-bottom: 40px;
 }
 
+.HomePage-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
 .page-feedback {
   margin: 0 var(--page-padding);
   padding: 14px 16px;
@@ -393,5 +399,78 @@
   .SpendingOverview {
     max-width: 1100px;
     margin: 0 auto;
+  }
+}
+
+@media (min-width: 1080px) {
+  .HomePage-shell {
+    gap: 30px;
+    padding-bottom: 64px;
+  }
+
+  .Balance-container.Mobile {
+    max-width: 1180px;
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
+    grid-template-areas:
+      "hero chart"
+      "summary chart";
+    gap: 24px 28px;
+    align-items: stretch;
+  }
+
+  .Balance-hero {
+    grid-area: hero;
+    justify-content: center;
+    min-height: 100%;
+    padding-top: 0;
+  }
+
+  .Balance-summary {
+    grid-area: summary;
+    align-self: end;
+  }
+
+  .Balance-chart-card {
+    grid-area: chart;
+    min-height: 100%;
+    padding: 22px 22px 18px;
+  }
+
+  .Balance-chart-wrap {
+    height: 320px;
+  }
+
+  .HomePage-grid {
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    padding: 0 var(--page-padding);
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+    gap: 28px;
+    align-items: start;
+  }
+
+  .budget-container.Mobile,
+  .SpendingOverview {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .budget-container.Mobile .budget-items {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 18px;
+    padding-bottom: 0;
+  }
+
+  .plus-icon {
+    top: 0;
+    align-self: flex-start;
+  }
+
+  .recent-transactions {
+    min-height: 100%;
   }
 }

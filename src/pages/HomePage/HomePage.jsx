@@ -52,8 +52,10 @@ function HomePage({ potjes = [], transacties = [], isLoading = false, errorMessa
         expenseTotal={expenseTotal}
         spendingData={spendingData}
       />
-      <BudgetSection potjes={recentPotjes} />
-      <RecentTransactionsSection transacties={transacties} potjes={potjes} />
+      <div className="HomePage-grid">
+        <BudgetSection potjes={recentPotjes} />
+        <RecentTransactionsSection transacties={transacties} potjes={potjes} />
+      </div>
     </main>
   );
 }

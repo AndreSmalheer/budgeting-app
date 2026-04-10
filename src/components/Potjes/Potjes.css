@@ -73,3 +73,14 @@
   stroke: black;
   stroke-width: 2;
 }
+
+@media (min-width: 1080px) {
+  .budget-container.Mobile .budget-items {
+    padding: 0;
+  }
+
+  .Potje {
+    width: 96px;
+    min-height: 134px;
+  }
+}

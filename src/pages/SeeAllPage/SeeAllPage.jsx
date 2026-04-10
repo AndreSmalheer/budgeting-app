@@ -37,6 +37,7 @@ function SeeAllPage({
   const sortedPotjes = [...potjes].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
   );
+  const potToDelete = deleteId ? potjes.find((potje) => potje.id === deleteId) : null;
   const selectedPot = filterPotId
     ? potjes.find((potje) => potje.id === filterPotId)
     : null;
@@ -199,12 +200,14 @@ function SeeAllPage({
 
       {deleteId && (
         <ConfirmModal
-          title="Weet je het zeker?"
-          description="Dit potje wordt definitief verwijderd."
+          title={`Weet je zeker dat je "${potToDelete?.name || "dit potje"}" wilt verwijderen?`}
+          description="Deze actie kan niet worden teruggedraaid."
+          note="Ook de transacties die bij dit potje horen worden verwijderd."
           cancelLabel="Annuleren"
-          confirmLabel={isDeleting ? "Bezig..." : "Verwijderen"}
+          confirmLabel={isDeleting ? "Bezig..." : "Ja, verwijder potje"}
           onCancel={cancelDelete}
           onConfirm={confirmDelete}
+          isBusy={isDeleting}
         />
       )}
     </div>
