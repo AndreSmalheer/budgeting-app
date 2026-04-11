@@ -25,3 +25,11 @@ backend/.env
 *.njsproj
 *.sln
 *.sw?
+
+# SQLite temp files
+backend/data/*.db-shm
+backend/data/*.db-wal
+backend/data/*.db
+
+# Logs
+*.log
