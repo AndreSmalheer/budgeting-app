@@ -44,7 +44,7 @@ function TransactionEditModal({
       title={isScheduled ? "Gepland bedrag bewerken" : "Transactie bewerken"}
       description={
         isScheduled
-          ? "Pas de geplande transactie aan en sla de wijziging op."
+          ? "Pas het geplande bedrag aan en sla de wijziging op."
           : "Pas de details aan en sla de wijziging op."
       }
       actions={
@@ -88,24 +88,22 @@ function TransactionEditModal({
           />
         </div>
 
-        {!isScheduled ? (
-          <div className="modal-field">
-            <label htmlFor="transaction-type">Type</label>
-            <select
-              id="transaction-type"
-              value={formData.type}
-              onChange={(event) =>
-                setFormData((current) => ({
-                  ...current,
-                  type: event.target.value,
-                }))
-              }
-            >
-              <option value="deposit">Storting</option>
-              <option value="expense">Uitgave</option>
-            </select>
-          </div>
-        ) : null}
+        <div className="modal-field">
+          <label htmlFor="transaction-type">Type</label>
+          <select
+            id="transaction-type"
+            value={formData.type}
+            onChange={(event) =>
+              setFormData((current) => ({
+                ...current,
+                type: event.target.value,
+              }))
+            }
+          >
+            <option value="deposit">Storting</option>
+            <option value="expense">Uitgave</option>
+          </select>
+        </div>
 
         <div className="modal-field">
           <label htmlFor="transaction-category">Categorie</label>

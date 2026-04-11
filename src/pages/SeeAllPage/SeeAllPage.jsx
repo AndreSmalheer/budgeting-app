@@ -110,6 +110,7 @@ function SeeAllPage({
               userId: session.id,
               description: formData.description,
               amount: formData.amount,
+              type: formData.type,
               category: formData.category,
               recurrence: formData.recurrence,
               startDate: formData.startDate,
@@ -207,14 +208,16 @@ function SeeAllPage({
         iconName={potje?.icon}
         categoryLabel={
           item.itemType === "scheduled"
-            ? "Scheduled"
+            ? item.type === "deposit"
+              ? "Bijschrijving"
+              : "Afschrijving"
             : getTransactionCategoryLabel(item.category)
         }
         statusLabel={
           item.itemType === "scheduled"
             ? item.recurrence === "daily"
-              ? "Dagelijks"
-              : "Maandelijks"
+              ? "Scheduled · Dagelijks"
+              : "Scheduled · Maandelijks"
             : getTransactionStatusLabel(item.status)
         }
         statusTone={

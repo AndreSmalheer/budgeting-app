@@ -11,6 +11,7 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState(`${potName} afschrijving`.trim());
   const [amount, setAmount] = useState("");
+  const [type, setType] = useState("expense");
   const [category, setCategory] = useState("overig");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -33,6 +34,7 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
     onSubmit?.({
       description: description.trim(),
       amount: Number(amount),
+      type,
       category,
       startDate,
       endDate,
@@ -105,7 +107,7 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
         <div className="spf-trigger-text">
           <div className="spf-trigger-label">Bedrag inplannen</div>
           <div className="spf-trigger-sub">
-            Stel een dagelijkse of maandelijkse afschrijving in
+            Stel een dagelijkse of maandelijkse bij- of afschrijving in
           </div>
         </div>
         <svg className="spf-chevron" viewBox="0 0 20 20" fill="none">
@@ -126,7 +128,7 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
             <input
               className="spf-input"
               type="text"
-              placeholder="Bijv. huur of boodschappen"
+              placeholder="Bijv. huur of salaris"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
             />
@@ -148,6 +150,20 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
               </div>
             </div>
             <div className="spf-field">
+              <label className="spf-label">Type</label>
+              <select
+                className="spf-input"
+                value={type}
+                onChange={(event) => setType(event.target.value)}
+              >
+                <option value="expense">Afschrijving</option>
+                <option value="deposit">Bijschrijving</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="spf-grid-2">
+            <div className="spf-field">
               <label className="spf-label">Categorie</label>
               <select
                 className="spf-input"
@@ -160,6 +176,21 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
                   </option>
                 ))}
               </select>
+            </div>
+            <div className="spf-field">
+              <label className="spf-label">Herhaling</label>
+              <div className="spf-pills">
+                {REPEAT_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    className={`spf-pill${repeat === option.value ? " active" : ""}`}
+                    onClick={() => setRepeat(option.value)}
+                    type="button"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -192,22 +223,6 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
               <div className="spf-hint-text">{dateHint}</div>
             </div>
           ) : null}
-
-          <div className="spf-field">
-            <label className="spf-label">Herhaling</label>
-            <div className="spf-pills">
-              {REPEAT_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  className={`spf-pill${repeat === option.value ? " active" : ""}`}
-                  onClick={() => setRepeat(option.value)}
-                  type="button"
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="spf-divider" />
 

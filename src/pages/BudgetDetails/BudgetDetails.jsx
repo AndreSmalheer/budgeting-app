@@ -232,6 +232,7 @@ function BudgetDetails({
           userId: session.id,
           description: formData.description,
           amount: formData.amount,
+          type: formData.type,
           category: formData.category,
           recurrence: formData.recurrence,
           startDate: formData.startDate,

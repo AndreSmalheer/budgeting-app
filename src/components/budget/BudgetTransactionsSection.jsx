@@ -48,12 +48,14 @@ function BudgetTransactionsSection({
             iconName={iconName}
             categoryLabel={
               transaction.itemType === "scheduled"
-                ? "Scheduled"
+                ? transaction.type === "deposit"
+                  ? "Bijschrijving"
+                  : "Afschrijving"
                 : transaction.categoryLabel
             }
             statusLabel={
               transaction.itemType === "scheduled"
-                ? transaction.recurrenceLabel
+                ? `Scheduled · ${transaction.recurrenceLabel}`
                 : getTransactionStatusLabel(transaction.status)
             }
             statusTone={

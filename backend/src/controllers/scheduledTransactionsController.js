@@ -8,6 +8,7 @@ import {
 } from "./budgetHelpers.js";
 
 const RECURRENCE_TYPES = new Set(["daily", "monthly"]);
+const SCHEDULE_TYPES = new Set(["deposit", "expense"]);
 
 export async function getScheduledTransactions(request, response, next) {
   try {
@@ -45,6 +46,7 @@ export async function createScheduledTransaction(request, response, next) {
   try {
     const userId = request.body.userId?.trim() || "";
     const potId = request.body.potId?.trim() || "";
+    const type = request.body.type?.trim() || "expense";
     const description = request.body.description?.trim() || "";
     const amount = Number(request.body.amount);
     const category = normalizeCategory(request.body.category?.trim() || "overig");
@@ -57,6 +59,7 @@ export async function createScheduledTransaction(request, response, next) {
     validateScheduleInput({
       description,
       amount,
+      type,
       startDate,
       endDate,
       recurrence,
@@ -82,7 +85,7 @@ export async function createScheduledTransaction(request, response, next) {
     const scheduledTransaction = {
       userId,
       potId,
-      type: "expense",
+      type,
       description,
       amount,
       category,
@@ -115,6 +118,7 @@ export async function updateScheduledTransaction(request, response, next) {
   try {
     const userId = request.body.userId?.trim() || "";
     const scheduleId = request.params.id;
+    const type = request.body.type?.trim() || "expense";
     const description = request.body.description?.trim() || "";
     const amount = Number(request.body.amount);
     const category = normalizeCategory(request.body.category?.trim() || "overig");
@@ -127,6 +131,7 @@ export async function updateScheduledTransaction(request, response, next) {
     validateScheduleInput({
       description,
       amount,
+      type,
       startDate,
       endDate,
       recurrence,
@@ -157,6 +162,7 @@ export async function updateScheduledTransaction(request, response, next) {
         $set: {
           description,
           amount,
+          type,
           category,
           startDate,
           endDate: endDate || null,
@@ -174,6 +180,7 @@ export async function updateScheduledTransaction(request, response, next) {
           ...existingSchedule,
           description,
           amount,
+          type,
           category,
           startDate,
           endDate: endDate || null,
@@ -222,11 +229,7 @@ export async function deleteScheduledTransaction(request, response, next) {
 
 export async function syncScheduledTransactions(request, response, next) {
   try {
-    const userId = (
-      request.body?.userId ||
-      request.query.userId ||
-      ""
-    ).trim();
+    const userId = (request.body?.userId || request.query.userId || "").trim();
 
     validateUserId(userId);
 
@@ -338,6 +341,7 @@ export async function runScheduledTransactionSync(userId) {
 function validateScheduleInput({
   description,
   amount,
+  type,
   startDate,
   endDate,
   recurrence,
@@ -350,6 +354,10 @@ function validateScheduleInput({
 
   if (!Number.isFinite(amount) || amount <= 0) {
     throw createValidationError("Vul een geldig bedrag groter dan 0 in.");
+  }
+
+  if (!SCHEDULE_TYPES.has(type)) {
+    throw createValidationError("Gebruik een geldig transactietype.");
   }
 
   if (!startDate) {

@@ -45,12 +45,18 @@ function RecentTransactionsSection({
           amount={item.amount}
           isExpense={item.type === "expense"}
           iconName={potje?.icon}
-          categoryLabel={item.itemType === "scheduled" ? "Scheduled" : ""}
+          categoryLabel={
+            item.itemType === "scheduled"
+              ? item.type === "deposit"
+                ? "Bijschrijving"
+                : "Afschrijving"
+              : ""
+          }
           statusLabel={
             item.itemType === "scheduled"
               ? item.recurrence === "daily"
-                ? "Dagelijks"
-                : "Maandelijks"
+                ? "Scheduled · Dagelijks"
+                : "Scheduled · Maandelijks"
               : getTransactionStatusLabel(item.status)
           }
           statusTone={
