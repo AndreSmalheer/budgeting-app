@@ -1,6 +1,6 @@
 {
-  "name": "BudgetMaatje",
-  "short_name": "BudgetMaatje",
+  "name": "Budgetly",
+  "short_name": "Budgetly",
   "id": "/",
   "start_url": "/",
   "display": "standalone",

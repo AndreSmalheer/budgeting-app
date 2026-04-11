@@ -1,5 +1,5 @@
 const appConfig = {
-  appName: "BudgetApp",
+  appName: "Budgetly",
   apiBaseUrl: "/api",
   approvalLimit: 100,
 };
