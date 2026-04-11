@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./ScheduledPaymentForm.css";
+import "./Scheduledpaymentform.css"
 
 const REPEAT_OPTIONS = [
   "Eenmalig",
