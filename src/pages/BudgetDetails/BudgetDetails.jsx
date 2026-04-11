@@ -9,6 +9,7 @@ import { useSession } from "../../hooks/useSession";
 import { createTransaction } from "../../services/api/client";
 import { formatDate } from "../../utils/formatters";
 import "./BudgetDetails.css";
+import ScheduledPaymentForm from "../../components/scheduledPaymentsForm/Scheduledpaymentform";
 import ScrollToTop from "../../components/ScrollToTop/ScrollToTop";
 
 function BudgetDetails({
@@ -24,12 +25,12 @@ function BudgetDetails({
   const potje = potjes.find((item) => item.id === id);
 
   const potjeTransacties = transacties.filter(
-    (transaction) => transaction.potId === id
+    (transaction) => transaction.potId === id,
   );
 
   const [budgetAfhalenAmount, setBudgetAfhalenAmount] = useState("");
   const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState(
-    `${potje?.name || ""} afschrijving`
+    `${potje?.name || ""} afschrijving`,
   );
   const [budgetAfhalenCategory, setBudgetAfhalenCategory] = useState("overig");
   const [feedback, setFeedback] = useState("");
@@ -40,6 +41,18 @@ function BudgetDetails({
       setBudgetAfhalenNaam(`${potje.name} afschrijving`);
     }
   }, [potje?.name, budgetAfhalenNaam]);
+
+  function handleScheduledPaymentSubmit() {
+    console.log("Scheduled payment submitted 🚀");
+    console.log("TODO: Add payment scheduling logic here");
+    return null;
+  }
+
+  function handleScheduledPaymentCancel() {
+    console.log("Scheduled payment cancelled ❌");
+    console.log("TODO: Reset form / close modal here");
+    return null;
+  }
 
   const budget = Number(potje?.targetAmount) || 0;
   const remaining = Number(potje?.currentBalance) || 0;
@@ -62,7 +75,9 @@ function BudgetDetails({
         return transaction.status === "approved";
       }
 
-      return transaction.type === "expense" && transaction.status === "approved";
+      return (
+        transaction.type === "expense" && transaction.status === "approved"
+      );
     });
 
     let runningBalance = 0;
@@ -161,12 +176,13 @@ function BudgetDetails({
     Number(budgetAfhalenAmount) > 0 &&
     !isSubmitting;
 
-  const isWithdrawValid = hasValidInput && Number(budgetAfhalenAmount) <= remaining;
+  const isWithdrawValid =
+    hasValidInput && Number(budgetAfhalenAmount) <= remaining;
   const isDepositValid = hasValidInput;
 
   return (
     <main className="BudgetDetails-page">
-      <scrollToTop />
+      <ScrollToTop />
       <div className="BudgetDetails-page__back">
         <BackBtn />
       </div>
@@ -191,11 +207,19 @@ function BudgetDetails({
         isDepositValid={isDepositValid}
         isWithdrawValid={isWithdrawValid}
         onAmountChange={(event) => setBudgetAfhalenAmount(event.target.value)}
-        onCategoryChange={(event) => setBudgetAfhalenCategory(event.target.value)}
+        onCategoryChange={(event) =>
+          setBudgetAfhalenCategory(event.target.value)
+        }
         onNameChange={(event) => setBudgetAfhalenNaam(event.target.value)}
         onDepositSubmit={handleBudgetToevoegen}
         onWithdrawSubmit={handleBudgetAfhalen}
         isSubmitting={isSubmitting}
+      />
+
+      <ScheduledPaymentForm
+        potName={potje.name}
+        onSubmit={handleScheduledPaymentSubmit}
+        onCancel={handleScheduledPaymentCancel}
       />
 
       <BudgetTransactionsSection
