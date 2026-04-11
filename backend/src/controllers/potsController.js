@@ -1,4 +1,11 @@
 import { getDatabase } from "../config/database.js";
+import {
+  createValidationError,
+  getPotOrFail,
+  mapPot,
+  validateNumericId,
+  validateUserId,
+} from "./budgetHelpers.js";
 
 export async function getPots(request, response, next) {
   try {
@@ -9,10 +16,7 @@ export async function getPots(request, response, next) {
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
 
-    const pots = await potsCollection
-      .find({ userId })
-      .sort({ createdAt: -1 })
-      .toArray();
+    const pots = await potsCollection.find({ userId }).sort({ createdAt: -1 }).toArray();
 
     response.json({
       success: true,
@@ -29,13 +33,12 @@ export async function getPotById(request, response, next) {
     const potId = request.params.id;
 
     validateUserId(userId);
-    validateId(potId, "Ongeldig potje-id.");
+    validateNumericId(potId, "Ongeldig potje-id.");
 
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
-
     const pot = await potsCollection.findOne({
-      _id: parseInt(potId),
+      _id: Number(potId),
       userId,
     });
 
@@ -64,20 +67,7 @@ export async function createPot(request, response, next) {
     const amount = Number(request.body.amount);
 
     validateUserId(userId);
-
-    if (name.length < 2) {
-      throw createValidationError(
-        "Geef het potje een naam van minimaal 2 tekens.",
-      );
-    }
-
-    if (!icon) {
-      throw createValidationError("Kies een icoon voor het potje.");
-    }
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-      throw createValidationError("Vul een geldig bedrag groter dan 0 in.");
-    }
+    validatePotInput({ name, icon, amount });
 
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
@@ -108,20 +98,74 @@ export async function createPot(request, response, next) {
   }
 }
 
+export async function updatePot(request, response, next) {
+  try {
+    const userId = request.body.userId?.trim() || "";
+    const potId = request.params.id;
+    const name = request.body.name?.trim() || "";
+    const icon = request.body.icon?.trim() || "";
+    const amount = Number(request.body.amount);
+
+    validateUserId(userId);
+    validateNumericId(potId, "Ongeldig potje-id.");
+    validatePotInput({ name, icon, amount });
+
+    const db = await getDatabase();
+    const potsCollection = db.collection("pots");
+    const existingPot = await getPotOrFail({
+      potsCollection,
+      userId,
+      potId,
+      response,
+    });
+
+    if (!existingPot) {
+      return;
+    }
+
+    const now = new Date();
+    await potsCollection.updateOne(
+      { _id: Number(potId), userId },
+      {
+        $set: {
+          name,
+          icon,
+          targetAmount: amount,
+          updatedAt: now,
+        },
+      },
+    );
+
+    response.json({
+      success: true,
+      message: "Potje bijgewerkt.",
+      pot: mapPot({
+        ...existingPot,
+        name,
+        icon,
+        targetAmount: amount,
+        updatedAt: now,
+      }),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function deletePot(request, response, next) {
   try {
     const userId = request.query.userId?.trim() || "";
     const potId = request.params.id;
 
     validateUserId(userId);
-    validateId(potId, "Ongeldig potje-id.");
+    validateNumericId(potId, "Ongeldig potje-id.");
 
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
     const transactionsCollection = db.collection("transactions");
 
     const result = await potsCollection.deleteOne({
-      _id: parseInt(potId),
+      _id: Number(potId),
       userId,
     });
 
@@ -147,33 +191,16 @@ export async function deletePot(request, response, next) {
   }
 }
 
-function mapPot(pot) {
-  return {
-    id: String(pot._id),
-    userId: pot.userId,
-    name: pot.name,
-    icon: pot.icon,
-    targetAmount: Number(pot.targetAmount || 0),
-    currentBalance: Number(pot.currentBalance || 0),
-    createdAt: pot.createdAt,
-    updatedAt: pot.updatedAt,
-  };
-}
-
-function validateUserId(userId) {
-  if (!userId) {
-    throw createValidationError("Geen gebruiker gevonden. Log opnieuw in.");
+function validatePotInput({ name, icon, amount }) {
+  if (name.length < 2) {
+    throw createValidationError("Geef het potje een naam van minimaal 2 tekens.");
   }
-}
 
-function validateId(value, message) {
-  if (!value || (typeof value === "string" && isNaN(value))) {
-    throw createValidationError(message);
+  if (!icon) {
+    throw createValidationError("Kies een icoon voor het potje.");
   }
-}
 
-function createValidationError(message) {
-  const error = new Error(message);
-  error.statusCode = 422;
-  return error;
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw createValidationError("Vul een geldig bedrag groter dan 0 in.");
+  }
 }

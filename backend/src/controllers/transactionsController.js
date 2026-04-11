@@ -1,5 +1,17 @@
 import { getDatabase } from "../config/database.js";
-import { config } from "../config/env.js";
+import {
+  createValidationError,
+  getPendingExpenseTotal,
+  getPotOrFail,
+  getTransactionMessage,
+  getTransactionOrFail,
+  mapTransaction,
+  normalizeCategory,
+  recalculatePotBalance,
+  resolveTransactionApprovalState,
+  validateNumericId,
+  validateUserId,
+} from "./budgetHelpers.js";
 
 export async function getTransactions(request, response, next) {
   try {
@@ -12,7 +24,6 @@ export async function getTransactions(request, response, next) {
 
     const db = await getDatabase();
     const transactionsCollection = db.collection("transactions");
-
     const filter = { userId };
 
     if (potId) {
@@ -53,44 +64,20 @@ export async function createTransaction(request, response, next) {
     );
 
     validateUserId(userId);
-
-    if (!potId) {
-      throw createValidationError("Kies eerst een potje.");
-    }
-
-    if (!["deposit", "expense"].includes(type)) {
-      throw createValidationError("Gebruik een geldig transactietype.");
-    }
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-      throw createValidationError("Vul een geldig bedrag groter dan 0 in.");
-    }
-
-    if (description.length < 2) {
-      throw createValidationError(
-        "Geef de transactie een naam van minimaal 2 tekens.",
-      );
-    }
-
-    if (isNaN(potId)) {
-      throw createValidationError("Ongeldig potje-id.");
-    }
+    validateTransactionInput({ potId, type, description, amount });
 
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
     const transactionsCollection = db.collection("transactions");
     const linksCollection = db.collection("parentChildLinks");
-
-    const pot = await potsCollection.findOne({
-      _id: parseInt(potId),
+    const pot = await getPotOrFail({
+      potsCollection,
       userId,
+      potId,
+      response,
     });
 
     if (!pot) {
-      response.status(404).json({
-        success: false,
-        message: "Potje niet gevonden.",
-      });
       return;
     }
 
@@ -108,18 +95,15 @@ export async function createTransaction(request, response, next) {
       );
     }
 
-    const parentLink =
-      type === "expense"
-        ? await linksCollection.findOne({ childId: userId })
-        : null;
-    const needsApproval =
-      type === "expense" &&
-      Boolean(parentLink) &&
-      amount > Number(config.approvalLimit || 40);
-
+    const { status, reviewParentId, needsApproval } =
+      await resolveTransactionApprovalState({
+        linksCollection,
+        type,
+        amount,
+        userId,
+      });
     const nextBalance =
       type === "expense" ? currentBalance - amount : currentBalance + amount;
-
     const now = new Date();
     const transaction = {
       userId,
@@ -128,8 +112,8 @@ export async function createTransaction(request, response, next) {
       amount,
       description,
       category,
-      status: needsApproval ? "pending" : "approved",
-      reviewParentId: needsApproval ? parentLink.parentId : null,
+      status,
+      reviewParentId,
       createdAt: now,
       updatedAt: now,
     };
@@ -138,7 +122,7 @@ export async function createTransaction(request, response, next) {
 
     if (!needsApproval) {
       await potsCollection.updateOne(
-        { _id: parseInt(potId), userId },
+        { _id: Number(potId), userId },
         {
           $set: {
             currentBalance: nextBalance,
@@ -166,68 +150,223 @@ export async function createTransaction(request, response, next) {
   }
 }
 
-function mapTransaction(transaction) {
-  return {
-    id: String(transaction._id),
-    userId: transaction.userId,
-    potId: transaction.potId,
-    type: transaction.type,
-    amount: Number(transaction.amount || 0),
-    description: transaction.description,
-    category: transaction.category || "overig",
-    status: transaction.status,
-    createdAt: transaction.createdAt,
-    updatedAt: transaction.updatedAt || transaction.createdAt,
-  };
-}
+export async function updateTransaction(request, response, next) {
+  try {
+    const transactionId = request.params.id;
+    const userId = request.body.userId?.trim() || "";
+    const description = request.body.description?.trim() || "";
+    const amount = Number(request.body.amount);
+    const type = request.body.type?.trim() || "";
+    const category = normalizeCategory(
+      request.body.category?.trim() || "overig",
+    );
 
-function normalizeCategory(category) {
-  return category ? category.toLowerCase() : "overig";
-}
+    validateUserId(userId);
+    validateNumericId(transactionId, "Ongeldige transactie-id.");
 
-async function getPendingExpenseTotal(transactionsCollection, userId, potId) {
-  const result = await transactionsCollection
-    .aggregate([
+    if (!["deposit", "expense"].includes(type)) {
+      throw createValidationError("Gebruik een geldig transactietype.");
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw createValidationError("Vul een geldig bedrag groter dan 0 in.");
+    }
+
+    if (description.length < 2) {
+      throw createValidationError(
+        "Geef de transactie een naam van minimaal 2 tekens.",
+      );
+    }
+
+    const db = await getDatabase();
+    const transactionsCollection = db.collection("transactions");
+    const potsCollection = db.collection("pots");
+    const linksCollection = db.collection("parentChildLinks");
+    const existingTransaction = await getTransactionOrFail({
+      transactionsCollection,
+      userId,
+      transactionId,
+      response,
+    });
+
+    if (!existingTransaction) {
+      return;
+    }
+
+    const pot = await getPotOrFail({
+      potsCollection,
+      userId,
+      potId: existingTransaction.potId,
+      response,
+    });
+
+    if (!pot) {
+      return;
+    }
+
+    const { status, reviewParentId, needsApproval } =
+      await resolveTransactionApprovalState({
+        linksCollection,
+        type,
+        amount,
+        userId,
+      });
+    const approvedBalanceWithoutCurrent =
+      Number(pot.currentBalance || 0) -
+      getApprovedTransactionImpact(existingTransaction);
+    const pendingExpensesWithoutCurrent = await getPendingExpenseTotal(
+      transactionsCollection,
+      userId,
+      existingTransaction.potId,
+      transactionId,
+    );
+    const projectedApprovedBalance =
+      approvedBalanceWithoutCurrent +
+      (status === "approved"
+        ? type === "expense"
+          ? -amount
+          : amount
+        : 0);
+    const projectedPendingExpenses =
+      pendingExpensesWithoutCurrent +
+      (status === "pending" && type === "expense" ? amount : 0);
+
+    if (projectedApprovedBalance - projectedPendingExpenses < 0) {
+      throw createValidationError(
+        "Je kunt niet meer afhalen dan er in het potje zit.",
+      );
+    }
+
+    const now = new Date();
+
+    await transactionsCollection.updateOne(
+      { _id: Number(transactionId), userId },
       {
-        $match: {
-          userId,
-          potId,
-          type: "expense",
-          status: "pending",
+        $set: {
+          description,
+          amount,
+          type,
+          category,
+          status,
+          reviewParentId,
+          updatedAt: now,
         },
       },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: "$amount" },
-        },
+    );
+
+    const nextBalance = await recalculatePotBalance({
+      potsCollection,
+      transactionsCollection,
+      userId,
+      potId: existingTransaction.potId,
+      updatedAt: now,
+    });
+
+    response.json({
+      success: true,
+      message: needsApproval
+        ? "Transactie bijgewerkt. Deze opname wacht nu op goedkeuring."
+        : "Transactie bijgewerkt.",
+      transaction: mapTransaction({
+        ...existingTransaction,
+        description,
+        amount,
+        type,
+        category,
+        status,
+        reviewParentId,
+        updatedAt: now,
+      }),
+      pot: {
+        id: existingTransaction.potId,
+        currentBalance: nextBalance,
+        updatedAt: now,
       },
-    ])
-    .toArray();
-
-  return Number(result[0]?.total || 0);
-}
-
-function getTransactionMessage(type, needsApproval) {
-  if (type === "deposit") {
-    return "Bedrag toegevoegd.";
-  }
-
-  if (needsApproval) {
-    return `Opnameverzoek verstuurd. Een ouder moet deze opname boven €${config.approvalLimit} eerst goedkeuren.`;
-  }
-
-  return "Bedrag afgehaald.";
-}
-
-function validateUserId(userId) {
-  if (!userId) {
-    throw createValidationError("Geen gebruiker gevonden. Log opnieuw in.");
+    });
+  } catch (error) {
+    next(error);
   }
 }
 
-function createValidationError(message) {
-  const error = new Error(message);
-  error.statusCode = 422;
-  return error;
+export async function deleteTransaction(request, response, next) {
+  try {
+    const transactionId = request.params.id;
+    const userId = request.query.userId?.trim() || "";
+
+    validateUserId(userId);
+    validateNumericId(transactionId, "Ongeldige transactie-id.");
+
+    const db = await getDatabase();
+    const transactionsCollection = db.collection("transactions");
+    const potsCollection = db.collection("pots");
+    const existingTransaction = await getTransactionOrFail({
+      transactionsCollection,
+      userId,
+      transactionId,
+      response,
+    });
+
+    if (!existingTransaction) {
+      return;
+    }
+
+    await transactionsCollection.deleteOne({
+      _id: Number(transactionId),
+      userId,
+    });
+
+    const now = new Date();
+    const nextBalance = await recalculatePotBalance({
+      potsCollection,
+      transactionsCollection,
+      userId,
+      potId: existingTransaction.potId,
+      updatedAt: now,
+    });
+
+    response.json({
+      success: true,
+      message: "Transactie verwijderd.",
+      pot: {
+        id: existingTransaction.potId,
+        currentBalance: nextBalance,
+        updatedAt: now,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+function validateTransactionInput({ potId, type, description, amount }) {
+  if (!potId) {
+    throw createValidationError("Kies eerst een potje.");
+  }
+
+  if (!["deposit", "expense"].includes(type)) {
+    throw createValidationError("Gebruik een geldig transactietype.");
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw createValidationError("Vul een geldig bedrag groter dan 0 in.");
+  }
+
+  if (description.length < 2) {
+    throw createValidationError(
+      "Geef de transactie een naam van minimaal 2 tekens.",
+    );
+  }
+
+  if (Number.isNaN(Number(potId))) {
+    throw createValidationError("Ongeldig potje-id.");
+  }
+}
+
+function getApprovedTransactionImpact(transaction) {
+  if (transaction.status !== "approved") {
+    return 0;
+  }
+
+  const amount = Number(transaction.amount || 0);
+  return transaction.type === "expense" ? -amount : amount;
 }

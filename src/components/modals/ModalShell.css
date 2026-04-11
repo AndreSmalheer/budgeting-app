@@ -1,0 +1,114 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(54 54 54 / 55%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  height: 100vh;
+  padding: 18px;
+}
+
+.modal {
+  background: #2c2c2c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  width: min(420px, 100%);
+  padding: 20px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  animation: modalPop 0.18s ease-out;
+}
+
+.modal h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.modal p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-delete,
+.btn-save {
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-delete {
+  background: rgba(255, 77, 77, 0.9);
+}
+
+.btn-save {
+  background: rgba(45, 212, 191, 0.9);
+}
+
+.modal-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.modal-field {
+  display: grid;
+  gap: 6px;
+}
+
+.modal-field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.modal-field input,
+.modal-field select {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  padding: 12px 14px;
+}
+
+.modal-field input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.modal-feedback {
+  margin-top: 14px;
+  color: #fca5a5;
+  font-size: 12px;
+}
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

@@ -7,23 +7,57 @@ import {
   getTransactionStatusTone,
 } from "../../utils/transactionStatus";
 
-function RecentTransactionsSection({ transacties, potjes }) {
-  const recentItems = [...transacties]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+function RecentTransactionsSection({
+  transacties,
+  scheduledTransactions = [],
+  potjes,
+}) {
+  const recentItems = [
+    ...scheduledTransactions
+      .filter((item) => item.isActive)
+      .map((item) => ({
+        ...item,
+        itemType: "scheduled",
+        sortDate: item.nextExecutionDate || item.startDate,
+      })),
+    ...transacties.map((transaction) => ({
+      ...transaction,
+      itemType: "transaction",
+      sortDate: transaction.createdAt,
+    })),
+  ]
+    .sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate))
     .slice(0, 4)
-    .map((transaction) => {
-      const potje = potjes.find((item) => item.id === transaction.potId);
+    .map((item) => {
+      const potje = potjes.find((entry) => entry.id === item.potId);
 
       return (
         <TransactionItem
-          key={transaction.id}
-          description={transaction.description}
-          meta={`${potje?.name || "Zonder potje"} · ${formatDate(transaction.createdAt)}`}
-          amount={transaction.amount}
-          isExpense={transaction.type === "expense"}
+          key={`${item.itemType}-${item.id}`}
+          description={item.description}
+          meta={
+            item.itemType === "scheduled"
+              ? `${potje?.name || "Zonder potje"} · Volgende uitvoering ${formatDate(
+                  item.nextExecutionDate,
+                )}`
+              : `${potje?.name || "Zonder potje"} · ${formatDate(item.createdAt)}`
+          }
+          amount={item.amount}
+          isExpense={item.type === "expense"}
           iconName={potje?.icon}
-          statusLabel={getTransactionStatusLabel(transaction.status)}
-          statusTone={getTransactionStatusTone(transaction.status)}
+          categoryLabel={item.itemType === "scheduled" ? "Scheduled" : ""}
+          statusLabel={
+            item.itemType === "scheduled"
+              ? item.recurrence === "daily"
+                ? "Dagelijks"
+                : "Maandelijks"
+              : getTransactionStatusLabel(item.status)
+          }
+          statusTone={
+            item.itemType === "scheduled"
+              ? "scheduled"
+              : getTransactionStatusTone(item.status)
+          }
         />
       );
     });

@@ -8,11 +8,17 @@ import StarterInhoud from "../pages/Starter-inhoud/Starter-inhoud";
 import HomePage from "../pages/HomePage/HomePage";
 import BudgetDetails from "../pages/BudgetDetails/BudgetDetails";
 import PotjeToevoegen from "../pages/PotjeToevoegen/PotjeToevoegen";
+import PotjeBewerken from "../pages/PotjeToevoegen/PotjeBewerken";
 import LoginPage from "../pages/LoginPage/LoginPage";
 import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import AccountPage from "../pages/AccountPage/AccountPage";
 import SeeAllPage from "../pages/SeeAllPage/SeeAllPage";
-import { getPots, getTransactions } from "../services/api/client";
+import {
+  getPots,
+  getScheduledTransactions,
+  getTransactions,
+  syncScheduledTransactions,
+} from "../services/api/client";
 
 function AppRoutes() {
   const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS === "true";
@@ -20,6 +26,7 @@ function AppRoutes() {
   const loggedIn = Boolean(session);
   const [potjes, setPotjes] = useState([]);
   const [transacties, setTransacties] = useState([]);
+  const [scheduledTransactions, setScheduledTransactions] = useState([]);
   const [isBudgetLoading, setIsBudgetLoading] = useState(false);
   const [budgetError, setBudgetError] = useState("");
 
@@ -29,6 +36,7 @@ function AppRoutes() {
     if (!session?.id) {
       setPotjes([]);
       setTransacties([]);
+      setScheduledTransactions([]);
       setBudgetError("");
       setIsBudgetLoading(false);
       return;
@@ -38,13 +46,17 @@ function AppRoutes() {
     setBudgetError("");
 
     try {
-      const [potsResponse, transactionsResponse] = await Promise.all([
+      await syncScheduledTransactions(session.id);
+
+      const [potsResponse, transactionsResponse, scheduledResponse] = await Promise.all([
         getPots(session.id),
         getTransactions(session.id),
+        getScheduledTransactions(session.id),
       ]);
 
       setPotjes(potsResponse.pots || []);
       setTransacties(transactionsResponse.transactions || []);
+      setScheduledTransactions(scheduledResponse.scheduledTransactions || []);
     } catch (error) {
       setBudgetError(error.message || "De budgetgegevens konden niet geladen worden.");
     } finally {
@@ -60,6 +72,15 @@ function AppRoutes() {
     return <AppShell>{element}</AppShell>;
   }
 
+  const sharedBudgetProps = {
+    potjes,
+    transacties,
+    scheduledTransactions,
+    isLoading: isBudgetLoading,
+    errorMessage: budgetError,
+    onBudgetDataChanged: loadBudgetData,
+  };
+
   return (
     <Routes>
       <Route
@@ -70,6 +91,7 @@ function AppRoutes() {
               <HomePage
                 potjes={potjes}
                 transacties={transacties}
+                scheduledTransactions={scheduledTransactions}
                 isLoading={isBudgetLoading}
                 errorMessage={budgetError}
               />,
@@ -88,6 +110,7 @@ function AppRoutes() {
               <HomePage
                 transacties={transacties}
                 potjes={potjes}
+                scheduledTransactions={scheduledTransactions}
                 isLoading={isBudgetLoading}
                 errorMessage={budgetError}
               />,
@@ -100,16 +123,7 @@ function AppRoutes() {
         path="/see-all/transacties"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            {withAppShell(
-              <SeeAllPage
-                type="transacties"
-                potjes={potjes}
-                transacties={transacties}
-                isLoading={isBudgetLoading}
-                errorMessage={budgetError}
-                onPotDeleted={loadBudgetData}
-              />,
-            )}
+            {withAppShell(<SeeAllPage type="transacties" {...sharedBudgetProps} />)}
           </ProtectedRoute>
         }
       />
@@ -118,16 +132,7 @@ function AppRoutes() {
         path="/see-all/transacties/pot/:id"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            {withAppShell(
-              <SeeAllPage
-                type="transacties"
-                potjes={potjes}
-                transacties={transacties}
-                isLoading={isBudgetLoading}
-                errorMessage={budgetError}
-                onPotDeleted={loadBudgetData}
-              />,
-            )}
+            {withAppShell(<SeeAllPage type="transacties" {...sharedBudgetProps} />)}
           </ProtectedRoute>
         }
       />
@@ -136,16 +141,7 @@ function AppRoutes() {
         path="/see-all/potjes"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            {withAppShell(
-              <SeeAllPage
-                type="potjes"
-                potjes={potjes}
-                transacties={transacties}
-                isLoading={isBudgetLoading}
-                errorMessage={budgetError}
-                onPotDeleted={loadBudgetData}
-              />,
-            )}
+            {withAppShell(<SeeAllPage type="potjes" {...sharedBudgetProps} />)}
           </ProtectedRoute>
         }
       />
@@ -187,6 +183,17 @@ function AppRoutes() {
       />
 
       <Route
+        path="/potje-bewerken/:id"
+        element={
+          <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
+            {withAppShell(
+              <PotjeBewerken potjes={potjes} onPotUpdated={loadBudgetData} />,
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/starter-inhoud"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
@@ -199,15 +206,7 @@ function AppRoutes() {
         path="/budget-details/:id"
         element={
           <ProtectedRoute isAllowed={canAccessProtectedRoutes}>
-            {withAppShell(
-              <BudgetDetails
-                potjes={potjes}
-                transacties={transacties}
-                isLoading={isBudgetLoading}
-                errorMessage={budgetError}
-                onTransactionCreated={loadBudgetData}
-              />,
-            )}
+            {withAppShell(<BudgetDetails {...sharedBudgetProps} />)}
           </ProtectedRoute>
         }
       />

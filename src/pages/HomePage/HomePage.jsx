@@ -4,7 +4,13 @@ import BudgetSection from "../../components/home/BudgetSection";
 import RecentTransactionsSection from "../../components/home/RecentTransactionsSection";
 import "./HomePage.css";
 
-function HomePage({ potjes = [], transacties = [], isLoading = false, errorMessage = "" }) {
+function HomePage({
+  potjes = [],
+  transacties = [],
+  scheduledTransactions = [],
+  isLoading = false,
+  errorMessage = "",
+}) {
   const { incomeTotal, expenseTotal, potValueData, recentPotjes } = useMemo(() => {
     const incomeTotal = potjes.reduce(
       (sum, potje) => sum + Number(potje.currentBalance || 0),
@@ -42,7 +48,11 @@ function HomePage({ potjes = [], transacties = [], isLoading = false, errorMessa
         potValueData={potValueData}
       />
       <BudgetSection potjes={recentPotjes} />
-      <RecentTransactionsSection transacties={transacties} potjes={potjes} />
+      <RecentTransactionsSection
+        transacties={transacties}
+        scheduledTransactions={scheduledTransactions}
+        potjes={potjes}
+      />
     </main>
   );
 }

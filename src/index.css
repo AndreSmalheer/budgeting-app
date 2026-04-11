@@ -122,3 +122,8 @@ textarea {
   background: rgba(251, 113, 133, 0.12);
   color: #fecdd3;
 }
+
+.transaction__status--scheduled {
+  background: rgba(45, 212, 191, 0.16);
+  color: #99f6e4;
+}

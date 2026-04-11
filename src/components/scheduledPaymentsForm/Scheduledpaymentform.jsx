@@ -1,34 +1,23 @@
 import { useState } from "react";
-import "./Scheduledpaymentform.css"
+import { TRANSACTION_CATEGORIES } from "../../config/transactionCategories";
+import "./Scheduledpaymentform.css";
 
 const REPEAT_OPTIONS = [
-  "Eenmalig",
-  "Wekelijks",
-  "Maandelijks",
-  "Per kwartaal",
-  "Jaarlijks",
-];
-const CATEGORIES = [
-  "Overig",
-  "Huur & wonen",
-  "Boodschappen",
-  "Transport",
-  "Abonnementen",
+  { label: "Dagelijks", value: "daily" },
+  { label: "Maandelijks", value: "monthly" },
 ];
 
 function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
   const [open, setOpen] = useState(false);
-  const [description, setDescription] = useState(
-    `${potName} afschrijving`.trim(),
-  );
+  const [description, setDescription] = useState(`${potName} afschrijving`.trim());
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("Overig");
+  const [category, setCategory] = useState("overig");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [repeat, setRepeat] = useState("Maandelijks");
+  const [repeat, setRepeat] = useState("monthly");
 
   function handleToggle() {
-    setOpen((v) => !v);
+    setOpen((value) => !value);
   }
 
   function handleCancel() {
@@ -37,38 +26,54 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
   }
 
   function handleSubmit() {
-    if (!description.trim() || !amount || !startDate) return;
+    if (!description.trim() || !amount || !startDate) {
+      return;
+    }
+
     onSubmit?.({
-      description,
-      amount: +amount,
+      description: description.trim(),
+      amount: Number(amount),
       category,
       startDate,
       endDate,
-      repeat,
+      recurrence: repeat,
     });
     setOpen(false);
   }
 
   const dateHint = (() => {
-    if (!startDate) return null;
-    const d = new Date(startDate);
-    const now = new Date();
-    const diff = Math.round((d - now) / (1000 * 60 * 60 * 24));
-    const label = d.toLocaleDateString("nl-NL", {
+    if (!startDate) {
+      return null;
+    }
+
+    const targetDate = new Date(`${startDate}T00:00:00`);
+    const today = new Date();
+    const diff = Math.round((targetDate - today) / (1000 * 60 * 60 * 24));
+    const label = targetDate.toLocaleDateString("nl-NL", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-    if (diff < 0) return `Startdatum ligt in het verleden`;
-    if (diff === 0) return `Eerste betaling vandaag — ${label}`;
-    return `Eerste betaling op ${label} — over ${diff} dagen`;
+
+    if (diff < 0) {
+      return "Startdatum ligt in het verleden";
+    }
+
+    if (diff === 0) {
+      return `Eerste betaling vandaag - ${label}`;
+    }
+
+    return `Eerste betaling op ${label} - over ${diff} dagen`;
   })();
+
+  const isInvalid = !description.trim() || !amount || !startDate;
 
   return (
     <div className="spf-wrap">
       <button
         className={`spf-trigger${open ? " open" : ""}`}
         onClick={handleToggle}
+        type="button"
       >
         <div className="spf-trigger-icon">
           <svg
@@ -98,9 +103,9 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
           </svg>
         </div>
         <div className="spf-trigger-text">
-          <div className="spf-trigger-label">Betaling inplannen</div>
+          <div className="spf-trigger-label">Bedrag inplannen</div>
           <div className="spf-trigger-sub">
-            Stel een automatische afschrijving in
+            Stel een dagelijkse of maandelijkse afschrijving in
           </div>
         </div>
         <svg className="spf-chevron" viewBox="0 0 20 20" fill="none">
@@ -121,9 +126,9 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
             <input
               className="spf-input"
               type="text"
-              placeholder="Bijv. Huur mei"
+              placeholder="Bijv. huur of boodschappen"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(event) => setDescription(event.target.value)}
             />
           </div>
 
@@ -138,7 +143,7 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
                   type="number"
                   placeholder="0,00"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(event) => setAmount(event.target.value)}
                 />
               </div>
             </div>
@@ -147,11 +152,11 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
               <select
                 className="spf-input"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(event) => setCategory(event.target.value)}
               >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                {TRANSACTION_CATEGORIES.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
                   </option>
                 ))}
               </select>
@@ -167,7 +172,7 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
                 className="spf-input"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(event) => setStartDate(event.target.value)}
               />
             </div>
             <div className="spf-field">
@@ -176,28 +181,29 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
                 className="spf-input"
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(event) => setEndDate(event.target.value)}
               />
             </div>
           </div>
 
-          {dateHint && (
+          {dateHint ? (
             <div className="spf-date-hint">
               <div className="spf-hint-dot" />
               <div className="spf-hint-text">{dateHint}</div>
             </div>
-          )}
+          ) : null}
 
           <div className="spf-field">
             <label className="spf-label">Herhaling</label>
             <div className="spf-pills">
-              {REPEAT_OPTIONS.map((opt) => (
+              {REPEAT_OPTIONS.map((option) => (
                 <button
-                  key={opt}
-                  className={`spf-pill${repeat === opt ? " active" : ""}`}
-                  onClick={() => setRepeat(opt)}
+                  key={option.value}
+                  className={`spf-pill${repeat === option.value ? " active" : ""}`}
+                  onClick={() => setRepeat(option.value)}
+                  type="button"
                 >
-                  {opt}
+                  {option.label}
                 </button>
               ))}
             </div>
@@ -207,19 +213,19 @@ function ScheduledPaymentForm({ onSubmit, onCancel, potName = "" }) {
 
           <div className="spf-actions">
             <button
-              className={`spf-btn spf-btn--save${!description.trim() || !amount || !startDate ? " disabled" : ""}`}
+              className={`spf-btn spf-btn--save${isInvalid ? " disabled" : ""}`}
               onClick={handleSubmit}
-              disabled={!description.trim() || !amount || !startDate}
+              disabled={isInvalid}
+              type="button"
             >
               Inplannen
             </button>
             <button
               className={`spf-btn spf-btn--cancel spf-btn--action${
-                !description.trim() || !amount || !startDate
-                  ? " spf-btn--disabled"
-                  : ""
+                isInvalid ? " spf-btn--disabled" : ""
               }`}
               onClick={handleCancel}
+              type="button"
             >
               Annuleren
             </button>

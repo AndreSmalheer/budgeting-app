@@ -35,22 +35,22 @@ class SQLiteCollection {
   }
 
   async insertOne(doc) {
-    const keys = Object.keys(doc).filter((k) => k !== "_id");
+    const keys = Object.keys(doc).filter((key) => key !== "_id");
     const placeholders = keys.map(() => "?").join(",");
     const sql = `INSERT INTO ${this.name} (${keys.join(",")}) VALUES (${placeholders})`;
     const stmt = this.db.prepare(sql);
-    const result = stmt.run(...keys.map((k) => this._formatValue(doc[k])));
+    const result = stmt.run(...keys.map((key) => this._formatValue(doc[key])));
     return { insertedId: result.lastInsertRowid };
   }
 
   async updateOne(query, update) {
     const where = this._buildWhere(query);
     const $set = update.$set || update;
-    const setKeys = Object.keys($set).filter((k) => k !== "_id");
-    const setClauses = setKeys.map((k) => `${k} = ?`).join(",");
+    const setKeys = Object.keys($set).filter((key) => key !== "_id");
+    const setClauses = setKeys.map((key) => `${key} = ?`).join(",");
     const sql = `UPDATE ${this.name} SET ${setClauses} WHERE ${where.clause}`;
     const values = [
-      ...setKeys.map((k) => this._formatValue($set[k])),
+      ...setKeys.map((key) => this._formatValue($set[key])),
       ...where.values,
     ];
     const stmt = this.db.prepare(sql);
@@ -74,7 +74,7 @@ class SQLiteCollection {
     return { deletedCount: result.changes };
   }
 
-  createIndex(fields, options) {
+  createIndex(_fields, _options) {
     // No-op for SQLite, indexes are created during table creation
   }
 
@@ -91,10 +91,9 @@ class SQLiteCollection {
         if (value.$in) {
           const placeholders = value.$in.map(() => "?").join(",");
           clauses.push(`_id IN (${placeholders})`);
-          values.push(...value.$in.map((v) => this._idToDb(v)));
+          values.push(...value.$in.map((item) => this._idToDb(item)));
         }
       } else if (typeof value === "object" && value !== null) {
-        // Handle operators
         if (value.$in) {
           const placeholders = value.$in.map(() => "?").join(",");
           clauses.push(`${key} IN (${placeholders})`);
@@ -116,14 +115,17 @@ class SQLiteCollection {
     if (value instanceof Date) {
       return value.toISOString();
     }
+
     return value;
   }
 
   _mapRow(row) {
     if (!row) return null;
+
     if (row._id) {
       row._id = row._id.toString();
     }
+
     return row;
   }
 
@@ -131,9 +133,11 @@ class SQLiteCollection {
     if (typeof id === "object" && id._id) {
       return id._id;
     }
-    if (typeof id === "string" && !isNaN(id)) {
-      return parseInt(id);
+
+    if (typeof id === "string" && !Number.isNaN(Number(id))) {
+      return Number(id);
     }
+
     return id;
   }
 }
@@ -158,9 +162,11 @@ class SQLiteFindQuery {
 
     if (this.sortBy) {
       const sortClauses = [];
+
       for (const [key, order] of Object.entries(this.sortBy)) {
         sortClauses.push(`${key} ${order === -1 ? "DESC" : "ASC"}`);
       }
+
       sql += ` ORDER BY ${sortClauses.join(", ")}`;
     }
 
@@ -215,9 +221,8 @@ class SQLiteAggregateQuery {
   }
 
   async toArray() {
-    // Handle the specific $group aggregation for pending expenses
-    const matchStage = this.pipeline.find((s) => s.$match);
-    const groupStage = this.pipeline.find((s) => s.$group);
+    const matchStage = this.pipeline.find((stage) => stage.$match);
+    const groupStage = this.pipeline.find((stage) => stage.$group);
 
     if (matchStage && groupStage && groupStage.$group.total) {
       const where = this._buildWhere(matchStage.$match);
@@ -251,21 +256,21 @@ export async function connectToDatabase() {
     return new SQLiteDatabase(dbInstance);
   }
 
-  // Create data directory if it doesn't exist
   const dataDir = path.dirname(dbPath);
+
   try {
     const fs = await import("fs");
+
     if (!fs.default.existsSync(dataDir)) {
       fs.default.mkdirSync(dataDir, { recursive: true });
     }
-  } catch (e) {
-    // Ignore
+  } catch {
+    // Ignore local directory bootstrap problems here.
   }
 
   dbInstance = new Database(dbPath);
   dbInstance.pragma("journal_mode = WAL");
 
-  // Create tables
   dbInstance.exec(`
     CREATE TABLE IF NOT EXISTS users (
       _id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -309,11 +314,36 @@ export async function connectToDatabase() {
       updatedAt TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS scheduledTransactions (
+      _id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId TEXT NOT NULL,
+      potId TEXT NOT NULL,
+      type TEXT NOT NULL,
+      amount REAL NOT NULL,
+      description TEXT NOT NULL,
+      category TEXT NOT NULL,
+      startDate TEXT NOT NULL,
+      endDate TEXT,
+      recurrence TEXT NOT NULL,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
     CREATE INDEX IF NOT EXISTS idx_pots_userId ON pots(userId, createdAt DESC);
     CREATE INDEX IF NOT EXISTS idx_transactions_userId ON transactions(userId, createdAt DESC);
     CREATE INDEX IF NOT EXISTS idx_transactions_potId ON transactions(potId, createdAt DESC);
     CREATE INDEX IF NOT EXISTS idx_parentChildLinks_parentId ON parentChildLinks(parentId, childId);
+    CREATE INDEX IF NOT EXISTS idx_scheduledTransactions_userId ON scheduledTransactions(userId, createdAt DESC);
+    CREATE INDEX IF NOT EXISTS idx_scheduledTransactions_potId ON scheduledTransactions(potId, startDate ASC);
+  `);
+
+  ensureColumn(dbInstance, "transactions", "scheduledTransactionId", "TEXT");
+  ensureColumn(dbInstance, "transactions", "scheduledOccurrenceDate", "TEXT");
+  dbInstance.exec(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_schedule_occurrence
+    ON transactions(scheduledTransactionId, scheduledOccurrenceDate)
+    WHERE scheduledTransactionId IS NOT NULL AND scheduledOccurrenceDate IS NOT NULL;
   `);
 
   return new SQLiteDatabase(dbInstance);
@@ -326,9 +356,8 @@ export async function getDatabase() {
 export async function getDatabaseStatus() {
   try {
     const db = await connectToDatabase();
-    // Simple test query
     const users = db.collection("users");
-    users.findOne({ _id: 1 }); // This will always return null but tests the connection
+    users.findOne({ _id: 1 });
 
     return {
       configured: true,
@@ -343,5 +372,16 @@ export async function getDatabaseStatus() {
       databaseName: "SQLite Local Database",
       message: error.message,
     };
+  }
+}
+
+function ensureColumn(db, tableName, columnName, columnDefinition) {
+  const columns = db.prepare(`PRAGMA table_info(${tableName})`).all();
+  const hasColumn = columns.some((column) => column.name === columnName);
+
+  if (!hasColumn) {
+    db.exec(
+      `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDefinition}`,
+    );
   }
 }

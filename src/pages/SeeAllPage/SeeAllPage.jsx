@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import BackBtn from "../../components/BackBtn/BackBtn";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import PotListItem from "../../components/Potjes/PotListItem";
+import TransactionEditModal from "../../components/transactions/TransactionEditModal";
 import TransactionItem from "../../components/transactions/TransactionItem";
 import TransactionSection from "../../components/transactions/TransactionSection";
-import {
-  getTransactionCategoryLabel,
-} from "../../config/transactionCategories";
+import { getTransactionCategoryLabel } from "../../config/transactionCategories";
 import { useSession } from "../../hooks/useSession";
 import {
   deletePot as deletePotRequest,
+  deleteScheduledTransaction as deleteScheduledTransactionRequest,
+  deleteTransaction as deleteTransactionRequest,
   getTransactions as getTransactionsRequest,
+  updateScheduledTransaction as updateScheduledTransactionRequest,
+  updateTransaction as updateTransactionRequest,
 } from "../../services/api/client";
 import { formatDate } from "../../utils/formatters";
 import {
@@ -24,14 +27,17 @@ import "./SeeAllPage.css";
 function SeeAllPage({
   type,
   potjes,
+  scheduledTransactions = [],
   isLoading = false,
   errorMessage = "",
-  onPotDeleted,
+  onBudgetDataChanged,
 }) {
   const { id: filterPotId } = useParams();
-  const [deleteId, setDeleteId] = useState(null);
+  const [deletePotId, setDeletePotId] = useState(null);
+  const [transactionToDelete, setTransactionToDelete] = useState(null);
+  const [editingTransaction, setEditingTransaction] = useState(null);
   const [feedback, setFeedback] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
   const [isTransactionsLoading, setIsTransactionsLoading] = useState(false);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [transactionTypeFilter, setTransactionTypeFilter] = useState("all");
@@ -45,69 +51,199 @@ function SeeAllPage({
     ? potjes.find((potje) => potje.id === filterPotId)
     : null;
 
-  useEffect(() => {
-    async function loadFilteredTransactions() {
-      if (type !== "transacties" || !session?.id) {
-        return;
-      }
-
-      setIsTransactionsLoading(true);
-      setFeedback("");
-
-      try {
-        const response = await getTransactionsRequest(session.id, {
-          potId: filterPotId,
-          type: transactionTypeFilter,
-        });
-
-        setFilteredTransactions(response.transactions || []);
-      } catch (error) {
-        setFeedback(error.message || "De transacties konden niet geladen worden.");
-      } finally {
-        setIsTransactionsLoading(false);
-      }
-    }
-
-    loadFilteredTransactions();
-  }, [filterPotId, session?.id, transactionTypeFilter, type]);
-
-  function cancelDelete() {
-    setDeleteId(null);
-  }
-
-  async function confirmDelete() {
-    if (!deleteId || !session?.id) {
+  const loadFilteredTransactions = useCallback(async () => {
+    if (type !== "transacties" || !session?.id) {
       return;
     }
 
-    setIsDeleting(true);
+    setIsTransactionsLoading(true);
+
+    try {
+      const response = await getTransactionsRequest(session.id, {
+        potId: filterPotId,
+        type: transactionTypeFilter === "scheduled" ? "" : transactionTypeFilter,
+      });
+
+      setFilteredTransactions(response.transactions || []);
+    } catch (error) {
+      setFeedback(error.message || "De transacties konden niet geladen worden.");
+    } finally {
+      setIsTransactionsLoading(false);
+    }
+  }, [filterPotId, session?.id, transactionTypeFilter, type]);
+
+  useEffect(() => {
+    loadFilteredTransactions();
+  }, [loadFilteredTransactions]);
+
+  async function handlePotDelete() {
+    if (!deletePotId || !session?.id) {
+      return;
+    }
+
+    setIsMutating(true);
     setFeedback("");
 
     try {
-      await deletePotRequest(session.id, deleteId);
-      await onPotDeleted?.();
-      setDeleteId(null);
+      const response = await deletePotRequest(session.id, deletePotId);
+      await onBudgetDataChanged?.();
+      setDeletePotId(null);
+      setFeedback(response.message || "");
     } catch (error) {
       setFeedback(error.message || "Het potje kon niet worden verwijderd.");
     } finally {
-      setIsDeleting(false);
+      setIsMutating(false);
     }
   }
 
-  const transactionItems = filteredTransactions.map((transaction) => {
-    const potje = potjes.find((item) => item.id === transaction.potId);
+  async function handleTransactionUpdate(formData) {
+    if (!editingTransaction || !session?.id) {
+      return;
+    }
+
+    setIsMutating(true);
+
+    try {
+      const response =
+        editingTransaction.itemType === "scheduled"
+          ? await updateScheduledTransactionRequest(editingTransaction.id, {
+              userId: session.id,
+              description: formData.description,
+              amount: formData.amount,
+              category: formData.category,
+              recurrence: formData.recurrence,
+              startDate: formData.startDate,
+              endDate: formData.endDate,
+            })
+          : await updateTransactionRequest(editingTransaction.id, {
+              userId: session.id,
+              ...formData,
+            });
+
+      await Promise.all([onBudgetDataChanged?.(), loadFilteredTransactions()]);
+      setEditingTransaction(null);
+      setFeedback(response.message || "");
+    } finally {
+      setIsMutating(false);
+    }
+  }
+
+  async function handleTransactionDelete() {
+    if (!transactionToDelete || !session?.id) {
+      return;
+    }
+
+    setIsMutating(true);
+    setFeedback("");
+
+    try {
+      const response =
+        transactionToDelete.itemType === "scheduled"
+          ? await deleteScheduledTransactionRequest(session.id, transactionToDelete.id)
+          : await deleteTransactionRequest(session.id, transactionToDelete.id);
+      await Promise.all([onBudgetDataChanged?.(), loadFilteredTransactions()]);
+      setTransactionToDelete(null);
+      setFeedback(response.message || "");
+    } catch (error) {
+      setFeedback(
+        error.message ||
+          (transactionToDelete.itemType === "scheduled"
+            ? "Het geplande bedrag kon niet worden verwijderd."
+            : "De transactie kon niet worden verwijderd."),
+      );
+    } finally {
+      setIsMutating(false);
+    }
+  }
+
+  const visibleScheduledItems = useMemo(
+    () =>
+      scheduledTransactions
+        .filter((item) => item.isActive)
+        .filter((item) => !filterPotId || item.potId === filterPotId)
+        .map((item) => ({
+          ...item,
+          itemType: "scheduled",
+          sortDate: item.nextExecutionDate || item.startDate,
+        })),
+    [filterPotId, scheduledTransactions],
+  );
+
+  const visibleItems = useMemo(() => {
+    const mappedTransactions = filteredTransactions.map((transaction) => ({
+      ...transaction,
+      itemType: "transaction",
+      sortDate: transaction.createdAt,
+    }));
+
+    if (transactionTypeFilter === "scheduled") {
+      return visibleScheduledItems;
+    }
+
+    const mergedItems =
+      transactionTypeFilter === "all"
+        ? [...visibleScheduledItems, ...mappedTransactions]
+        : mappedTransactions;
+
+    return mergedItems.sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
+  }, [filteredTransactions, transactionTypeFilter, visibleScheduledItems]);
+
+  const transactionItems = visibleItems.map((item) => {
+    const potje = potjes.find((entry) => entry.id === item.potId);
 
     return (
       <TransactionItem
-        key={transaction.id}
-        description={transaction.description}
-        meta={`${potje?.name || "Zonder potje"} · ${formatDate(transaction.createdAt)}`}
-        amount={transaction.amount}
-        isExpense={transaction.type === "expense"}
+        key={`${item.itemType}-${item.id}`}
+        description={item.description}
+        meta={
+          item.itemType === "scheduled"
+            ? `${potje?.name || "Zonder potje"} · Volgende uitvoering ${formatDate(
+                item.nextExecutionDate,
+              )}`
+            : `${potje?.name || "Zonder potje"} · ${formatDate(item.createdAt)}`
+        }
+        amount={item.amount}
+        isExpense={item.type === "expense"}
         iconName={potje?.icon}
-        categoryLabel={getTransactionCategoryLabel(transaction.category)}
-        statusLabel={getTransactionStatusLabel(transaction.status)}
-        statusTone={getTransactionStatusTone(transaction.status)}
+        categoryLabel={
+          item.itemType === "scheduled"
+            ? "Scheduled"
+            : getTransactionCategoryLabel(item.category)
+        }
+        statusLabel={
+          item.itemType === "scheduled"
+            ? item.recurrence === "daily"
+              ? "Dagelijks"
+              : "Maandelijks"
+            : getTransactionStatusLabel(item.status)
+        }
+        statusTone={
+          item.itemType === "scheduled"
+            ? "scheduled"
+            : getTransactionStatusTone(item.status)
+        }
+        action={
+          <div className="item-actions">
+            <button
+              className="icon-action-btn"
+              type="button"
+              disabled={isMutating}
+              aria-label={`Bewerk ${item.description}`}
+              onClick={() => setEditingTransaction(item)}
+            >
+              <Pencil size={16} />
+            </button>
+            <button
+              className="icon-action-btn delete-btn"
+              type="button"
+              disabled={isMutating}
+              aria-label={`Verwijder ${item.description}`}
+              onClick={() => setTransactionToDelete(item)}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        }
       />
     );
   });
@@ -120,14 +256,12 @@ function SeeAllPage({
       {feedback && <p className="empty-state">{feedback}</p>}
 
       <div className={`SpendingOverview ${type === "potjes" ? "potjes" : "transacties"}`}>
-        {type === "transacties" && (
+        {type === "transacties" ? (
           <TransactionSection
-            title={
-              selectedPot ? `Alle transacties van ${selectedPot.name}` : "Alle transacties"
-            }
+            title={selectedPot ? `Alle transacties van ${selectedPot.name}` : "Alle transacties"}
             belowHeaderContent={
               <>
-                <div className="transaction-filters__compact">
+                <div className="transaction-filters__compact transaction-filters__compact--four">
                   <button
                     className={`filter-chip ${transactionTypeFilter === "all" ? "active" : ""}`}
                     type="button"
@@ -149,11 +283,18 @@ function SeeAllPage({
                   >
                     Uitgaven
                   </button>
+                  <button
+                    className={`filter-chip ${transactionTypeFilter === "scheduled" ? "active" : ""}`}
+                    type="button"
+                    onClick={() => setTransactionTypeFilter("scheduled")}
+                  >
+                    Scheduled
+                  </button>
                 </div>
 
-                {isTransactionsLoading && (
+                {isTransactionsLoading ? (
                   <p className="transaction-filters__status">Transacties laden...</p>
-                )}
+                ) : null}
               </>
             }
             emptyText={
@@ -164,16 +305,16 @@ function SeeAllPage({
             items={transactionItems}
             className="SpendingOverview"
           />
-        )}
+        ) : null}
 
-        {type === "potjes" && (
+        {type === "potjes" ? (
           <>
             <h2 className="section-title">Alle doelpotjes</h2>
 
             <div className="potjes-list">
-              {sortedPotjes.length === 0 && (
+              {sortedPotjes.length === 0 ? (
                 <p className="empty-state">Er zijn nog geen potjes.</p>
-              )}
+              ) : null}
 
               {sortedPotjes.map((potje) => (
                 <PotListItem
@@ -184,36 +325,78 @@ function SeeAllPage({
                   iconName={potje.icon}
                   onClick={() => navigate(`/budget-details/${potje.id}`)}
                   action={
-                    <button
-                      className="delete-btn"
-                      type="button"
-                      aria-label={`Verwijder ${potje.name}`}
-                      disabled={isDeleting}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setDeleteId(potje.id);
-                      }}
-                    >
-                      <Trash2 size={18} strokeWidth={2} />
-                    </button>
+                    <div className="item-actions">
+                      <button
+                        className="icon-action-btn"
+                        type="button"
+                        aria-label={`Bewerk ${potje.name}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          navigate(`/potje-bewerken/${potje.id}`);
+                        }}
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        className="icon-action-btn delete-btn"
+                        type="button"
+                        aria-label={`Verwijder ${potje.name}`}
+                        disabled={isMutating}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setDeletePotId(potje.id);
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   }
                 />
               ))}
             </div>
           </>
-        )}
+        ) : null}
       </div>
 
-      {deleteId && (
+      {deletePotId ? (
         <ConfirmModal
           title="Weet je het zeker?"
           description="Dit potje wordt definitief verwijderd."
           cancelLabel="Annuleren"
-          confirmLabel={isDeleting ? "Bezig..." : "Verwijderen"}
-          onCancel={cancelDelete}
-          onConfirm={confirmDelete}
+          confirmLabel={isMutating ? "Bezig..." : "Verwijderen"}
+          onCancel={() => setDeletePotId(null)}
+          onConfirm={handlePotDelete}
         />
-      )}
+      ) : null}
+
+      {editingTransaction ? (
+        <TransactionEditModal
+          key={`${editingTransaction.itemType}-${editingTransaction.id}`}
+          transaction={editingTransaction}
+          isSubmitting={isMutating}
+          onCancel={() => setEditingTransaction(null)}
+          onSubmit={handleTransactionUpdate}
+        />
+      ) : null}
+
+      {transactionToDelete ? (
+        <ConfirmModal
+          title={
+            transactionToDelete.itemType === "scheduled"
+              ? "Gepland bedrag verwijderen?"
+              : "Transactie verwijderen?"
+          }
+          description={
+            transactionToDelete.itemType === "scheduled"
+              ? "Dit geplande bedrag stopt en wordt verwijderd."
+              : "Deze transactie wordt definitief verwijderd."
+          }
+          cancelLabel="Annuleren"
+          confirmLabel={isMutating ? "Bezig..." : "Verwijderen"}
+          onCancel={() => setTransactionToDelete(null)}
+          onConfirm={handleTransactionDelete}
+        />
+      ) : null}
     </div>
   );
 }

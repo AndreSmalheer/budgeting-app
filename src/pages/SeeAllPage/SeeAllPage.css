@@ -102,82 +102,39 @@
 }
 
 .delete-btn {
+  color: #ff4d4d;
+}
+
+.transaction-filters__compact--four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.icon-action-btn {
   background: transparent;
   border: none;
+  color: #e5e7eb;
   cursor: pointer;
-  color: #ff4d4d;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 6px;
+  border-radius: 999px;
 }
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgb(54 54 54 / 55%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-  height: 100vh;
-}
-
-.modal {
-  background: #2c2c2c;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  width: min(340px, 90vw);
-  padding: 20px;
-  color: white;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  animation: modalPop 0.18s ease-out;
-}
-
-.modal h2 {
-  margin: 0 0 8px;
-  font-size: 18px;
-}
-
-.modal p {
-  margin: 0;
-  font-size: 13px;
-  opacity: 0.75;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 18px;
-}
-
-.btn-cancel {
+.icon-action-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
 }
 
-.btn-delete {
-  background: rgba(255, 77, 77, 0.9);
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-@keyframes modalPop {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+.icon-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 @media (min-width: 650px) {
@@ -196,5 +153,9 @@
 @media (max-width: 650px) {
     .transaction-filters__compact {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .transaction-filters__compact--four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }

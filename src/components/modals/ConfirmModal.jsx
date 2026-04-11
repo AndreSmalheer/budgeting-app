@@ -1,3 +1,5 @@
+import ModalShell from "./ModalShell";
+
 function ConfirmModal({
   title,
   description,
@@ -7,12 +9,11 @@ function ConfirmModal({
   onConfirm,
 }) {
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h2>{title}</h2>
-        <p>{description}</p>
-
-        <div className="modal-actions">
+    <ModalShell
+      title={title}
+      description={description}
+      actions={
+        <>
           <button className="btn-cancel" type="button" onClick={onCancel}>
             {cancelLabel}
           </button>
@@ -20,9 +21,9 @@ function ConfirmModal({
           <button className="btn-delete" type="button" onClick={onConfirm}>
             {confirmLabel}
           </button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 }
 
