@@ -431,3 +431,20 @@ select.afnemen-input option {
     margin: 0 auto;
   }
 }
+
+.goal-projection-label {
+  align-self: center;
+  margin-top: -10px;
+  padding: 8px 16px;
+  background-color: rgba(96, 165, 250, 0.10);
+  /* border: 1px solid rgba(45, 212, 191, 0.15); */
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.goal-projection-label strong {
+  color: #4ade80;
+  font-weight: 600;
+}

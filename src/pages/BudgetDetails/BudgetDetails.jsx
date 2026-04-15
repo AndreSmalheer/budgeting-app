@@ -18,6 +18,7 @@ import {
   updateTransaction,
 } from "../../services/api/client";
 import { formatDate } from "../../utils/formatters";
+import { calculateGoalReachDate, formatRemainingTime } from "../../utils/projections";
 import "./BudgetDetails.css";
 import ScheduledPaymentForm from "../../components/scheduledPaymentsForm/Scheduledpaymentform";
 import ScrollToTop from "../../components/ScrollToTop/ScrollToTop";
@@ -45,7 +46,7 @@ function BudgetDetails({
     `${potje?.name || ""} afschrijving`,
   );
   const [budgetAfhalenCategory, setBudgetAfhalenCategory] = useState("overig");
-  const [, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
@@ -68,6 +69,20 @@ function BudgetDetails({
         transaction.type === "expense" && transaction.status === "approved",
     )
     .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
+
+  const estimatedDate = useMemo(() => {
+    // We use the real scheduled transactions from the backend if available
+    // and map them to the format expected by our utility if needed.
+    const normalizedScheduled = potjeScheduledTransactions.map(t => ({
+      ...t,
+      isScheduled: true // Ensure utility treats them as scheduled
+    }));
+    return calculateGoalReachDate(remaining, budget, normalizedScheduled);
+  }, [remaining, budget, potjeScheduledTransactions]);
+
+  const estimatedTimeRemaining = estimatedDate
+    ? formatRemainingTime(estimatedDate)
+    : null;
 
   const historyData = useMemo(() => {
     const sortedTransactions = [...potjeTransacties].sort(
@@ -318,6 +333,8 @@ function BudgetDetails({
         />
       </div>
 
+      {feedback && <p className="page-feedback">{feedback}</p>}
+
       <BudgetWithdrawForm
         amount={budgetAfhalenAmount}
         category={budgetAfhalenCategory}
@@ -348,6 +365,12 @@ function BudgetDetails({
         onDeleteTransaction={setTransactionToDelete}
         isMutating={isTransactionMutating}
       />
+
+      {estimatedTimeRemaining && (
+        <div className="goal-projection-label">
+          Verwachte datum doel bereikt: <strong>{estimatedTimeRemaining}</strong>
+        </div>
+      )}
 
       {editingTransaction ? (
         <TransactionEditModal
