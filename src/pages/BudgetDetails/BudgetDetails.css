@@ -178,6 +178,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .BudgetTrend-eyebrow {
@@ -433,15 +434,13 @@ select.afnemen-input option {
 }
 
 .goal-projection-label {
-  align-self: center;
-  margin-top: -10px;
-  padding: 8px 16px;
-  background-color: rgba(96, 165, 250, 0.10);
-  /* border: 1px solid rgba(45, 212, 191, 0.15); */
+  padding: 6px 12px;
+  background-color: rgba(96, 165, 250, 0.08);
   border-radius: 999px;
   color: var(--text-secondary);
-  font-size: 13px;
-  text-align: center;
+  font-size: 11px;
+  text-align: right;
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .goal-projection-label strong {

@@ -46,6 +46,7 @@ function BudgetDetailsChart({
   targetAmount,
   depositTotal,
   expenseTotal,
+  estimatedTimeRemaining,
 }) {
   const chartMax = getChartMax(
     targetAmount,
@@ -65,6 +66,12 @@ function BudgetDetailsChart({
             {/* Hier zie je hoe dit potje beweegt door stortingen en uitgaven. */}
           </p>
         </div>
+
+        {estimatedTimeRemaining && (
+          <div className="goal-projection-label">
+            Verwacht: <strong>{estimatedTimeRemaining}</strong>
+          </div>
+        )}
       </div>
 
       <div className="BudgetTrend-stats">

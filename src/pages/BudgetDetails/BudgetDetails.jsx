@@ -330,6 +330,7 @@ function BudgetDetails({
           targetAmount={budget}
           depositTotal={depositTotal}
           expenseTotal={expenseTotal}
+          estimatedTimeRemaining={estimatedTimeRemaining}
         />
       </div>
 
@@ -365,12 +366,6 @@ function BudgetDetails({
         onDeleteTransaction={setTransactionToDelete}
         isMutating={isTransactionMutating}
       />
-
-      {estimatedTimeRemaining && (
-        <div className="goal-projection-label">
-          Verwachte datum doel bereikt: <strong>{estimatedTimeRemaining}</strong>
-        </div>
-      )}
 
       {editingTransaction ? (
         <TransactionEditModal
