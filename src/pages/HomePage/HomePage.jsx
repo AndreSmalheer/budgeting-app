@@ -24,8 +24,8 @@ function HomePage({
       )
       .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
 
-    const potValueData = potjes
-      .sort((a, b) => (Number(a.orderIndex) || 0) - (Number(b.orderIndex) || 0))
+    const potValueData = [...potjes]
+      .sort((a, b) => (Number(b.currentBalance) || 0) - (Number(a.currentBalance) || 0))
       .map((potje) => ({
         name: potje.name,
         value: Number(potje.currentBalance || 0),
