@@ -99,6 +99,16 @@
 
 .potjes-list{
     padding: 4px 0 0;
+    user-select: none;
+}
+
+.reorder-btn {
+    cursor: grab;
+    touch-action: none;
+}
+
+.reorder-btn:active {
+    cursor: grabbing;
 }
 
 .delete-btn {
@@ -124,7 +134,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  padding: 10px;
   border-radius: 999px;
 }
 

@@ -4,9 +4,10 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
   useSensor,
   useSensors,
+  MouseSensor,
+  TouchSensor,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -26,11 +27,15 @@ function SortablePotListItem({ potje, isMutating, navigate, setDeletePotId }) {
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({ id: potje.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    zIndex: isDragging ? 10 : 1,
+    position: "relative",
+    opacity: isDragging ? 0.6 : 1,
   };
 
   return (
@@ -70,6 +75,7 @@ function SortablePotListItem({ potje, isMutating, navigate, setDeletePotId }) {
               className="icon-action-btn reorder-btn"
               type="button"
               aria-label="Sorteer potje"
+              style={{ touchAction: "none" }}
               {...listeners}
             >
               <GripVertical size={16} />
@@ -416,7 +422,12 @@ function SeeAllPage({
 
             <DndContext
               sensors={useSensors(
-                useSensor(PointerSensor),
+                useSensor(MouseSensor),
+                useSensor(TouchSensor, {
+                  activationConstraint: {
+                    distance: 5,
+                  },
+                }),
                 useSensor(KeyboardSensor, {
                   coordinateGetter: sortableKeyboardCoordinates,
                 })
