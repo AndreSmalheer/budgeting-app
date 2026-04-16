@@ -16,7 +16,8 @@ export async function getPots(request, response, next) {
     const db = await getDatabase();
     const potsCollection = db.collection("pots");
 
-    const pots = await potsCollection.find({ userId }).sort({ createdAt: -1 }).toArray();
+    // Updated to sort by orderIndex first
+    const pots = await potsCollection.find({ userId }).sort({ orderIndex: 1, createdAt: -1 }).toArray();
 
     response.json({
       success: true,
@@ -81,6 +82,7 @@ export async function createPot(request, response, next) {
       currentBalance: 0,
       createdAt: now,
       updatedAt: now,
+      orderIndex: 0 // Default order index
     };
 
     const result = await potsCollection.insertOne(newPot);
@@ -148,6 +150,38 @@ export async function updatePot(request, response, next) {
       }),
     });
   } catch (error) {
+    next(error);
+  }
+}
+
+export async function reorderPots(request, response, next) {
+  try {
+    const userId = request.body.userId?.trim() || "";
+    const orderedIds = request.body.orderedIds; // Array of pot IDs
+    console.log("reorderPots called with userId:", userId, "orderedIds:", orderedIds);
+
+    validateUserId(userId);
+    if (!Array.isArray(orderedIds)) {
+      throw createValidationError("Ongeldige invoer voor sortering.");
+    }
+
+    const db = await getDatabase();
+    // Ensure we access the pool correctly
+    const pool = db.pool;
+
+    for (let i = 0; i < orderedIds.length; i++) {
+      await pool.execute(
+        "UPDATE pots SET orderIndex = ? WHERE _id = ? AND userId = ?",
+        [i, Number(orderedIds[i]), userId]
+      );
+    }
+
+    response.json({
+      success: true,
+      message: "Potjes opnieuw gesorteerd.",
+    });
+  } catch (error) {
+    console.error("reorderPots error:", error);
     next(error);
   }
 }

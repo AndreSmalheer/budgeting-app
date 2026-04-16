@@ -25,14 +25,14 @@ function HomePage({
       .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
 
     const potValueData = potjes
+      .sort((a, b) => (Number(a.orderIndex) || 0) - (Number(b.orderIndex) || 0))
       .map((potje) => ({
         name: potje.name,
         value: Number(potje.currentBalance || 0),
-      }))
-      .sort((a, b) => b.value - a.value);
+      }));
 
     const recentPotjes = [...potjes]
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .sort((a, b) => (Number(a.orderIndex) || 0) - (Number(b.orderIndex) || 0))
       .slice(0, 3);
 
     return { incomeTotal, expenseTotal, potValueData, recentPotjes };

@@ -138,6 +138,13 @@ export async function deletePot(userId, potId) {
   });
 }
 
+export async function reorderPots(userId, formData) {
+  return apiRequest("/pots/reorder", {
+    method: "PATCH",
+    body: JSON.stringify({ userId, ...formData }),
+  });
+}
+
 export async function getTransactions(userId, options = {}) {
   const params = new URLSearchParams({ userId });
   const { potId = "", type = "", category = "" } = options;

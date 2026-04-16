@@ -1,6 +1,87 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Pencil, Trash2 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Pencil, Trash2, GripVertical } from "lucide-react";
+
+// Add this component for sortable items
+function SortablePotListItem({ potje, isMutating, navigate, setDeletePotId }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: potje.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <PotListItem
+        name={potje.name}
+        balance={potje.currentBalance}
+        targetAmount={potje.targetAmount}
+        iconName={potje.icon}
+        onClick={() => navigate(`/budget-details/${potje.id}`)}
+        action={
+          <div className="item-actions">
+            <button
+              className="icon-action-btn"
+              type="button"
+              aria-label={`Bewerk ${potje.name}`}
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(`/potje-bewerken/${potje.id}`);
+              }}
+            >
+              <Pencil size={16} />
+            </button>
+            <button
+              className="icon-action-btn delete-btn"
+              type="button"
+              aria-label={`Verwijder ${potje.name}`}
+              disabled={isMutating}
+              onClick={(event) => {
+                event.stopPropagation();
+                setDeletePotId(potje.id);
+              }}
+            >
+              <Trash2 size={16} />
+            </button>
+            <button
+              className="icon-action-btn reorder-btn"
+              type="button"
+              aria-label="Sorteer potje"
+              {...listeners}
+            >
+              <GripVertical size={16} />
+            </button>
+          </div>
+        }
+      />
+    </div>
+  );
+}
+// Replace the render logic for type === 'potjes' in SeeAllPage with DndContext and SortableContext
+
 import BackBtn from "../../components/BackBtn/BackBtn";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import PotListItem from "../../components/Potjes/PotListItem";
@@ -16,6 +97,7 @@ import {
   getTransactions as getTransactionsRequest,
   updateScheduledTransaction as updateScheduledTransactionRequest,
   updateTransaction as updateTransactionRequest,
+  reorderPots as reorderPotsRequest,
 } from "../../services/api/client";
 import { formatDate } from "../../utils/formatters";
 import {
@@ -33,6 +115,7 @@ function SeeAllPage({
   onBudgetDataChanged,
 }) {
   const { id: filterPotId } = useParams();
+  const [isReordering, setIsReordering] = useState(false);
   const [deletePotId, setDeletePotId] = useState(null);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
   const [editingTransaction, setEditingTransaction] = useState(null);
@@ -44,11 +127,29 @@ function SeeAllPage({
   const navigate = useNavigate();
   const session = useSession();
 
-  const sortedPotjes = [...potjes].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-  );
+  const [localPotjes, setLocalPotjes] = useState([]);
+
+  useEffect(() => {
+    // Only update localPotjes if the incoming potjes are actually different in data,
+    // not just because of a re-render.
+    setLocalPotjes((current) => {
+        // Simple check to see if IDs are same
+        const currentIds = current.map(p => p.id).join(',');
+        const newIds = [...potjes].sort((a,b) => a.orderIndex - b.orderIndex).map(p => p.id).join(',');
+
+        if (currentIds === newIds) {
+            return current;
+        }
+
+        return [...potjes].sort((a, b) => {
+            return (a.orderIndex || 0) - (b.orderIndex || 0);
+        });
+    });
+  }, [potjes]);
+
+  const sortedPotjes = localPotjes;
   const selectedPot = filterPotId
-    ? potjes.find((potje) => potje.id === filterPotId)
+    ? localPotjes.find((potje) => potje.id === filterPotId)
     : null;
 
   const loadFilteredTransactions = useCallback(async () => {
@@ -254,7 +355,6 @@ function SeeAllPage({
   return (
     <div className="see-all-page">
       <BackBtn />
-      {isLoading && <p className="empty-state">Gegevens laden...</p>}
       {!isLoading && errorMessage && <p className="empty-state">{errorMessage}</p>}
       {feedback && <p className="empty-state">{feedback}</p>}
 
@@ -295,7 +395,7 @@ function SeeAllPage({
                   </button>
                 </div>
 
-                {isTransactionsLoading ? (
+                {!isReordering && isTransactionsLoading ? (
                   <p className="transaction-filters__status">Transacties laden...</p>
                 ) : null}
               </>
@@ -314,49 +414,58 @@ function SeeAllPage({
           <>
             <h2 className="section-title">Alle doelpotjes</h2>
 
-            <div className="potjes-list">
-              {sortedPotjes.length === 0 ? (
-                <p className="empty-state">Er zijn nog geen potjes.</p>
-              ) : null}
+            <DndContext
+              sensors={useSensors(
+                useSensor(PointerSensor),
+                useSensor(KeyboardSensor, {
+                  coordinateGetter: sortableKeyboardCoordinates,
+                })
+              )}
+              collisionDetection={closestCenter}
+              onDragStart={() => setIsReordering(true)}
+              onDragEnd={(event) => {
+                setIsReordering(false);
+                const { active, over } = event;
+                if (active.id !== over.id) {
+                  const oldIndex = sortedPotjes.findIndex((p) => p.id === active.id);
+                  const newIndex = sortedPotjes.findIndex((p) => p.id === over.id);
+                  const newOrder = arrayMove(sortedPotjes, oldIndex, newIndex);
 
-              {sortedPotjes.map((potje) => (
-                <PotListItem
-                  key={potje.id}
-                  name={potje.name}
-                  balance={potje.currentBalance}
-                  targetAmount={potje.targetAmount}
-                  iconName={potje.icon}
-                  onClick={() => navigate(`/budget-details/${potje.id}`)}
-                  action={
-                    <div className="item-actions">
-                      <button
-                        className="icon-action-btn"
-                        type="button"
-                        aria-label={`Bewerk ${potje.name}`}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          navigate(`/potje-bewerken/${potje.id}`);
-                        }}
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        className="icon-action-btn delete-btn"
-                        type="button"
-                        aria-label={`Verwijder ${potje.name}`}
-                        disabled={isMutating}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setDeletePotId(potje.id);
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  }
-                />
-              ))}
-            </div>
+                  // Optimistically update the UI
+                  setLocalPotjes(newOrder);
+
+                  // Persist to backend
+                  reorderPotsRequest(session.id, { orderedIds: newOrder.map(p => p.id) })
+                    .then(() => {
+                        // Trigger a refresh without showing the global loading state
+                        onBudgetDataChanged?.(true);
+                    })
+                    .catch((err) => {
+                      console.error("Reorder failed:", err);
+                      // Revert on failure
+                      setLocalPotjes(sortedPotjes);
+                    });
+                }
+              }}
+            >
+              <div className="potjes-list">
+                {sortedPotjes.length === 0 ? (
+                  <p className="empty-state">Er zijn nog geen potjes.</p>
+                ) : null}
+
+                <SortableContext items={sortedPotjes.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+                  {sortedPotjes.map((potje) => (
+                    <SortablePotListItem
+                      key={potje.id}
+                      potje={potje}
+                      isMutating={false}
+                      navigate={navigate}
+                      setDeletePotId={setDeletePotId}
+                    />
+                  ))}
+                </SortableContext>
+              </div>
+            </DndContext>
           </>
         ) : null}
       </div>

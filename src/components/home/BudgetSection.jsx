@@ -3,6 +3,10 @@ import { Plus } from "lucide-react";
 import Potjes from "../Potjes/Potjes";
 
 function BudgetSection({ potjes }) {
+  const sortedPotjes = [...potjes].sort(
+    (a, b) => (Number(a.orderIndex) || 0) - (Number(b.orderIndex) || 0)
+  );
+
   return (
     <div className="budget-container Mobile">
       <div className="budget-header">
@@ -13,7 +17,7 @@ function BudgetSection({ potjes }) {
       </div>
 
       <div className="budget-items">
-        {potjes.map((potje) => {
+        {sortedPotjes.map((potje) => {
           return (
             <Potjes
               key={potje.id}

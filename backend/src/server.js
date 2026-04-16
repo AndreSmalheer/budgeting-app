@@ -7,10 +7,10 @@ app.listen(config.port, async () => {
 
   try {
     await connectToDatabase();
-    console.log("SQLite lokale database verbinding is gelukt.");
+    console.log("MySQL database verbinding is gelukt.");
   } catch (error) {
     console.log(
-      `SQLite database verbinding is nog niet gelukt: ${error.message}`,
+      `MySQL database verbinding is nog niet gelukt: ${error.message}`,
     );
   }
 });
