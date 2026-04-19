@@ -135,6 +135,18 @@ function SeeAllPage({
 
   const [localPotjes, setLocalPotjes] = useState([]);
 
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   useEffect(() => {
     // Only update localPotjes if the incoming potjes are actually different in data,
     // not just because of a re-render.
@@ -421,17 +433,7 @@ function SeeAllPage({
             <h2 className="section-title">Alle doelpotjes</h2>
 
             <DndContext
-              sensors={useSensors(
-                useSensor(MouseSensor),
-                useSensor(TouchSensor, {
-                  activationConstraint: {
-                    distance: 5,
-                  },
-                }),
-                useSensor(KeyboardSensor, {
-                  coordinateGetter: sortableKeyboardCoordinates,
-                })
-              )}
+              sensors={sensors}
               collisionDetection={closestCenter}
               onDragStart={() => setIsReordering(true)}
               onDragEnd={(event) => {
