@@ -249,10 +249,18 @@ export async function runScheduledTransactionSync(userId) {
   const schedulesCollection = db.collection("scheduledTransactions");
   const transactionsCollection = db.collection("transactions");
   const potsCollection = db.collection("pots");
-  const schedules = await schedulesCollection
+  const rawSchedules = await schedulesCollection
     .find({ userId })
     .sort({ createdAt: 1 })
     .toArray();
+    
+  // Normalize dates to YYYY-MM-DD strings immediately
+  const schedules = rawSchedules.map(s => ({
+    ...s,
+    startDate: normalizeDateKey(s.startDate),
+    endDate: s.endDate ? normalizeDateKey(s.endDate) : ""
+  }));
+
   const today = getTodayKey();
   const scheduleIds = schedules.map((schedule) => String(schedule._id));
   const existingGeneratedTransactions = scheduleIds.length
@@ -263,29 +271,46 @@ export async function runScheduledTransactionSync(userId) {
         .toArray()
     : [];
   const existingOccurrences = new Set(
-    existingGeneratedTransactions.map(
-      (transaction) =>
-        `${transaction.scheduledTransactionId}:${transaction.scheduledOccurrenceDate}`,
-    ),
+    existingGeneratedTransactions.map((transaction) => {
+      // Normalize date to YYYY-MM-DD if it's a Date object or has time
+      const datePart = String(transaction.scheduledOccurrenceDate || "").slice(0, 10);
+      return `${transaction.scheduledTransactionId}:${datePart}`;
+    }),
   );
   const affectedPotIds = new Set();
   let generatedCount = 0;
 
+  console.log(`[Sync] Running for user ${userId}. Today: ${today}. Schedules found: ${schedules.length}`);
+
   for (const schedule of schedules) {
     const dueUntil = getDueUntil(schedule, today);
 
+    console.log(`[Sync] Schedule "${schedule.description}" (ID: ${schedule._id}):`);
+    console.log(`       - Start Date: "${schedule.startDate}"`);
+    console.log(`       - End Date: "${schedule.endDate}"`);
+    console.log(`       - Due Until: "${dueUntil}"`);
+
     if (!dueUntil) {
+      console.log(`       - Skipping: not due yet or ended.`);
       continue;
     }
 
     const occurrences = getOccurrencesInRange(schedule, dueUntil);
+    console.log(`       - Occurrences found: ${occurrences.length} (${occurrences.join(", ")})`);
+    
+    if (occurrences.length > 0) {
+      affectedPotIds.add(schedule.potId);
+    }
 
     for (const occurrenceDate of occurrences) {
       const occurrenceKey = `${schedule._id}:${occurrenceDate}`;
 
       if (existingOccurrences.has(occurrenceKey)) {
+        console.log(`       - Occurrence ${occurrenceDate} already exists in transactions.`);
         continue;
       }
+
+      console.log(`[Sync] Generating transaction for schedule ${schedule._id} on ${occurrenceDate}`);
 
       const createdAt = toOccurrenceDate(occurrenceDate);
       const transaction = {
@@ -306,7 +331,12 @@ export async function runScheduledTransactionSync(userId) {
       try {
         await transactionsCollection.insertOne(transaction);
       } catch (error) {
-        if (String(error.message || "").includes("UNIQUE constraint failed")) {
+        const isDuplicate = 
+          String(error.message || "").includes("UNIQUE constraint failed") || 
+          String(error.message || "").includes("Duplicate entry") ||
+          error.code === "ER_DUP_ENTRY";
+
+        if (isDuplicate) {
           existingOccurrences.add(occurrenceKey);
           continue;
         }
@@ -318,6 +348,10 @@ export async function runScheduledTransactionSync(userId) {
       affectedPotIds.add(schedule.potId);
       generatedCount += 1;
     }
+  }
+
+  if (generatedCount > 0) {
+    console.log(`[Sync] Generated ${generatedCount} transactions for user ${userId}`);
   }
 
   for (const potId of affectedPotIds) {
@@ -489,9 +523,17 @@ function normalizeDateKey(value) {
     return "";
   }
 
-  const date = new Date(`${value}T00:00:00.000Z`);
+  // If it's already a Date object, use it directly
+  const date = value instanceof Date ? value : new Date(`${value}T00:00:00.000Z`);
 
   if (Number.isNaN(date.getTime())) {
+    // Try one more time without the T00 part if it's a string
+    if (typeof value === "string") {
+      const fallbackDate = new Date(value);
+      if (!Number.isNaN(fallbackDate.getTime())) {
+        return fallbackDate.toISOString().slice(0, 10);
+      }
+    }
     throw createValidationError("Gebruik een geldige datum.");
   }
 

@@ -66,6 +66,18 @@ function AppRoutes() {
 
   useEffect(() => {
     loadBudgetData();
+
+    // Refresh when app becomes visible (useful for PWA on mobile)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        loadBudgetData();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [loadBudgetData]);
 
   function withAppShell(element) {
