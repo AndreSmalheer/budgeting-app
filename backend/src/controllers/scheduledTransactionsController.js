@@ -419,6 +419,10 @@ function validateScheduleInput({
 }
 
 function mapScheduledTransaction(schedule, todayKey = getTodayKey()) {
+  const startDate = normalizeDateKey(schedule.startDate);
+  const endDate = schedule.endDate ? normalizeDateKey(schedule.endDate) : "";
+  const normalizedSchedule = { ...schedule, startDate, endDate };
+
   return {
     id: String(schedule._id),
     userId: schedule.userId,
@@ -427,11 +431,11 @@ function mapScheduledTransaction(schedule, todayKey = getTodayKey()) {
     description: schedule.description,
     amount: Number(schedule.amount || 0),
     category: schedule.category || "overig",
-    startDate: schedule.startDate,
-    endDate: schedule.endDate || "",
+    startDate,
+    endDate,
     recurrence: schedule.recurrence,
-    isActive: !schedule.endDate || schedule.endDate >= todayKey,
-    nextExecutionDate: getNextExecutionDate(schedule, todayKey),
+    isActive: !endDate || endDate >= todayKey,
+    nextExecutionDate: getNextExecutionDate(normalizedSchedule, todayKey),
     createdAt: schedule.createdAt,
     updatedAt: schedule.updatedAt || schedule.createdAt,
   };
