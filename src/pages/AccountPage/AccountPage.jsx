@@ -7,6 +7,7 @@ import {
   getLinkedChildPots,
   getLinkedChildTransactions,
   getPendingApprovals,
+  getScheduledTransactions,
   linkChildAccount,
   reviewApproval,
   unlinkFamilyAccount,
@@ -34,6 +35,8 @@ function AccountPage() {
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [isChildOverviewLoading, setIsChildOverviewLoading] = useState(false);
   const [isReviewingApproval, setIsReviewingApproval] = useState("");
+  const [scheduledTotal, setScheduledTotal] = useState(0);
+
   const roleLabel =
     session?.role === "parent"
       ? "Ouder"
@@ -49,6 +52,34 @@ function AccountPage() {
         .slice(0, 2)
         .toUpperCase()
     : "?";
+
+  const loadScheduledTransactions = useCallback(async () => {
+    if (!session?.id) return;
+
+    try {
+      const response = await getScheduledTransactions(session.id);
+      const schedules = response.scheduledTransactions || [];
+      
+      const total = schedules.reduce((acc, s) => {
+        if (!s.isActive) return acc;
+        
+        let monthlyAmount = s.amount;
+        if (s.recurrence === "daily") {
+          monthlyAmount = s.amount * 30; // Approximation for daily
+        }
+        
+        return s.type === "expense" ? acc + monthlyAmount : acc - monthlyAmount;
+      }, 0);
+      
+      setScheduledTotal(total);
+    } catch (error) {
+      console.error("Failed to load scheduled transactions:", error);
+    }
+  }, [session?.id]);
+
+  useEffect(() => {
+    loadScheduledTransactions();
+  }, [loadScheduledTransactions]);
 
   const loadFamilyData = useCallback(async () => {
     if (!session?.id) {
@@ -291,6 +322,23 @@ function AccountPage() {
                   <div className="AccountInfo__content">
                     <span className="AccountInfo__label">Rol</span>
                     <span className="AccountInfo__value">{roleLabel}</span>
+                  </div>
+                </li>
+
+                <li className="AccountInfo__row">
+                  <span className="AccountInfo__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  </span>
+                  <div className="AccountInfo__content">
+                    <span className="AccountInfo__label">Maandelijkse geplande uitgaven</span>
+                    <span className={`AccountInfo__value ${scheduledTotal > 0 ? 'is-expense' : 'is-deposit'}`}>
+                      +{formatCurrency(Math.abs(scheduledTotal))}
+                    </span>
                   </div>
                 </li>
               </ul>

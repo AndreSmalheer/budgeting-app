@@ -298,6 +298,12 @@ export async function runScheduledTransactionSync(userId) {
     const occurrences = getOccurrencesInRange(schedule, dueUntil);
     console.log(`       - Occurrences found: ${occurrences.length} (${occurrences.join(", ")})`);
     
+    // If the schedule was updated (not just created), skip occurrences on or before the update date.
+    // This prevents immediate generation of a transaction for 'today' if the user just edited it.
+    const isUpdated = schedule.updatedAt && 
+                      Math.abs(new Date(schedule.updatedAt).getTime() - new Date(schedule.createdAt).getTime()) > 1000;
+    const updateDateKey = isUpdated ? new Date(schedule.updatedAt).toISOString().slice(0, 10) : null;
+
     if (occurrences.length > 0) {
       affectedPotIds.add(schedule.potId);
     }
@@ -307,6 +313,11 @@ export async function runScheduledTransactionSync(userId) {
 
       if (existingOccurrences.has(occurrenceKey)) {
         console.log(`       - Occurrence ${occurrenceDate} already exists in transactions.`);
+        continue;
+      }
+
+      if (updateDateKey && occurrenceDate <= updateDateKey) {
+        console.log(`       - Skipping occurrence ${occurrenceDate} because it is on or before the update date (${updateDateKey}).`);
         continue;
       }
 

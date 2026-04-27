@@ -567,6 +567,14 @@
   text-overflow: ellipsis;
 }
 
+.AccountInfo__value.is-expense {
+  color: #fda4af;
+}
+
+.AccountInfo__value.is-deposit {
+  color: #86efac;
+}
+
 .AccountEmpty {
   display: flex;
   flex-direction: column;
