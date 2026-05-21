@@ -8,14 +8,16 @@ services:
     restart: always
     ports:
       - "5050:5050"
+    env_file:
+      - .env
     environment:
-      - PORT=5050
-      - DB_HOST=REDACTED_HOST
-      - DB_PORT=3306
-      - DB_USER=REDACTED_USER
-      - DB_PASSWORD=REDACTED_PASSWORD
-      - DB_NAME=budgeting_app
-      - CLIENT_URL=http://localhost
+      - PORT=${PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - CLIENT_URL=${CLIENT_URL}
 
   frontend:
     build:
