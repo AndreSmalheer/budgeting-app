@@ -6,6 +6,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     restart: always
+    ports:
+      - "5050:5050"
     environment:
       - PORT=5050
       - DB_HOST=REDACTED_HOST
@@ -21,6 +23,6 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
