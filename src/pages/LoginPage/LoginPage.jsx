@@ -11,7 +11,7 @@ function LoginPage() {
   const location = useLocation();
   const [formData, setFormData] = useState({
     email: "",
-    REDACTED_PASSWORD: "",
+    password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({ type: "", message: "" });
@@ -85,10 +85,10 @@ function LoginPage() {
         <label className="AuthField">
           <span>Wachtwoord</span>
           <input
-            name="REDACTED_PASSWORD"
-            type="REDACTED_PASSWORD"
+            name="password"
+            type="password"
             placeholder="Voer je wachtwoord in"
-            value={formData.REDACTED_PASSWORD}
+            value={formData.password}
             onChange={handleChange}
             required
           />

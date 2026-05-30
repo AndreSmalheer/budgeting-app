@@ -5,10 +5,10 @@ export async function registerUser(request, response, next) {
   try {
     const fullName = request.body.fullName?.trim() || "";
     const email = request.body.email?.trim().toLowerCase() || "";
-    const REDACTED_PASSWORD = request.body.REDACTED_PASSWORD || "";
+    const password = request.body.password || "";
     const role = request.body.role?.trim() || "";
 
-    validateRegisterInput(fullName, email, REDACTED_PASSWORD, role);
+    validateRegisterInput(fullName, email, password, role);
 
     const db = await getDatabase();
     const usersCollection = db.collection("users");
@@ -23,12 +23,12 @@ export async function registerUser(request, response, next) {
       return;
     }
 
-    const REDACTED_PASSWORDHash = await bcrypt.hash(REDACTED_PASSWORD, 10);
+    const passwordHash = await bcrypt.hash(password, 10);
 
     const result = await usersCollection.insertOne({
       fullName,
       email,
-      REDACTED_PASSWORDHash,
+      passwordHash,
       role,
       createdAt: new Date(),
     });
@@ -51,7 +51,7 @@ export async function registerUser(request, response, next) {
 export async function loginUser(request, response, next) {
   try {
     const email = request.body.email?.trim().toLowerCase() || "";
-    const REDACTED_PASSWORD = request.body.REDACTED_PASSWORD || "";
+    const password = request.body.password || "";
 
     if (!isValidEmail(email)) {
       response.status(422).json({
@@ -61,7 +61,7 @@ export async function loginUser(request, response, next) {
       return;
     }
 
-    if (!REDACTED_PASSWORD) {
+    if (!password) {
       response.status(422).json({
         success: false,
         message: "Vul je wachtwoord in.",
@@ -82,9 +82,9 @@ export async function loginUser(request, response, next) {
       return;
     }
 
-    const REDACTED_PASSWORDIsValid = await bcrypt.compare(REDACTED_PASSWORD, user.REDACTED_PASSWORDHash);
+    const passwordIsValid = await bcrypt.compare(password, user.passwordHash);
 
-    if (!REDACTED_PASSWORDIsValid) {
+    if (!passwordIsValid) {
       response.status(401).json({
         success: false,
         message: "De inloggegevens kloppen niet.",
@@ -107,7 +107,7 @@ export async function loginUser(request, response, next) {
   }
 }
 
-function validateRegisterInput(fullName, email, REDACTED_PASSWORD, role) {
+function validateRegisterInput(fullName, email, password, role) {
   if (fullName.length < 2) {
     const error = new Error("Vul een geldige naam in van minimaal 2 tekens.");
     error.statusCode = 422;
@@ -120,7 +120,7 @@ function validateRegisterInput(fullName, email, REDACTED_PASSWORD, role) {
     throw error;
   }
 
-  if (REDACTED_PASSWORD.length < 6) {
+  if (password.length < 6) {
     const error = new Error("Je wachtwoord moet minimaal 6 tekens lang zijn.");
     error.statusCode = 422;
     throw error;

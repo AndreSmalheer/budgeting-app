@@ -248,7 +248,7 @@ export async function connectToDatabase() {
     host: config.dbHost,
     port: config.dbPort,
     user: config.dbUser,
-    REDACTED_PASSWORD: config.dbPassword,
+    password: config.dbPassword,
     database: config.dbName,
     waitForConnections: true,
     connectionLimit: 10,

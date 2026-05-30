@@ -13,7 +13,7 @@ function RegisterPage() {
     fullName: "",
     role: "child",
     email: "",
-    REDACTED_PASSWORD: "",
+    password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({ type: "", message: "" });
@@ -108,10 +108,10 @@ function RegisterPage() {
         <label className="AuthField">
           <span>Wachtwoord</span>
           <input
-            name="REDACTED_PASSWORD"
-            type="REDACTED_PASSWORD"
+            name="password"
+            type="password"
             placeholder="Maak een wachtwoord"
-            value={formData.REDACTED_PASSWORD}
+            value={formData.password}
             onChange={handleChange}
             required
           />
