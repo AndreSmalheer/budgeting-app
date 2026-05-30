@@ -28,3 +28,9 @@ services:
       - "3000:80"
     depends_on:
       - backend
+
+    labels:
+      - homepage.group=Infrastructure & Admin
+      - homepage.name=Budget App
+      - homepage.icon=mdi-cash-multiple
+      - homepage.href=http://server:3000
