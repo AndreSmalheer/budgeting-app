@@ -18,7 +18,10 @@ import {
   updateTransaction,
 } from "../../services/api/client";
 import { formatDate } from "../../utils/formatters";
-import { calculateGoalReachDate, formatRemainingTime } from "../../utils/projections";
+import {
+  calculateGoalReachDate,
+  formatRemainingTime,
+} from "../../utils/projections";
 import "./BudgetDetails.css";
 import ScheduledPaymentForm from "../../components/scheduledPaymentsForm/Scheduledpaymentform";
 import ScrollToTop from "../../components/ScrollToTop/ScrollToTop";
@@ -36,7 +39,9 @@ function BudgetDetails({
   const session = useSession();
 
   const potje = potjes.find((item) => item.id === id);
-  const potjeTransacties = transacties.filter((transaction) => transaction.potId === id);
+  const potjeTransacties = transacties.filter(
+    (transaction) => transaction.potId === id,
+  );
   const potjeScheduledTransactions = scheduledTransactions.filter(
     (scheduledTransaction) => scheduledTransaction.potId === id,
   );
@@ -45,6 +50,7 @@ function BudgetDetails({
   const [budgetAfhalenNaam, setBudgetAfhalenNaam] = useState(
     `${potje?.name || ""} afschrijving`,
   );
+  const [valueInput, setValueInput] = useState("");
   const [budgetAfhalenCategory, setBudgetAfhalenCategory] = useState("overig");
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,6 +63,36 @@ function BudgetDetails({
       setBudgetAfhalenNaam(`${potje.name} afschrijving`);
     }
   }, [potje?.name, budgetAfhalenNaam]);
+
+  const monthlyIncome = useMemo(() => {
+    return potjeScheduledTransactions
+      .filter((t) => t.isActive && t.type === "deposit")
+      .reduce((sum, t) => {
+        const amount = Number(t.amount || 0);
+
+        if (t.recurrence === "monthly") {
+          return sum + amount;
+        }
+
+        if (t.recurrence === "daily") {
+          return sum + amount * 30;
+        }
+
+        return sum;
+      }, 0);
+  }, [potjeScheduledTransactions]);
+
+  const daysWorth = useMemo(() => {
+    const value = Number(valueInput);
+
+    if (!value || monthlyIncome <= 0) {
+      return null;
+    }
+
+    const dailyIncome = monthlyIncome / 30;
+
+    return value / dailyIncome;
+  }, [valueInput, monthlyIncome]);
 
   const budget = Number(potje?.targetAmount) || 0;
   const remaining = Number(potje?.currentBalance) || 0;
@@ -73,9 +109,9 @@ function BudgetDetails({
   const estimatedDate = useMemo(() => {
     // We use the real scheduled transactions from the backend if available
     // and map them to the format expected by our utility if needed.
-    const normalizedScheduled = potjeScheduledTransactions.map(t => ({
+    const normalizedScheduled = potjeScheduledTransactions.map((t) => ({
       ...t,
-      isScheduled: true // Ensure utility treats them as scheduled
+      isScheduled: true, // Ensure utility treats them as scheduled
     }));
     return calculateGoalReachDate(remaining, budget, normalizedScheduled);
   }, [remaining, budget, potjeScheduledTransactions]);
@@ -93,14 +129,18 @@ function BudgetDetails({
         return transaction.status === "approved";
       }
 
-      return transaction.type === "expense" && transaction.status === "approved";
+      return (
+        transaction.type === "expense" && transaction.status === "approved"
+      );
     });
 
     let runningBalance = 0;
     const points = [
       {
         shortLabel: "Start",
-        fullLabel: potje?.createdAt ? `Start · ${formatDate(potje.createdAt)}` : "Start",
+        fullLabel: potje?.createdAt
+          ? `Start · ${formatDate(potje.createdAt)}`
+          : "Start",
         balance: runningBalance,
       },
     ];
@@ -299,7 +339,8 @@ function BudgetDetails({
     budgetAfhalenNaam.trim() !== "" &&
     Number(budgetAfhalenAmount) > 0 &&
     !isSubmitting;
-  const isWithdrawValid = hasValidInput && Number(budgetAfhalenAmount) <= remaining;
+  const isWithdrawValid =
+    hasValidInput && Number(budgetAfhalenAmount) <= remaining;
   const isDepositValid = hasValidInput;
 
   return (
@@ -344,7 +385,9 @@ function BudgetDetails({
         isDepositValid={isDepositValid}
         isWithdrawValid={isWithdrawValid}
         onAmountChange={(event) => setBudgetAfhalenAmount(event.target.value)}
-        onCategoryChange={(event) => setBudgetAfhalenCategory(event.target.value)}
+        onCategoryChange={(event) =>
+          setBudgetAfhalenCategory(event.target.value)
+        }
         onNameChange={(event) => setBudgetAfhalenNaam(event.target.value)}
         onDepositSubmit={() => handleTransactionSubmit("deposit")}
         onWithdrawSubmit={() => handleTransactionSubmit("expense")}
@@ -356,6 +399,41 @@ function BudgetDetails({
         onSubmit={handleScheduledPaymentSubmit}
         onCancel={handleScheduledPaymentCancel}
       />
+
+      <section className="income-value">
+        <div className="income-value__copy">
+          <p className="income-value__eyebrow">Income Value Calculator</p>
+          <h3 className="income-value__title">
+            How many days of income is this?
+          </h3>
+
+          <p className="income-value__subtitle">
+            Monthly scheduled income:
+            <strong> €{monthlyIncome.toFixed(2)}</strong>
+          </p>
+        </div>
+
+        <input
+          className="income-value__input"
+          type="number"
+          min="0"
+          placeholder="Enter an amount..."
+          value={valueInput}
+          onChange={(e) => setValueInput(e.target.value)}
+        />
+
+        {daysWorth !== null && (
+          <div className="income-value__result">
+            <span>This amount equals</span>
+
+            <strong>
+              {daysWorth.toFixed(1)} day{daysWorth !== 1 ? "s" : ""}
+            </strong>
+
+            <small>of your scheduled monthly income.</small>
+          </div>
+        )}
+      </section>
 
       <BudgetTransactionsSection
         transactions={potjeTransacties}
