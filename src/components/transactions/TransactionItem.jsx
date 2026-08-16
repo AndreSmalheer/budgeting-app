@@ -15,19 +15,11 @@ function TransactionItem({
 }) {
   return (
     <div className={className}>
-      <div
-        className="transaction__icon"
-        style={{
-          background: "#E1F5EE",
-          borderColor: "transparent",
-          boxShadow: "0 12px 24px rgba(10, 16, 28, 0.14)",
-        }}
-      >
+      <div className="transaction__icon">
         <LucideIcon
           name={iconName}
           size={19}
           strokeWidth={2.2}
-          color="#111111"
         />
       </div>
 

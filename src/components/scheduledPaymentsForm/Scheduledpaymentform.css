@@ -12,27 +12,21 @@
   align-items: center;
   gap: 10px;
   padding: 14px 18px;
-  border-radius: 24px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-soft);
-  background: linear-gradient(
-    180deg,
-    rgba(50, 54, 69, 0.97),
-    rgba(43, 46, 59, 0.98)
-  );
+  background: var(--bg-elevated);
   color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   width: 100%;
   text-align: left;
-  transition:
-    border-color 0.2s,
-    border-radius 0.3s;
+  transition: border-color 0.2s, border-radius 0.3s;
   box-shadow: var(--surface-shadow);
 }
 
 .spf-trigger.open {
-  border-color: rgba(45, 212, 191, 0.3);
+  border-color: var(--accent);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   border-bottom-color: transparent;
@@ -42,8 +36,8 @@
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  background: rgba(45, 212, 191, 0.1);
-  border: 1px solid rgba(45, 212, 191, 0.25);
+  background: var(--accent-light);
+  border: 1px solid rgba(139, 92, 246, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,6 +47,7 @@
 .spf-trigger-icon svg {
   width: 15px;
   height: 15px;
+  stroke: var(--accent);
 }
 
 .spf-trigger-text {
@@ -100,15 +95,11 @@
 
 .spf-panel {
   padding: 18px 18px 16px;
-  border: 1px solid rgba(45, 212, 191, 0.3);
+  border: 1px solid var(--border-soft);
   border-top: none;
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
-  background: linear-gradient(
-    180deg,
-    rgba(48, 52, 67, 0.98),
-    rgba(42, 45, 57, 0.99)
-  );
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  background: var(--bg-elevated);
   box-shadow: var(--surface-shadow);
   display: flex;
   flex-direction: column;
@@ -129,7 +120,7 @@
 }
 
 .spf-label {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -138,9 +129,9 @@
 
 .spf-input {
   padding: 11px 12px;
-  border-radius: 14px;
-  border: 1px solid var(--border-soft);
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg-elevated);
   color: var(--text-primary);
   font-size: 13px;
   font-family: inherit;
@@ -152,7 +143,8 @@
 }
 
 .spf-input:focus {
-  border-color: rgba(45, 212, 191, 0.4);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
 }
 
 .spf-input::placeholder {
@@ -160,7 +152,7 @@
 }
 
 .spf-input option {
-  background: #2b2e3b;
+  background: var(--bg-elevated);
   color: var(--text-primary);
 }
 
@@ -196,21 +188,22 @@
   gap: 8px;
   padding: 9px 12px;
   border-radius: 10px;
-  border: 1px solid rgba(45, 212, 191, 0.18);
-  background: rgba(45, 212, 191, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  background: var(--accent-light);
 }
 
 .spf-hint-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #2dd4bf;
+  background: var(--accent);
   flex-shrink: 0;
 }
 
 .spf-hint-text {
-  color: #8ec5bb;
+  color: var(--accent-strong);
   font-size: 11px;
+  font-weight: 500;
 }
 
 /* ── Repeat pills ── */
@@ -223,9 +216,9 @@
 .spf-pill {
   padding: 7px 12px;
   border-radius: 999px;
-  border: 1px solid var(--border-soft);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-muted);
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -234,9 +227,9 @@
 }
 
 .spf-pill.active {
-  background: rgba(45, 212, 191, 0.12);
-  border-color: rgba(45, 212, 191, 0.4);
-  color: #2dd4bf;
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent-strong);
 }
 
 /* ── Actions ── */
@@ -248,42 +241,38 @@
 
 .spf-btn {
   padding: 12px;
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   border: none;
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition:
-    opacity 0.2s,
-    transform 0.1s;
-}
-
-.spf-btn:active {
-  transform: scale(0.98);
+  transition: all 0.2s ease;
 }
 
 .spf-btn--cancel {
-  background: #ffd2d7;
-  color: #7f1d1d;
-  border: 1px solid var(--border-soft);
-}
-
-.spf-btn--disabled{
-  opacity: 0.4;
+  background: var(--bg-elevated-strong);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-strong);
 }
 
 .spf-btn--cancel:hover {
-  opacity: 0.6;
+  background: var(--danger-light);
+  color: var(--danger-strong);
+  border-color: var(--danger-light);
 }
 
 .spf-btn--save {
-  background: linear-gradient(135deg, #55f6c6, #2dd4bf);
-  color: #063a30;
+  background: var(--accent);
+  color: #ffffff;
 }
 
-.spf-btn--save.disabled {
-  opacity: 0.4;
+.spf-btn--save:hover:not(.disabled) {
+  background-color: var(--accent-strong);
+}
+
+.spf-btn--disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
@@ -299,9 +288,9 @@
   width: 100%;
   max-width: 768px;
   margin: 0 auto;
-  padding: 18px 18px 8px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(50, 54, 69, 0.97), rgba(42, 45, 57, 0.98));
+  padding: 22px 22px 14px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
   border: 1px solid var(--border-soft);
   box-shadow: var(--surface-shadow);
 }
@@ -316,7 +305,7 @@
 .scheduled-list__title {
   margin: 0;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
@@ -332,10 +321,10 @@
 }
 
 .scheduled-card {
-  padding: 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  background: var(--bg-elevated-strong);
 }
 
 .scheduled-card__top,
@@ -353,9 +342,9 @@
 
 .scheduled-card__name {
   margin: 0;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .scheduled-card__meta,
@@ -366,7 +355,7 @@
 }
 
 .scheduled-card__amount {
-  color: #fda4af;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 700;
 }
@@ -374,8 +363,8 @@
 .scheduled-card__badge {
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(45, 212, 191, 0.16);
-  color: #99f6e4;
+  background: var(--accent-light);
+  color: var(--accent-strong);
   font-size: 11px;
   font-weight: 700;
 }

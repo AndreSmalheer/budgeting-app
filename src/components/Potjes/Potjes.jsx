@@ -8,7 +8,7 @@ function Potjes({ id, name, balance, targetAmount, icon }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
   const formattedSaved = formatCurrency(balance);
-  const formattedTarget = formatCurrency(targetAmount);
+  const pct = targetAmount > 0 ? Math.min(Math.round((balance / targetAmount) * 100), 100) : 0;
 
   useEffect(() => {
     const handleResize = () => {
@@ -29,21 +29,22 @@ function Potjes({ id, name, balance, targetAmount, icon }) {
       id={id}
       onClick={handleCLick}
     >
-      <div className="Potje-image-wrapper">
-        <div
-          className="Potje-image"
-          style={{
-            background: "#E1F5EE",
-          }}
-        >
-          <LucideIcon name={icon} size={22} strokeWidth={2} color="#111111" />
+      <div className="Potje-top-row">
+        <div className="Potje-image">
+          <LucideIcon name={icon} size={20} strokeWidth={2} />
         </div>
+        <span className="Potje-pct">{pct}%</span>
       </div>
 
       <h1 className="Potje-title">{name}</h1>
-      <h2 className="Potje-subtitle">
-        {formattedSaved} van {formattedTarget}
-      </h2>
+      <p className="Potje-amount">{formattedSaved}</p>
+
+      <div className="Potje-progress">
+        <div
+          className="Potje-progress-fill"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
     </div>
   );
 }

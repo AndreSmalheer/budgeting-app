@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
 import TransactionItem from "../transactions/TransactionItem";
@@ -16,22 +17,59 @@ function BudgetTransactionsSection({
   onDeleteTransaction,
   isMutating = false,
 }) {
-  const items = [...scheduledItems, ...transactions];
-  const visibleTransactions = items.slice(0, 5);
+  const [filter, setFilter] = useState("all"); // "all" | "deposit" | "expense"
+
+  const allItems = [...scheduledItems, ...transactions];
+
+  const filtered = allItems.filter((item) => {
+    if (filter === "all") return true;
+    if (filter === "deposit") return item.type === "deposit";
+    if (filter === "expense") return item.type === "expense";
+    return true;
+  });
+
+  const visibleTransactions = filtered.slice(0, 5);
 
   return (
     <div className="transaction-list budget-details-page">
+      {/* Section header */}
       <div className="transaction-list__header">
         <h3 className="transaction-list__title">Transacties</h3>
-        {items.length > 5 && (
+        {allItems.length > 5 && (
           <Link className="transaction-list__see-all" to={`/see-all/transacties/pot/${potId}`}>
             Alles
           </Link>
         )}
       </div>
 
-      {items.length === 0 ? (
-        <p className="empty-state">Er zijn nog geen transacties voor dit potje.</p>
+      {/* Segmented filter — Inkomen / Uitgaven */}
+      <div className="bd-tx-filter">
+        <button
+          className={`bd-tx-chip${filter === "all" ? " active" : ""}`}
+          type="button"
+          onClick={() => setFilter("all")}
+        >
+          Alles
+        </button>
+        <button
+          className={`bd-tx-chip${filter === "deposit" ? " active" : ""}`}
+          type="button"
+          onClick={() => setFilter("deposit")}
+        >
+          Inkomen
+        </button>
+        <button
+          className={`bd-tx-chip${filter === "expense" ? " active" : ""}`}
+          type="button"
+          onClick={() => setFilter("expense")}
+        >
+          Uitgaven
+        </button>
+      </div>
+
+      {/* List */}
+      {filtered.length === 0 ? (
+        <p className="empty-state">Geen transacties gevonden.</p>
       ) : (
         visibleTransactions.map((transaction) => (
           <TransactionItem
@@ -55,7 +93,7 @@ function BudgetTransactionsSection({
             }
             statusLabel={
               transaction.itemType === "scheduled"
-                ? `Scheduled · ${transaction.recurrenceLabel}`
+                ? `Gepland · ${transaction.recurrenceLabel}`
                 : getTransactionStatusLabel(transaction.status)
             }
             statusTone={

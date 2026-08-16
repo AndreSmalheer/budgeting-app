@@ -1,21 +1,23 @@
 .backBtn {
-  width: 46px;
-  height: 46px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.09);
-  background: rgba(255,255,255,0.05);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.15s, background 0.2s;
-  color: white;
-  box-shadow: 0 14px 26px rgba(9, 14, 28, 0.18);
+  transition: transform 0.15s, background 0.2s, border-color 0.2s, color 0.2s;
+  color: var(--text-secondary);
+  box-shadow: var(--surface-shadow);
 }
 
 .backBtn:hover {
-  background: rgba(255,255,255,0.08);
-  transform: translateY(-1px);
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1.5px);
 }
 
 .backBtn:active {

@@ -8,9 +8,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Link } from "react-router-dom";
+import { Plus, RotateCcw } from "lucide-react";
+import { useSession } from "../../hooks/useSession";
 import { formatCurrency } from "../../utils/formatters";
 
-const COLORS = ["#2DD4BF", "#F59E0B", "#FB7185", "#60A5FA", "#A78BFA"];
+const COLORS = ["#9b7ae0", "#6f96d8", "#55aa7a", "#d19a3f", "#c56888"];
 
 function shortenLabel(label) {
   if (label.length <= 10) {
@@ -29,6 +32,10 @@ function shortCurrency(value) {
 }
 
 function BalanceOverview({ incomeTotal, expenseTotal, potValueData }) {
+  const session = useSession();
+  //   const cardHolderName = session?.name || session?.username || "";
+  const cardHolderName = session?.fullName || "";
+
   const chartData =
     potValueData.length > 5
       ? [
@@ -47,29 +54,46 @@ function BalanceOverview({ incomeTotal, expenseTotal, potValueData }) {
     shortName: shortenLabel(item.name),
   }));
 
+  // Create formatted dummy card ending using incomeTotal digits
+  const lastDigits = Math.round(incomeTotal)
+    .toString()
+    .slice(-4)
+    .padStart(4, "3279");
+
   return (
     <div className="Balance-container Mobile">
-      <section className="Balance-hero">
-        {/* <p className="Balance-eyebrow">Jouw budget in beeld</p> */}
-        <h1>Saldo in je potjes</h1>
-        <p className="Balance-total">{formatCurrency(incomeTotal)}</p>
-      </section>
+      <div className="credit-card-wrapper">
+        <div className="credit-card">
+          <div className="credit-card-top">
+            <div className="mc-logo">
+              <span className="mc-circle mc-red" />
+              <span className="mc-circle mc-orange" />
+            </div>
 
-      <section className="Balance-summary">
-        <div className="Balance-summary-card positive">
-          <span className="Balance-summary-label">Beschikbaar nu</span>
-          <strong className="Balance-summary-value">
-            {formatCurrency(incomeTotal)}
-          </strong>
-        </div>
+            <span className="credit-card-exp">Exp. Date: 05/28</span>
+          </div>
 
-        <div className="Balance-summary-card negative">
-          <span className="Balance-summary-label">Totaal uitgegeven</span>
-          <strong className="Balance-summary-value">
-            {formatCurrency(expenseTotal)}
-          </strong>
+          <div className="credit-card-number">4015 5587 9985 {lastDigits}</div>
+
+          <div className="credit-card-holder">{cardHolderName}</div>
+
+          <div className="credit-card-bottom">
+            <Link
+              to="/potje-toevoegen"
+              className="overlap-add-btn"
+              aria-label="Nieuw potje"
+            >
+              <Plus size={18} strokeWidth={2.5} />
+            </Link>
+
+            <div className="overlap-balance-pill">
+              <span className="overlap-balance-text">
+                Balance: <strong>{formatCurrency(incomeTotal)}</strong>
+              </span>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
 
       <section className="Balance-chart-card">
         <div className="Balance-chart-header">
@@ -95,40 +119,41 @@ function BalanceOverview({ incomeTotal, expenseTotal, potValueData }) {
               >
                 <CartesianGrid
                   vertical={false}
-                  stroke="rgba(148, 163, 184, 0.14)"
+                  stroke="rgba(15, 23, 42, 0.05)"
                   strokeDasharray="4 4"
                 />
                 <XAxis
                   dataKey="shortName"
-                  axisLine={{ stroke: "rgba(148, 163, 184, 0.18)" }}
+                  axisLine={{ stroke: "rgba(15, 23, 42, 0.08)" }}
                   tickLine={false}
                   interval={0}
-                  tick={{ fill: "#cbd5e1", fontSize: 11 }}
+                  tick={{ fill: "#64748b", fontSize: 11 }}
                 />
                 <YAxis
                   width={48}
                   tickLine={false}
-                  axisLine={{ stroke: "rgba(148, 163, 184, 0.18)" }}
+                  axisLine={{ stroke: "rgba(15, 23, 42, 0.08)" }}
                   tickFormatter={shortCurrency}
-                  tick={{ fill: "#94a3b8", fontSize: 10 }}
+                  tick={{ fill: "#64748b", fontSize: 10 }}
                 />
                 <Tooltip
-                  cursor={{ fill: "rgba(148, 163, 184, 0.05)" }}
+                  cursor={{ fill: "rgba(139, 92, 246, 0.03)" }}
                   formatter={(value) => [formatCurrency(value), "Huidig saldo"]}
                   labelFormatter={(_, payload) =>
                     payload?.[0]?.payload?.name || ""
                   }
                   contentStyle={{
-                    fontSize: 11,
-                    padding: "8px 10px",
-                    borderRadius: 12,
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    background: "#2c314a",
+                    fontSize: 12,
+                    padding: "10px 14px",
+                    borderRadius: 16,
+                    border: "none",
+                    background: "#ffffff",
+                    boxShadow: "0 12px 40px rgba(0, 0, 0, 0.08)",
                   }}
-                  labelStyle={{ color: "#ffffff" }}
-                  itemStyle={{ color: "#ffffff" }}
+                  labelStyle={{ color: "#0f172a", fontWeight: 700 }}
+                  itemStyle={{ color: "#475569" }}
                 />
-                <Bar dataKey="value" radius={[10, 10, 0, 0]} barSize={22}>
+                <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={24}>
                   {chartRows.map((item, index) => (
                     <Cell
                       key={`${item.name}-${index}`}
@@ -141,7 +166,8 @@ function BalanceOverview({ incomeTotal, expenseTotal, potValueData }) {
           </div>
         ) : (
           <div className="Balance-chart-empty">
-            Maak een potje aan om hier direct je huidige saldo-overzicht te zien.
+            Maak een potje aan om hier direct je huidige saldo-overzicht te
+            zien.
           </div>
         )}
       </section>

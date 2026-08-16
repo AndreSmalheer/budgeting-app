@@ -1,73 +1,83 @@
 .LandingPage {
-    display: flex;
-    justify-content: center;
-    padding: 24px 16px 40px;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px 40px;
 }
 
 .LandingHero {
-    width: min(100%, 960px);
-    display: grid;
-    gap: 18px;
+  width: min(100%, 960px);
+  display: grid;
+  gap: 20px;
 }
 
 .LandingHero-copy,
 .LandingHero-card {
-    border-radius: 28px;
-    padding: 24px 20px;
-    box-sizing: border-box;
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  box-sizing: border-box;
+  box-shadow: var(--surface-shadow);
+  border: 1px solid var(--border-soft);
 }
 
 .LandingHero-copy {
-    background: linear-gradient(180deg, #f5fff7 0%, #dcf7ea 100%);
-    color: #16313f;
+  background: var(--accent-light);
+  color: var(--text-primary);
+  border-color: rgba(139, 92, 246, 0.12);
 }
 
 .ConnectionStatus {
-    margin-bottom: 18px;
-    border-radius: 20px;
-    padding: 14px 16px;
+  margin-bottom: 20px;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  border: 1px solid transparent;
 }
 
 .ConnectionStatus.loading {
-    background-color: #eef4ff;
-    color: #214170;
+  background-color: var(--accent-light);
+  color: var(--accent-strong);
+  border-color: rgba(139, 92, 246, 0.12);
 }
 
 .ConnectionStatus.success {
-    background-color: #d9f6e8;
-    color: #136045;
+  background-color: var(--success-light);
+  color: var(--success-strong);
+  border-color: rgba(16, 185, 129, 0.08);
 }
 
 .ConnectionStatus.error {
-    background-color: #ffe5e5;
-    color: #842d2d;
+  background-color: var(--danger-light);
+  color: var(--danger-strong);
+  border-color: rgba(239, 68, 68, 0.08);
 }
 
 .ConnectionStatus-title,
 .ConnectionStatus-message {
-    margin: 0;
+  margin: 0;
 }
 
 .ConnectionStatus-title {
-    font-weight: 700;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .ConnectionStatus-message {
-    margin-top: 6px;
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: 0.95;
 }
 
 .LandingHero-card {
-    background-color: #16313f;
-    color: #ffffff;
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
 }
 
 .LandingHero-eyebrow {
-    margin: 0 0 10px;
-    color: #207567;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .LandingHero h1,
@@ -75,66 +85,95 @@
 .LandingHero p,
 .LandingHero li,
 .LandingHero-button {
-    font-family: 'Poppins', sans-serif;
+  font-family: inherit;
 }
 
 .LandingHero h1 {
-    margin: 0;
-    font-size: clamp(2rem, 7vw, 3.4rem);
-    line-height: 1.05;
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
 }
 
 .LandingHero h2 {
-    margin-top: 0;
-    font-size: 1.2rem;
+  margin-top: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .LandingHero p {
-    margin: 14px 0 0;
-    font-size: 0.95rem;
-    line-height: 1.6;
+  margin: 16px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
 }
 
 .LandingHero-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .LandingHero-button {
-    border-radius: 999px;
-    padding: 14px 18px;
-    text-align: center;
-    font-weight: 600;
-    text-decoration: none;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
 .LandingHero-button.primary {
-    background-color: #207567;
-    color: #ffffff;
+  background-color: var(--accent);
+  color: #ffffff;
+}
+
+.LandingHero-button.primary:hover {
+  background-color: var(--accent-strong);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.16);
 }
 
 .LandingHero-button.secondary {
-    background-color: #ffffff;
-    color: #16313f;
+  background-color: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-strong);
+}
+
+.LandingHero-button.secondary:hover {
+  background-color: var(--bg-elevated-strong);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  transform: translateY(-1.5px);
+}
+
+.LandingHero-button:active {
+  transform: translateY(0);
 }
 
 .LandingHero-card ul {
-    margin: 0;
-    padding-left: 18px;
-    display: grid;
-    gap: 10px;
+  margin: 16px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 @media (min-width: 820px) {
-    .LandingHero {
-        grid-template-columns: 1.35fr 0.9fr;
-        align-items: stretch;
-    }
+  .LandingHero {
+    grid-template-columns: 1.35fr 0.9fr;
+    align-items: stretch;
+  }
 
-    .LandingHero-copy,
-    .LandingHero-card {
-        padding: 32px 28px;
-    }
+  .LandingHero-copy,
+  .LandingHero-card {
+    padding: 36px 32px;
+  }
 }

@@ -1,75 +1,134 @@
 .budget-container.Mobile .budget-items {
-    display: flex;
-    gap: 18px;
-    padding: 0 clamp(20px, 5vw, 32px);
+  display: flex;
+  gap: 14px;
+  padding: 4px var(--page-padding) 16px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
 }
+
+.budget-container.Mobile .budget-items::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Potje Widget Tile ── */
 
 .Potje {
-    width: 88px;
-    height: auto;
-    min-height: 128px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-    gap: 10px;
-    scroll-snap-align: start;
+  width: 148px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 10px;
+  scroll-snap-align: start;
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 22px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 6px 16px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease;
 }
 
-.Potje-image-wrapper {
-    width: fit-content;
-    height: fit-content;
-    flex-shrink: 0;
+.Potje:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 12px 28px rgba(139, 92, 246, 0.1);
 }
 
-.Potje-image-wrapper img {
-    width: inherit;
-    height: inherit;
+.Potje:active {
+  transform: translateY(-1px);
 }
 
-.Potje-title,
-.Potje-subtitle {
-    padding: 0;
-    margin: 0;
-    cursor: default;
-    width: 100%;
-    text-align: center;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    white-space: normal;
-    line-height: 1.2;
+/* Top row: icon + percentage */
+.Potje-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.Potje-title {
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+.Potje-pct {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
-
-.Potje-subtitle {
-    font-size: 11px;
-    color: #b6c0d4;
-    line-height: 1.35;
-}
-
 
 .Potje-image {
-  width: 58px;
-  height: 58px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 20px;
-  border: 1px solid transparent;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 14px 28px rgba(10, 16, 28, 0.14);
+  border-radius: 14px;
+  background: var(--accent-light);
 }
 
 .Potje-image svg {
-  width: 26px;
-  height: 26px;
-  stroke: black;
+  width: 20px;
+  height: 20px;
+  stroke: var(--accent);
   stroke-width: 2;
+}
+
+.Potje:hover .Potje-image {
+  background: var(--accent);
+}
+
+.Potje:hover .Potje-image svg {
+  stroke: #ffffff;
+}
+
+.Potje-title {
+  padding: 0;
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Potje-amount {
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Micro progress bar */
+.Potje-progress {
+  width: 100%;
+  height: 5px;
+  background: var(--bg-elevated-strong);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: auto;
+}
+
+.Potje-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+  min-width: 2px;
+}
+
+.Potje-image-wrapper {
+  display: contents;
+}
+
+.Potje-subtitle {
+  display: none;
 }

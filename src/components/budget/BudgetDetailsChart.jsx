@@ -56,29 +56,41 @@ function BudgetDetailsChart({
     historyData,
   );
 
+  const pct = targetAmount > 0
+    ? Math.min(Math.round((currentBalance / targetAmount) * 100), 100)
+    : 0;
+
   return (
     <section className="BudgetTrend">
+      {/* Hero header — big balance + pot name */}
       <div className="BudgetTrend-header">
-        <div>
-          <p className="BudgetTrend-eyebrow">Potje</p>
+        <div className="BudgetTrend-hero">
+          <p className="BudgetTrend-eyebrow">Huidig saldo</p>
           <h2>{formatCurrency(currentBalance)}</h2>
-          <p className="BudgetTrend-subtitle">
-            {/* Hier zie je hoe dit potje beweegt door stortingen en uitgaven. */}
-          </p>
+          {estimatedTimeRemaining && (
+            <p className="BudgetTrend-estimated">
+              Verwacht klaar: <strong>{estimatedTimeRemaining}</strong>
+            </p>
+          )}
         </div>
-
-        {estimatedTimeRemaining && (
-          <div className="goal-projection-label">
-            Verwacht: <strong>{estimatedTimeRemaining}</strong>
-          </div>
-        )}
       </div>
 
-      <div className="BudgetTrend-stats">
-        <div className="BudgetTrend-stat">
-          <span>Doelbedrag</span>
-          <strong>{formatCurrency(targetAmount)}</strong>
+      {/* Progress bar */}
+      <div className="BudgetTrend-progress-wrap">
+        <div className="BudgetTrend-progress-bar">
+          <div
+            className="BudgetTrend-progress-fill"
+            style={{ width: `${pct}%` }}
+          />
         </div>
+        <div className="BudgetTrend-progress-labels">
+          <span>{pct}% bereikt</span>
+          <span>Doel: {formatCurrency(targetAmount)}</span>
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div className="BudgetTrend-stats">
         <div className="BudgetTrend-stat BudgetTrend-stat--positive">
           <span>Gespaard</span>
           <strong>{formatCurrency(depositTotal)}</strong>
@@ -87,8 +99,13 @@ function BudgetDetailsChart({
           <span>Uitgegeven</span>
           <strong>{formatCurrency(expenseTotal)}</strong>
         </div>
+        <div className="BudgetTrend-stat">
+          <span>Doelbedrag</span>
+          <strong>{formatCurrency(targetAmount)}</strong>
+        </div>
       </div>
 
+      {/* Chart */}
       <div className="BudgetTrend-chartWrap">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
@@ -97,63 +114,64 @@ function BudgetDetailsChart({
           >
             <defs>
               <linearGradient id="budgetTrendFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#2DD4BF" stopOpacity={0.45} />
-                <stop offset="100%" stopColor="#2DD4BF" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.01} />
               </linearGradient>
             </defs>
 
             <CartesianGrid
               vertical={false}
-              stroke="rgba(148, 163, 184, 0.14)"
+              stroke="rgba(15, 23, 42, 0.05)"
               strokeDasharray="4 4"
             />
             <XAxis
               dataKey="shortLabel"
               tickLine={false}
-              axisLine={{ stroke: "rgba(148, 163, 184, 0.18)" }}
+              axisLine={{ stroke: "rgba(15, 23, 42, 0.08)" }}
               minTickGap={18}
-              tick={{ fill: "#94a3b8", fontSize: 11 }}
+              tick={{ fill: "#64748b", fontSize: 11 }}
             />
             <YAxis
               domain={[0, chartMax]}
               tickCount={5}
               tickLine={false}
-              axisLine={{ stroke: "rgba(148, 163, 184, 0.18)" }}
+              axisLine={{ stroke: "rgba(15, 23, 42, 0.08)" }}
               width={58}
-              tick={{ fill: "#94a3b8", fontSize: 11 }}
+              tick={{ fill: "#64748b", fontSize: 11 }}
               tickFormatter={shortCurrency}
             />
             <Tooltip
               formatter={(value) => [formatCurrency(value), "Saldo"]}
               labelFormatter={(_, payload) => payload?.[0]?.payload?.fullLabel || ""}
               contentStyle={{
-                fontSize: 11,
-                padding: "8px 10px",
-                borderRadius: 12,
-                border: "1px solid rgba(255,255,255,0.08)",
-                background: "#1f2438",
-                color: "#ffffff",
+                fontSize: 12,
+                padding: "10px 14px",
+                borderRadius: 16,
+                border: "none",
+                background: "#ffffff",
+                boxShadow: "0 12px 40px rgba(0, 0, 0, 0.08)",
+                color: "#0f172a",
               }}
             />
             <ReferenceLine
               y={targetAmount}
-              stroke="rgba(245, 158, 11, 0.9)"
+              stroke="rgba(139, 92, 246, 0.5)"
               strokeDasharray="5 5"
               ifOverflow="extendDomain"
               label={{
                 value: "Doel",
                 position: "insideTopRight",
-                fill: "#fcd34d",
+                fill: "#8b5cf6",
                 fontSize: 10,
               }}
             />
             <Area
               type="monotone"
               dataKey="balance"
-              stroke="#2DD4BF"
+              stroke="#8b5cf6"
               fill="url(#budgetTrendFill)"
-              strokeWidth={3}
-              activeDot={{ r: 4, strokeWidth: 0, fill: "#2DD4BF" }}
+              strokeWidth={2.5}
+              activeDot={{ r: 5, strokeWidth: 0, fill: "#8b5cf6" }}
             />
           </AreaChart>
         </ResponsiveContainer>
