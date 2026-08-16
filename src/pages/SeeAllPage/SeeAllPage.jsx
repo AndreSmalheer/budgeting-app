@@ -409,7 +409,7 @@ function SeeAllPage({
                     type="button"
                     onClick={() => setTransactionTypeFilter("scheduled")}
                   >
-                    Scheduled
+                    Gepland
                   </button>
                 </div>
 

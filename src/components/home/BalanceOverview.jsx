@@ -31,7 +31,7 @@ function shortCurrency(value) {
   return `€${Math.round(value)}`;
 }
 
-function BalanceOverview({ incomeTotal, expenseTotal, potValueData }) {
+function BalanceOverview({ incomeTotal, monthlyPlannedTotal, potValueData }) {
   const session = useSession();
   //   const cardHolderName = session?.name || session?.username || "";
   const cardHolderName = session?.fullName || "";
@@ -86,9 +86,15 @@ function BalanceOverview({ incomeTotal, expenseTotal, potValueData }) {
               <Plus size={18} strokeWidth={2.5} />
             </Link>
 
-            <div className="overlap-balance-pill">
+            <div className="overlap-balance-summary">
               <span className="overlap-balance-text">
                 Balance: <strong>{formatCurrency(incomeTotal)}</strong>
+              </span>
+              <span className="overlap-planned-expenses">
+                Maandelijks gepland{" "}
+                <strong className={monthlyPlannedTotal > 0 ? "is-expense" : "is-deposit"}>
+                  {formatCurrency(Math.abs(monthlyPlannedTotal))}
+                </strong>
               </span>
             </div>
           </div>

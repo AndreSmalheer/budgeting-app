@@ -30,40 +30,31 @@ function RecentTransactionsSection({
     .slice(0, 4)
     .map((item) => {
       const potje = potjes.find((entry) => entry.id === item.potId);
+      const isScheduled = item.itemType === "scheduled";
 
       return (
         <TransactionItem
           key={`${item.itemType}-${item.id}`}
           description={item.description}
-          meta={
-            item.itemType === "scheduled"
-              ? `${potje?.name || "Zonder potje"} · Volgende uitvoering ${formatDate(
-                  item.nextExecutionDate,
-                )}`
-              : `${potje?.name || "Zonder potje"} · ${formatDate(item.createdAt)}`
-          }
+          meta={`${potje?.name || "Zonder potje"} · ${formatDate(
+            isScheduled ? item.nextExecutionDate : item.createdAt,
+          )}`}
           amount={item.amount}
           isExpense={item.type === "expense"}
           iconName={potje?.icon}
           categoryLabel={
-            item.itemType === "scheduled"
-              ? item.type === "deposit"
-                ? "Bijschrijving"
-                : "Afschrijving"
+            isScheduled
+              ? item.recurrence === "daily"
+                ? "Dagelijks"
+                : "Maandelijks"
               : ""
           }
           statusLabel={
-            item.itemType === "scheduled"
-              ? item.recurrence === "daily"
-                ? "Scheduled · Dagelijks"
-                : "Scheduled · Maandelijks"
-              : getTransactionStatusLabel(item.status)
+            !isScheduled && item.status !== "approved"
+              ? getTransactionStatusLabel(item.status)
+              : ""
           }
-          statusTone={
-            item.itemType === "scheduled"
-              ? "scheduled"
-              : getTransactionStatusTone(item.status)
-          }
+          statusTone={getTransactionStatusTone(item.status)}
         />
       );
     });

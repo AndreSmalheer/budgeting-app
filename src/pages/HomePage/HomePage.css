@@ -129,15 +129,12 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.overlap-balance-pill {
+.overlap-balance-summary {
   display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 32px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
   padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
 }
 
 .overlap-balance-text {
@@ -150,6 +147,18 @@
 .overlap-balance-text strong {
   margin-left: 3px;
   color: #fff;
+  font-weight: 600;
+}
+
+.overlap-planned-expenses {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.overlap-planned-expenses strong {
+  color: rgba(255, 255, 255, 0.82);
   font-weight: 600;
 }
 
@@ -190,8 +199,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #ffffff;
-  color: #000000;
+  background: var(--bg-elevated-strong);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,7 +214,7 @@
 
 .overlap-add-btn:hover {
   transform: scale(1.05);
-  background: #f1f5f9;
+  background: var(--accent-light);
 }
 
 .overlap-balance-text {
@@ -351,34 +360,18 @@
 
 /* ── Transactions Sheet ── */
 .recent-transactions {
-  border-radius: var(--radius-lg);
-  padding: 8px 20px 24px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-soft);
-  box-shadow: var(--surface-shadow);
+  border-radius: var(--radius-md);
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   position: relative;
-}
-
-/* Sheet grab handle */
-.sheet-handle {
-  display: block;
-  width: 40px;
-  height: 4px;
-  background: var(--border-strong);
-  border-radius: 2px;
-  margin: 8px auto 18px;
-  opacity: 0.6;
 }
 
 @media (max-width: 860px) {
   .recent-transactions {
-    border-top-left-radius: 32px;
-    border-top-right-radius: 32px;
-    box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.06);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    margin: 0 calc(-1 * var(--page-padding));
-    padding: 8px var(--page-padding) 100px;
+    margin: 0;
+    padding: 0;
   }
 }
 
@@ -386,7 +379,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 2px;
+  padding: 14px 0;
   border-bottom: 1px solid var(--border-soft);
   cursor: pointer;
 }

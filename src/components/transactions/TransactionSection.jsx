@@ -16,7 +16,6 @@ function TransactionSection({
       {belowHeaderContent}
 
       <div className="recent-transactions">
-        <div className="sheet-handle" />
         {items.length === 0 ? <p className="empty-state">{emptyText}</p> : items}
       </div>
     </div>

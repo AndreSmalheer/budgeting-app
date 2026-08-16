@@ -7,12 +7,20 @@ function TransactionItem({
   amount,
   isExpense,
   iconName,
-  categoryLabel = "",
   statusLabel = "",
   statusTone = "approved",
   action = null,
   className = "transaction",
 }) {
+  const shortMeta = meta.replace(/\s+Volgende uitvoering\s+/, " ");
+  const frequency = statusLabel.includes("Dagelijks")
+    ? "Dagelijks"
+    : statusLabel.includes("Maandelijks")
+      ? "Maandelijks"
+      : statusLabel;
+  const isRecurring = statusTone === "scheduled";
+  const showStatus = statusLabel && !isRecurring && statusTone !== "approved";
+
   return (
     <div className={className}>
       <div className="transaction__icon">
@@ -26,11 +34,11 @@ function TransactionItem({
       <div className="transaction__info">
         <p className="transaction__name">{description}</p>
         <div className="transaction__meta-row">
-          <p className="transaction__meta">{meta}</p>
-          {categoryLabel && (
-            <span className="transaction__category">{categoryLabel}</span>
+          <p className="transaction__meta">{shortMeta}</p>
+          {isRecurring && frequency && (
+            <span className="transaction__category">{frequency}</span>
           )}
-          {statusLabel && (
+          {showStatus && (
             <span className={`transaction__status transaction__status--${statusTone}`}>
               {statusLabel}
             </span>

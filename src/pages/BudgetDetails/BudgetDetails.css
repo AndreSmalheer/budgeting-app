@@ -622,7 +622,7 @@ select.afnemen-input option {
 }
 
 .bd-meer-option-btn:hover {
-  background: #f1f5f9;
+  background: var(--bg-elevated-strong);
   transform: translateY(-1px);
 }
 

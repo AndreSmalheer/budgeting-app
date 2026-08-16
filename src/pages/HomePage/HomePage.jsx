@@ -11,18 +11,21 @@ function HomePage({
   isLoading = false,
   errorMessage = "",
 }) {
-  const { incomeTotal, expenseTotal, potValueData, recentPotjes } = useMemo(() => {
+  const { incomeTotal, monthlyPlannedTotal, potValueData, orderedPotjes } = useMemo(() => {
     const incomeTotal = potjes.reduce(
       (sum, potje) => sum + Number(potje.currentBalance || 0),
       0,
     );
 
-    const expenseTotal = transacties
-      .filter(
-        (transaction) =>
-          transaction.type === "expense" && transaction.status === "approved",
-      )
-      .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
+    const monthlyPlannedTotal = scheduledTransactions.reduce((sum, transaction) => {
+        if (!transaction.isActive) return sum;
+
+        const amount = Number(transaction.amount || 0);
+        const monthlyAmount = transaction.recurrence === "daily" ? amount * 30 : amount;
+        return transaction.type === "expense"
+          ? sum + monthlyAmount
+          : sum - monthlyAmount;
+      }, 0);
 
     const potValueData = [...potjes]
       .sort((a, b) => (Number(b.currentBalance) || 0) - (Number(a.currentBalance) || 0))
@@ -31,12 +34,11 @@ function HomePage({
         value: Number(potje.currentBalance || 0),
       }));
 
-    const recentPotjes = [...potjes]
+    const orderedPotjes = [...potjes]
       .sort((a, b) => (Number(a.orderIndex) || 0) - (Number(b.orderIndex) || 0))
-      .slice(0, 3);
 
-    return { incomeTotal, expenseTotal, potValueData, recentPotjes };
-  }, [potjes, transacties]);
+    return { incomeTotal, monthlyPlannedTotal, potValueData, orderedPotjes };
+  }, [potjes, scheduledTransactions]);
 
   return (
     <main className="HomePage-shell">
@@ -44,10 +46,10 @@ function HomePage({
       {!isLoading && errorMessage && <p className="page-feedback">{errorMessage}</p>}
       <BalanceOverview
         incomeTotal={incomeTotal}
-        expenseTotal={expenseTotal}
+        monthlyPlannedTotal={monthlyPlannedTotal}
         potValueData={potValueData}
       />
-      <BudgetSection potjes={recentPotjes} />
+      <BudgetSection potjes={orderedPotjes} />
       <RecentTransactionsSection
         transacties={transacties}
         scheduledTransactions={scheduledTransactions}
