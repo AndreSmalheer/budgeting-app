@@ -36,7 +36,10 @@ function BudgetTransactionsSection({
       <div className="transaction-list__header">
         <h3 className="transaction-list__title">Transacties</h3>
         {allItems.length > 5 && (
-          <Link className="transaction-list__see-all" to={`/see-all/transacties/pot/${potId}`}>
+          <Link
+            className="transaction-list__see-all"
+            to={`/see-all/transacties/pot/${potId}`}
+          >
             Alles
           </Link>
         )}
@@ -74,7 +77,7 @@ function BudgetTransactionsSection({
         visibleTransactions.map((transaction) => (
           <TransactionItem
             key={`${transaction.itemType || "transaction"}-${transaction.id}`}
-            className="transaction-potje"
+            className={`transaction-potje${transaction.itemType === "scheduled" ? " transaction-potje--scheduled" : ""}`}
             description={transaction.description}
             meta={
               transaction.itemType === "scheduled"

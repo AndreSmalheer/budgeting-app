@@ -1,7 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowDownLeft, ArrowUpRight, CalendarClock, Calculator, MoreHorizontal, Pencil } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  CalendarClock,
+  Calculator,
+  MoreHorizontal,
+  Pencil,
+  ArrowLeft,
+  ChevronDown,
+  X,
+  Delete,
+  Calendar,
+} from "lucide-react";
 import { createPortal } from "react-dom";
+import { LucideIcon } from "../../utils/icons";
 import BackBtn from "../../components/BackBtn/BackBtn";
 import BudgetDetailsChart from "../../components/budget/BudgetDetailsChart";
 import BudgetTransactionsSection from "../../components/budget/BudgetTransactionsSection";
@@ -28,14 +41,440 @@ import ScrollToTop from "../../components/ScrollToTop/ScrollToTop";
 /* ── Inline modal portal for deposit/withdraw ── */
 function TransactionModal({ title, onClose, children }) {
   return createPortal(
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="modal">
         <div className="modal-sheet-handle" />
         <h2>{title}</h2>
         {children}
       </div>
     </div>,
-    document.body
+    document.body,
+  );
+}
+
+function TransactionFlowModal({
+  title,
+  subtitle,
+  potjeIcon,
+  onClose,
+  amount,
+  setAmount,
+  category,
+  setCategory,
+  categories,
+  isValid,
+  isSubmitting,
+  onSubmit,
+  subtext,
+  submitLabel,
+  showCalendarOption = false,
+  isScheduled = false,
+  setIsScheduled,
+  schedStart,
+  setSchedStart,
+  schedEnd,
+  setSchedEnd,
+  schedRepeat,
+  setSchedRepeat,
+}) {
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (
+        e.target.tagName === "SELECT" ||
+        e.target.tagName === "INPUT" ||
+        e.target.tagName === "TEXTAREA"
+      ) {
+        return;
+      }
+
+      const key = e.key;
+      if (key >= "0" && key <= "9") {
+        setAmount((prev) => {
+          if (!prev || prev === "0") return key;
+          const dotIndex = prev.indexOf(".");
+          if (dotIndex !== -1 && prev.length - dotIndex > 2) {
+            return prev;
+          }
+          return prev + key;
+        });
+      } else if (key === "Backspace") {
+        setAmount((prev) => {
+          if (!prev || prev.length <= 1) return "";
+          return prev.slice(0, -1);
+        });
+      } else if (key === "." || key === ",") {
+        setAmount((prev) => {
+          if (!prev) return "0.";
+          if (prev.includes(".")) return prev;
+          return prev + ".";
+        });
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [setAmount]);
+
+  const handleKeypadPress = (val) => {
+    setAmount((prev) => {
+      if (val === "backspace") {
+        if (!prev || prev.length <= 1) return "";
+        return prev.slice(0, -1);
+      }
+      if (val === ".") {
+        if (!prev) return "0.";
+        if (prev.includes(".")) return prev;
+        return prev + ".";
+      }
+      if (!prev || prev === "0") return val;
+      const dotIndex = prev.indexOf(".");
+      if (dotIndex !== -1 && prev.length - dotIndex > 2) {
+        return prev;
+      }
+      return prev + val;
+    });
+  };
+
+  const displayAmount = amount ? amount.replace(".", ",") : "0";
+
+  return createPortal(
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="modal modal--flow">
+        <div className="modal-flow__header">
+          <button
+            className="modal-flow__back-btn"
+            onClick={onClose}
+            aria-label="Terug"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <div className="modal-flow__title-group">
+            <h3>{title}</h3>
+            {subtitle && (
+              <span className="modal-flow__subtitle">{subtitle}</span>
+            )}
+          </div>
+          <div className="modal-flow__avatar">
+            {potjeIcon && <LucideIcon name={potjeIcon} size={20} />}
+          </div>
+        </div>
+
+        <div className="modal-flow__amount-display">
+          <span className="modal-flow__currency">€</span>
+          <span className="modal-flow__amount">
+            {displayAmount.split("").map((char, index) => (
+              <span key={`${index}-${char}`} className="modal-flow__digit">
+                {char}
+              </span>
+            ))}
+          </span>
+        </div>
+        {subtext && <div className="modal-flow__subtext">{subtext}</div>}
+
+        <div className="modal-flow__category-wrapper">
+          <div className="modal-flow__category-pill">
+            <span className="modal-flow__category-label">
+              {categories.find((c) => c.value === category)?.label || "Overig"}
+            </span>
+            <ChevronDown size={14} className="modal-flow__category-chevron" />
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="modal-flow__category-select"
+            >
+              {categories.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {showCalendarOption && (
+          <div className={`modal-flow__scheduling-wrapper ${isScheduled ? "is-open" : ""}`}>
+            <div className="modal-flow__scheduling-section">
+              <div className="modal-flow__scheduling-row">
+                <div className="modal-flow__field">
+                  <label>Startdatum</label>
+                  <input
+                    type="date"
+                    value={schedStart}
+                    onChange={(e) => setSchedStart(e.target.value)}
+                    className="modal-flow__date-input"
+                  />
+                </div>
+                <div className="modal-flow__field">
+                  <label>Einddatum (optioneel)</label>
+                  <input
+                    type="date"
+                    value={schedEnd}
+                    onChange={(e) => setSchedEnd(e.target.value)}
+                    className="modal-flow__date-input"
+                  />
+                </div>
+              </div>
+              <div className="modal-flow__field">
+                <label>Herhaling</label>
+                <div className="modal-flow__repeat-toggle">
+                  <button
+                    type="button"
+                    className={`repeat-toggle-btn ${schedRepeat === "daily" ? "active" : ""}`}
+                    onClick={() => setSchedRepeat("daily")}
+                  >
+                    Dagelijks
+                  </button>
+                  <button
+                    type="button"
+                    className={`repeat-toggle-btn ${schedRepeat === "monthly" ? "active" : ""}`}
+                    onClick={() => setSchedRepeat("monthly")}
+                  >
+                    Maandelijks
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="modal-flow__actions">
+          {showCalendarOption ? (
+            <button
+              type="button"
+              className={`btn-circle-calendar ${isScheduled ? "btn-circle-calendar--active" : ""}`}
+              onClick={() => setIsScheduled(!isScheduled)}
+              aria-label="Inplannen toggle"
+            >
+              <Calendar size={20} />
+            </button>
+          ) : (
+            <button
+              className="btn-circle-cancel"
+              onClick={onClose}
+              aria-label="Annuleren"
+            >
+              <X size={20} />
+            </button>
+          )}
+          <button
+            className={`btn-pill-save ${!isValid ? "disabled" : ""}`}
+            onClick={onSubmit}
+            disabled={!isValid || isSubmitting}
+          >
+            {isSubmitting
+              ? "Bezig..."
+              : isScheduled
+                ? "Inplannen"
+                : submitLabel}
+          </button>
+        </div>
+
+        <div className="modal-flow__keypad">
+          {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleKeypadPress(num)}
+              className="keypad-btn"
+            >
+              {num}
+            </button>
+          ))}
+          <button onClick={() => handleKeypadPress(".")} className="keypad-btn">
+            ,
+          </button>
+          <button onClick={() => handleKeypadPress("0")} className="keypad-btn">
+            0
+          </button>
+          <button
+            onClick={() => handleKeypadPress("backspace")}
+            className="keypad-btn keypad-btn--backspace"
+            aria-label="Wissen"
+          >
+            <Delete size={20} />
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+function CalculatorFlowModal({
+  potje,
+  monthlyIncome,
+  valueInput,
+  setValueInput,
+  daysWorth,
+  onBack,
+  onClose,
+}) {
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (
+        e.target.tagName === "SELECT" ||
+        e.target.tagName === "INPUT" ||
+        e.target.tagName === "TEXTAREA"
+      ) {
+        return;
+      }
+
+      const key = e.key;
+      if (key >= "0" && key <= "9") {
+        setValueInput((prev) => {
+          if (!prev || prev === "0") return key;
+          const dotIndex = prev.indexOf(".");
+          if (dotIndex !== -1 && prev.length - dotIndex > 2) {
+            return prev;
+          }
+          return prev + key;
+        });
+      } else if (key === "Backspace") {
+        setValueInput((prev) => {
+          if (!prev || prev.length <= 1) return "";
+          return prev.slice(0, -1);
+        });
+      } else if (key === "." || key === ",") {
+        setValueInput((prev) => {
+          if (!prev) return "0.";
+          if (prev.includes(".")) return prev;
+          return prev + ".";
+        });
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [setValueInput]);
+
+  const handleKeypadPress = (val) => {
+    setValueInput((prev) => {
+      if (val === "backspace") {
+        if (!prev || prev.length <= 1) return "";
+        return prev.slice(0, -1);
+      }
+      if (val === ".") {
+        if (!prev) return "0.";
+        if (prev.includes(".")) return prev;
+        return prev + ".";
+      }
+      if (!prev || prev === "0") return val;
+      const dotIndex = prev.indexOf(".");
+      if (dotIndex !== -1 && prev.length - dotIndex > 2) {
+        return prev;
+      }
+      return prev + val;
+    });
+  };
+
+  const displayAmount = valueInput ? valueInput.replace(".", ",") : "0";
+
+  return createPortal(
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="modal modal--flow">
+        <div className="modal-flow__header">
+          <button
+            className="modal-flow__back-btn"
+            onClick={onBack}
+            aria-label="Terug"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <div className="modal-flow__title-group">
+            <h3>Inkomenscalculator</h3>
+            <span className="modal-flow__subtitle">{`voor ${potje.name}`}</span>
+          </div>
+          <div className="modal-flow__avatar">
+            <LucideIcon name={potje.icon} size={20} />
+          </div>
+        </div>
+
+        <div className="modal-flow__amount-display">
+          <span className="modal-flow__currency">€</span>
+          <span className="modal-flow__amount">
+            {displayAmount.split("").map((char, index) => (
+              <span key={`${index}-${char}`} className="modal-flow__digit">
+                {char}
+              </span>
+            ))}
+          </span>
+        </div>
+        <div className="modal-flow__subtext">
+          Maandelijks gepland inkomen: €{" "}
+          {monthlyIncome.toFixed(2).replace(".", ",")}
+        </div>
+
+        <div
+          className="modal-flow__calc-result-wrapper"
+          style={{
+            minHeight: "100px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "20px",
+          }}
+        >
+          {daysWorth !== null && daysWorth > 0 ? (
+            <div
+              className="bd-calc-result"
+              style={{ width: "100%", marginTop: 0 }}
+            >
+              <span>Dit bedrag kost je</span>
+              <strong>
+                {daysWorth.toFixed(1)} dag{daysWorth !== 1 ? "en" : ""}
+              </strong>
+              <small>aan gepland maandinkomen.</small>
+            </div>
+          ) : (
+            <div></div>
+          )}
+        </div>
+
+        <div className="modal-flow__keypad">
+          {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleKeypadPress(num)}
+              className="keypad-btn"
+            >
+              {num}
+            </button>
+          ))}
+          <button onClick={() => handleKeypadPress(".")} className="keypad-btn">
+            ,
+          </button>
+          <button onClick={() => handleKeypadPress("0")} className="keypad-btn">
+            0
+          </button>
+          <button
+            onClick={() => handleKeypadPress("backspace")}
+            className="keypad-btn keypad-btn--backspace"
+            aria-label="Wissen"
+          >
+            <Delete size={20} />
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -75,6 +514,7 @@ function BudgetDetails({
   const [schedStart, setSchedStart] = useState("");
   const [schedEnd, setSchedEnd] = useState("");
   const [schedRepeat, setSchedRepeat] = useState("monthly");
+  const [isScheduled, setIsScheduled] = useState(false);
 
   // Calculator state
   const [valueInput, setValueInput] = useState("");
@@ -143,26 +583,34 @@ function BudgetDetails({
     const points = [
       {
         shortLabel: "Start",
-        fullLabel: potje?.createdAt ? `Start · ${formatDate(potje.createdAt)}` : "Start",
+        fullLabel: potje?.createdAt
+          ? `Start · ${formatDate(potje.createdAt)}`
+          : "Start",
         balance: running,
       },
     ];
 
     approved.forEach((t, index) => {
-      running += t.type === "deposit" ? Number(t.amount || 0) : -Number(t.amount || 0);
+      running +=
+        t.type === "deposit" ? Number(t.amount || 0) : -Number(t.amount || 0);
       points.push({
         shortLabel:
           approved.length > 5
             ? String(index + 1)
-            : new Intl.DateTimeFormat("nl-NL", { day: "2-digit", month: "2-digit" }).format(
-                new Date(t.createdAt),
-              ),
+            : new Intl.DateTimeFormat("nl-NL", {
+                day: "2-digit",
+                month: "2-digit",
+              }).format(new Date(t.createdAt)),
         fullLabel: `${t.type === "deposit" ? "Toegevoegd" : "Uitgave"} · ${formatDate(t.createdAt)}`,
         balance: running,
       });
     });
 
-    points.push({ shortLabel: "Nu", fullLabel: "Huidige stand", balance: remaining });
+    points.push({
+      shortLabel: "Nu",
+      fullLabel: "Huidige stand",
+      balance: remaining,
+    });
     return points;
   }, [potje?.createdAt, potjeTransacties, remaining]);
 
@@ -178,7 +626,8 @@ function BudgetDetails({
         .map((t) => ({
           ...t,
           itemType: "scheduled",
-          recurrenceLabel: t.recurrence === "daily" ? "Dagelijks" : "Maandelijks",
+          recurrenceLabel:
+            t.recurrence === "daily" ? "Dagelijks" : "Maandelijks",
         })),
     [potjeScheduledTransactions],
   );
@@ -194,14 +643,31 @@ function BudgetDetails({
   function openModal(modal) {
     setFeedback("");
     setActiveModal(modal);
+    if (modal === "deposit" || modal === "withdraw") {
+      setName("Overig");
+    }
+    if (modal === "deposit") {
+      setSchedStart(new Date().toISOString().split("T")[0]);
+    }
   }
 
   function closeModal() {
     setActiveModal(null);
     setAmount("");
     setCategory("overig");
+    setIsScheduled(false);
+    setSchedStart("");
+    setSchedEnd("");
+    setSchedRepeat("monthly");
     if (potje?.name) setName(`${potje.name} afschrijving`);
   }
+
+  const handleCategoryChange = (val) => {
+    setCategory(val);
+    const categoryLabel =
+      TRANSACTION_CATEGORIES.find((c) => c.value === val)?.label || "Overig";
+    setName(categoryLabel);
+  };
 
   async function handleTransactionSubmit(type) {
     const value = Number(amount);
@@ -229,7 +695,8 @@ function BudgetDetails({
   }
 
   async function handleScheduledSubmit() {
-    if (!schedDesc.trim() || !schedAmount || !schedStart || !session?.id) return;
+    if (!schedDesc.trim() || !schedAmount || !schedStart || !session?.id)
+      return;
     setIsSubmitting(true);
     setFeedback("");
 
@@ -248,7 +715,39 @@ function BudgetDetails({
       await refreshBudgetData();
       closeModal();
     } catch (error) {
-      setFeedback(error.message || "De geplande transactie kon niet worden opgeslagen.");
+      setFeedback(
+        error.message || "De geplande transactie kon niet worden opgeslagen.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleScheduledSubmitCombined() {
+    const value = Number(amount);
+    if (!name.trim() || !value || value <= 0 || !schedStart || !session?.id)
+      return;
+    setIsSubmitting(true);
+    setFeedback("");
+
+    try {
+      await createScheduledTransaction({
+        userId: session.id,
+        potId: id,
+        description: name.trim(),
+        amount: value,
+        type: "deposit",
+        category,
+        startDate: schedStart,
+        endDate: schedEnd,
+        recurrence: schedRepeat,
+      });
+      await refreshBudgetData();
+      closeModal();
+    } catch (error) {
+      setFeedback(
+        error.message || "De geplande transactie kon niet worden opgeslagen.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -270,7 +769,10 @@ function BudgetDetails({
           endDate: formData.endDate,
         });
       } else {
-        await updateTransaction(editingTransaction.id, { userId: session.id, ...formData });
+        await updateTransaction(editingTransaction.id, {
+          userId: session.id,
+          ...formData,
+        });
       }
       setEditingTransaction(null);
       await refreshBudgetData();
@@ -302,9 +804,14 @@ function BudgetDetails({
     }
   }
 
-  const isDepositValid = name.trim() !== "" && Number(amount) > 0 && !isSubmitting;
+  const isDepositValid =
+    name.trim() !== "" &&
+    Number(amount) > 0 &&
+    (!isScheduled || !!schedStart) &&
+    !isSubmitting;
   const isWithdrawValid = isDepositValid && Number(amount) <= remaining;
-  const isSchedValid = schedDesc.trim() !== "" && Number(schedAmount) > 0 && !!schedStart;
+  const isSchedValid =
+    schedDesc.trim() !== "" && Number(schedAmount) > 0 && !!schedStart;
 
   return (
     <main className="BudgetDetails-page">
@@ -387,227 +894,125 @@ function BudgetDetails({
 
       {/* ── Deposit modal ── */}
       {activeModal === "deposit" && (
-        <TransactionModal title="Geld toevoegen" onClose={closeModal}>
-          <div className="modal-form">
-            <div className="modal-field">
-              <label>Omschrijving</label>
-              <input
-                type="text"
-                placeholder="Bijv. salaris of gift"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="modal-field">
-              <label>Bedrag (€)</label>
-              <input
-                type="number"
-                inputMode="decimal"
-                placeholder="0,00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-            </div>
-            <div className="modal-field">
-              <label>Categorie</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                {TRANSACTION_CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="modal-actions">
-            <button className="btn-cancel" type="button" onClick={closeModal}>Annuleren</button>
-            <button
-              className="btn-save"
-              type="button"
-              disabled={!isDepositValid}
-              onClick={() => handleTransactionSubmit("deposit")}
-            >
-              {isSubmitting ? "Bezig..." : "Toevoegen"}
-            </button>
-          </div>
-        </TransactionModal>
+        <TransactionFlowModal
+          title="Geld toevoegen"
+          subtitle={`voor ${potje.name}`}
+          potjeIcon={potje.icon}
+          onClose={closeModal}
+          amount={amount}
+          setAmount={setAmount}
+          category={category}
+          setCategory={handleCategoryChange}
+          categories={TRANSACTION_CATEGORIES}
+          isValid={isDepositValid}
+          isSubmitting={isSubmitting}
+          onSubmit={() => {
+            if (isScheduled) {
+              handleScheduledSubmitCombined();
+            } else {
+              handleTransactionSubmit("deposit");
+            }
+          }}
+          subtext="Geen transactiekosten"
+          submitLabel="Toevoegen"
+          showCalendarOption={true}
+          isScheduled={isScheduled}
+          setIsScheduled={setIsScheduled}
+          schedStart={schedStart}
+          setSchedStart={setSchedStart}
+          schedEnd={schedEnd}
+          setSchedEnd={setSchedEnd}
+          schedRepeat={schedRepeat}
+          setSchedRepeat={setSchedRepeat}
+        />
       )}
 
       {/* ── Withdraw modal ── */}
       {activeModal === "withdraw" && (
-        <TransactionModal title="Bedrag afhalen" onClose={closeModal}>
-          <div className="modal-form">
-            <div className="modal-field">
-              <label>Omschrijving</label>
-              <input
-                type="text"
-                placeholder="Bijv. boodschappen"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="modal-field">
-              <label>Bedrag (€)</label>
-              <input
-                type="number"
-                inputMode="decimal"
-                placeholder="0,00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-            </div>
-            <div className="modal-field">
-              <label>Categorie</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                {TRANSACTION_CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="modal-actions">
-            <button className="btn-cancel" type="button" onClick={closeModal}>Annuleren</button>
-            <button
-              className="btn-save"
-              type="button"
-              disabled={!isWithdrawValid}
-              onClick={() => handleTransactionSubmit("expense")}
-            >
-              {isSubmitting ? "Bezig..." : "Afhalen"}
-            </button>
-          </div>
-        </TransactionModal>
+        <TransactionFlowModal
+          title="Bedrag afhalen"
+          subtitle={`van ${potje.name}`}
+          potjeIcon={potje.icon}
+          onClose={closeModal}
+          amount={amount}
+          setAmount={setAmount}
+          category={category}
+          setCategory={handleCategoryChange}
+          categories={TRANSACTION_CATEGORIES}
+          isValid={isWithdrawValid}
+          isSubmitting={isSubmitting}
+          onSubmit={() => handleTransactionSubmit("expense")}
+          subtext={`Huidig stand: € ${Number(remaining).toFixed(2).replace(".", ",")}`}
+          submitLabel="Afhalen"
+        />
       )}
 
       {/* ── Meer modal (schedule + calculator) ── */}
       {activeModal === "meer" && (
-        <TransactionModal title="Meer opties" onClose={closeModal}>
-          <div className="bd-meer-options">
-            <button
-              className="bd-meer-option-btn"
-              type="button"
-              onClick={() => setActiveModal("schedule")}
-            >
-              <span className="bd-meer-option-icon"><CalendarClock size={22} strokeWidth={1.75} /></span>
-              <span className="bd-meer-option-text">
-                <strong>Bedrag inplannen</strong>
-                <small>Stel een dagelijkse of maandelijkse transactie in</small>
-              </span>
-            </button>
-            <button
-              className="bd-meer-option-btn"
-              type="button"
-              onClick={() => setActiveModal("calculator")}
-            >
-              <span className="bd-meer-option-icon"><Calculator size={22} strokeWidth={1.75} /></span>
-              <span className="bd-meer-option-text">
-                <strong>Inkomenscalculator</strong>
-                <small>Hoeveel werkdagen kost dit bedrag je?</small>
-              </span>
-            </button>
-          </div>
-          <div className="modal-actions">
-            <button className="btn-cancel" type="button" onClick={closeModal}>Sluiten</button>
-          </div>
-        </TransactionModal>
-      )}
+        <div
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeModal();
+          }}
+        >
+          <div className="modal modal--flow">
+            <div className="modal-flow__header">
+              <button
+                className="modal-flow__back-btn"
+                onClick={closeModal}
+                aria-label="Sluiten"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <div className="modal-flow__title-group">
+                <h3>Meer opties</h3>
+                <span className="modal-flow__subtitle">{`voor ${potje.name}`}</span>
+              </div>
+              <div className="modal-flow__avatar">
+                <LucideIcon name={potje.icon} size={20} />
+              </div>
+            </div>
 
-      {/* ── Schedule modal ── */}
-      {activeModal === "schedule" && (
-        <TransactionModal title="Bedrag inplannen" onClose={closeModal}>
-          <div className="modal-form">
-            <div className="modal-field">
-              <label>Omschrijving</label>
-              <input
-                type="text"
-                placeholder="Bijv. huur of salaris"
-                value={schedDesc}
-                onChange={(e) => setSchedDesc(e.target.value)}
-              />
+            <div className="bd-meer-options" style={{ marginBottom: "24px" }}>
+              <button
+                className="bd-meer-option-btn"
+                type="button"
+                onClick={() => setActiveModal("calculator")}
+              >
+                <span className="bd-meer-option-icon">
+                  <Calculator size={22} strokeWidth={1.75} />
+                </span>
+                <span className="bd-meer-option-text">
+                  <strong>Inkomenscalculator</strong>
+                  <small>Hoeveel werkdagen kost dit bedrag je?</small>
+                </span>
+              </button>
             </div>
-            <div className="modal-field">
-              <label>Bedrag (€)</label>
-              <input
-                type="number"
-                inputMode="decimal"
-                placeholder="0,00"
-                value={schedAmount}
-                onChange={(e) => setSchedAmount(e.target.value)}
-              />
-            </div>
-            <div className="modal-field">
-              <label>Type</label>
-              <select value={schedType} onChange={(e) => setSchedType(e.target.value)}>
-                <option value="expense">Afschrijving</option>
-                <option value="deposit">Bijschrijving</option>
-              </select>
-            </div>
-            <div className="modal-field">
-              <label>Categorie</label>
-              <select value={schedCategory} onChange={(e) => setSchedCategory(e.target.value)}>
-                {TRANSACTION_CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="modal-field">
-              <label>Herhaling</label>
-              <select value={schedRepeat} onChange={(e) => setSchedRepeat(e.target.value)}>
-                <option value="daily">Dagelijks</option>
-                <option value="monthly">Maandelijks</option>
-              </select>
-            </div>
-            <div className="modal-field">
-              <label>Startdatum</label>
-              <input type="date" value={schedStart} onChange={(e) => setSchedStart(e.target.value)} />
-            </div>
-            <div className="modal-field">
-              <label>Einddatum (optioneel)</label>
-              <input type="date" value={schedEnd} onChange={(e) => setSchedEnd(e.target.value)} />
+
+            <div className="modal-flow__actions" style={{ marginBottom: 0 }}>
+              <button
+                className="btn-circle-cancel"
+                onClick={closeModal}
+                aria-label="Sluiten"
+              >
+                <X size={20} />
+              </button>
             </div>
           </div>
-          <div className="modal-actions">
-            <button className="btn-cancel" type="button" onClick={() => setActiveModal("meer")}>Terug</button>
-            <button
-              className="btn-save"
-              type="button"
-              disabled={!isSchedValid || isSubmitting}
-              onClick={handleScheduledSubmit}
-            >
-              {isSubmitting ? "Bezig..." : "Inplannen"}
-            </button>
-          </div>
-        </TransactionModal>
+        </div>
       )}
 
       {/* ── Calculator modal ── */}
       {activeModal === "calculator" && (
-        <TransactionModal title="Inkomenscalculator" onClose={closeModal}>
-          <p style={{ margin: "8px 0 0", fontSize: "13px", color: "var(--text-muted)" }}>
-            Maandelijks gepland inkomen: <strong style={{ color: "var(--success-strong)" }}>€{monthlyIncome.toFixed(2)}</strong>
-          </p>
-          <div className="modal-form">
-            <div className="modal-field">
-              <label>Bedrag (€)</label>
-              <input
-                type="number"
-                inputMode="decimal"
-                placeholder="Voer een bedrag in..."
-                value={valueInput}
-                onChange={(e) => setValueInput(e.target.value)}
-              />
-            </div>
-          </div>
-          {daysWorth !== null && (
-            <div className="bd-calc-result">
-              <span>Dit bedrag kost je</span>
-              <strong>{daysWorth.toFixed(1)} dag{daysWorth !== 1 ? "en" : ""}</strong>
-              <small>aan gepland maandinkomen.</small>
-            </div>
-          )}
-          <div className="modal-actions">
-            <button className="btn-cancel" type="button" onClick={() => setActiveModal("meer")}>Terug</button>
-            <button className="btn-cancel" type="button" onClick={closeModal}>Sluiten</button>
-          </div>
-        </TransactionModal>
+        <CalculatorFlowModal
+          potje={potje}
+          monthlyIncome={monthlyIncome}
+          valueInput={valueInput}
+          setValueInput={setValueInput}
+          daysWorth={daysWorth}
+          onBack={() => setActiveModal("meer")}
+          onClose={closeModal}
+        />
       )}
 
       {editingTransaction ? (

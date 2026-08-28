@@ -663,10 +663,10 @@ select.afnemen-input option {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 20px;
+  padding: 16px;
   margin-top: 16px;
-  border-radius: var(--radius-md);
-  background: var(--bg-elevated-strong);
+  border-radius: 14px;
+  background: #18181b;
   border: 1px solid var(--border-soft);
   text-align: center;
 }
@@ -873,3 +873,453 @@ select.afnemen-input option {
     font-size: 1.75rem;
   }
 }
+
+.transaction-potje--scheduled {
+  position: relative;
+  border-bottom: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent-light);
+  padding: 14px 0px 14px 8px;
+  border-left: 3px solid var(--accent);
+}
+
+.transaction-potje--scheduled::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.transaction-potje--scheduled .transaction__icon {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+}
+
+.transaction-potje--scheduled .transaction__icon svg {
+  stroke: var(--accent-strong);
+}
+
+.transaction-potje--scheduled .transaction__name {
+  color: var(--text-primary);
+}
+
+.transaction-potje--scheduled .transaction__meta {
+  color: var(--accent-strong);
+  font-style: italic;
+}
+
+.transaction-potje--scheduled .transaction__amount {
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
+.transaction-potje--scheduled .transaction__amount.positive,
+.transaction-potje--scheduled .transaction__amount.negative {
+  color: var(--text-secondary);
+}
+
+/* ── Redesigned Transaction Flow Modals (Geld toevoegen / Bedrag afhalen) ── */
+
+.modal.modal--flow {
+  background: #0d0d0d;
+  border: 1px solid #1f1f23;
+  border-radius: 24px;
+  width: min(390px, 100%);
+  padding: 22px 20px 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-flow__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-flow__back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.modal-flow__back-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-flow__title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.modal-flow__title-group h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.modal-flow__subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.modal-flow__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-elevated-strong);
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-strong);
+  flex-shrink: 0;
+}
+
+.modal-flow__amount-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 14px;
+  min-height: 52px;
+}
+
+.modal-flow__currency {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.modal-flow__amount {
+  display: inline-flex;
+  align-items: center;
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.modal-flow__digit {
+  display: inline-block;
+  animation: modalDigitPop 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes modalDigitPop {
+  0% {
+    opacity: 0.3;
+    transform: translateY(-5px) scale(0.86);
+  }
+  60% {
+    transform: translateY(1px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-flow__subtext {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.modal-flow__category-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.modal-flow__category-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #18181b;
+  border: 1px solid var(--border-soft);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-flow__category-pill:hover {
+  border-color: var(--border-strong);
+  background: #202024;
+}
+
+.modal-flow__category-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-flow__category-chevron {
+  color: var(--text-muted);
+}
+
+.modal-flow__category-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.modal-flow__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.btn-circle-cancel {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #18181b;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-circle-cancel:hover {
+  background: #202024;
+  border-color: var(--text-subtle);
+}
+
+.btn-pill-save {
+  background: #ffffff;
+  color: #0c0c0c;
+  border: none;
+  border-radius: 999px;
+  flex-grow: 1;
+  height: 46px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-pill-save:hover:not(.disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-pill-save.disabled {
+  background: #1e1e22;
+  color: var(--text-muted);
+  border: 1px solid var(--border-soft);
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.modal-flow__keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  border-top: 1px solid #1a1a1f;
+  padding-top: 20px;
+}
+
+.keypad-btn {
+  background: #141416;
+  border: none;
+  border-radius: 12px;
+  height: 46px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.keypad-btn:hover {
+  background: #1d1d21;
+}
+
+.keypad-btn:active {
+  background: #242429;
+}
+
+.keypad-btn--backspace {
+  color: var(--text-secondary);
+}
+
+/* ── Calendar Button & Scheduling Expansion ── */
+
+.btn-circle-calendar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #18181b;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-circle-calendar:hover {
+  background: #202024;
+  border-color: var(--text-subtle);
+  color: var(--text-primary);
+}
+
+.btn-circle-calendar--active {
+  background: var(--accent) !important;
+  border-color: var(--accent-strong) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(141, 111, 168, 0.3);
+}
+
+.modal-flow__scheduling-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.25s ease,
+              margin-bottom 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-flow__scheduling-wrapper.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-bottom: 20px;
+}
+
+.modal-flow__scheduling-wrapper > div {
+  min-height: 0;
+}
+
+.modal-flow__scheduling-section {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-flow__scheduling-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.modal-flow__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.modal-flow__field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.modal-flow__date-input {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.modal-flow__date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  cursor: pointer;
+}
+
+.modal-flow__date-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(141, 111, 168, 0.25);
+}
+
+.modal-flow__repeat-toggle {
+  display: flex;
+  background: var(--bg-base);
+  border-radius: var(--radius-lg);
+  padding: 3px;
+  border: 1px solid var(--border-soft);
+}
+
+.repeat-toggle-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 0;
+  border-radius: calc(var(--radius-lg) - 3px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.repeat-toggle-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(141, 111, 168, 0.3);
+}
+
+@keyframes modalFlowSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+

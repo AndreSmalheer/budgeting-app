@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TRANSACTION_CATEGORIES } from "../../config/transactionCategories";
 import ModalShell from "../modals/ModalShell";
+import { Pencil, X } from "lucide-react";
 
 function TransactionEditModal({
   transaction,
@@ -42,23 +43,37 @@ function TransactionEditModal({
   return (
     <ModalShell
       title={isScheduled ? "Gepland bedrag bewerken" : "Transactie bewerken"}
-      description={
-        isScheduled
-          ? "Pas het geplande bedrag aan en sla de wijziging op."
-          : "Pas de details aan en sla de wijziging op."
+      subtitle={
+        transaction.description ? `voor ${transaction.description}` : ""
       }
+      icon={<Pencil size={18} />}
+      onClose={onCancel}
       actions={
         <>
-          <button className="btn-cancel" type="button" onClick={onCancel}>
-            Annuleren
+          <button
+            className="btn-circle-cancel"
+            type="button"
+            onClick={onCancel}
+            aria-label="Annuleren"
+          >
+            <X size={20} />
           </button>
-          <button className="btn-save" type="submit" form="transaction-edit-form">
+          <button
+            className="btn-flow-primary"
+            type="submit"
+            form="transaction-edit-form"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Opslaan..." : "Opslaan"}
           </button>
         </>
       }
     >
-      <form id="transaction-edit-form" className="modal-form" onSubmit={handleSubmit}>
+      <form
+        id="transaction-edit-form"
+        className="modal-form"
+        onSubmit={handleSubmit}
+      >
         <div className="modal-field">
           <label htmlFor="transaction-description">Naam</label>
           <input

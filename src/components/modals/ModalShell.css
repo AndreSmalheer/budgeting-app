@@ -138,6 +138,119 @@
   font-weight: 500;
 }
 
+/* ── Dark Flow Form Styling ── */
+.modal--flow .modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.modal--flow .modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal--flow .modal-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.modal--flow .modal-field input,
+.modal--flow .modal-field select {
+  background: #18181b;
+  border: 1px solid #2b2b30;
+  border-radius: 12px;
+  color: var(--text-primary);
+  padding: 11px 14px;
+  font-size: 13.5px;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.modal--flow .modal-field select option {
+  background: #18181b;
+  color: #ffffff;
+}
+
+.modal--flow .modal-field input:focus,
+.modal--flow .modal-field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(141, 111, 168, 0.2);
+}
+
+.modal--flow .modal-danger-box {
+  background: #1c1315;
+  border: 1px solid #3d1c20;
+  border-radius: 16px;
+  padding: 16px;
+  color: #fca5a5;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.modal--flow .modal-danger-box p {
+  color: #fca5a5;
+  font-size: 13px;
+}
+
+/* ── Flow Action Buttons ── */
+.btn-flow-primary {
+  flex: 1;
+  min-height: 48px;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-flow-primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.btn-flow-danger {
+  flex: 1;
+  min-height: 48px;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-flow-danger:hover:not(:disabled) {
+  background: #ef4444;
+  transform: translateY(-1px);
+}
+
+.btn-flow-primary:disabled,
+.btn-flow-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @keyframes modalPop {
   from {
     transform: scale(0.95);
